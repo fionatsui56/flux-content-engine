@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flux Strategy - Content Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --b0:#05050A; --b1:#0C0C12; --b2:#13131B; --b3:#1A1A24; --b4:#222230; --ac:#E8FF5A; --ac15:rgba(232,255,90,.15);
+      --ac08:rgba(232,255,90,.08); --t1:#FFFFFF; --t2:#A0A0A8; --t3:#6F6F7B; --bd:#282833; --bd2:#3A3A48;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--b0); color:var(--t1); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.5; }
+    .app { display:flex; height:100vh; overflow:hidden; }
+    .sidebar { width:260px; background:var(--b1); border-right:1px solid var(--bd); overflow-y:auto; display:flex; flex-direction:column; padding:16px 0; }
+    .logo { padding:0 16px 20px; display:flex; align-items:center; gap:8px; font-size:16px; font-weight:700; color:var(--ac); font-family:'Fraunces',serif; }
+    .logo-icon { width:32px; height:32px; background:linear-gradient(135deg,#E8FF5A,#FFE066); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--b0); font-weight:800; font-size:14px; }
+    .nav { flex:1; padding:0 12px; display:flex; flex-direction:column; gap:2px; }
+    .nav-item { padding:10px 12px; border-radius:6px; cursor:pointer; font-size:13px; color:var(--t2); transition:all .12s; border:1px solid transparent; }
+    .nav-item:hover { background:rgba(255,255,255,.04); color:var(--t1); border-color:var(--bd); }
+    .nav-item.active { background:var(--ac15); color:var(--ac); border-color:var(--ac); font-weight:600; }
+    .sidebar-footer { padding:12px 16px; border-top:1px solid var(--bd); font-size:11px; color:var(--t3); }
+    .main { flex:1; overflow:auto; padding:24px; }
+    .section { display:none; }
+    .section.active { display:block; }
+    h1 { font-size:28px; font-weight:700; margin-bottom:20px; font-family:'Fraunces',serif; }
+    h2 { font-size:18px; font-weight:700; margin:20px 0 12px; font-family:'Fraunces',serif; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:12px; font-weight:600; color:var(--t2); margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; }
+    input, textarea, select { width:100%; padding:10px 12px; border:1px solid var(--bd); background:var(--b3); color:var(--t1); border-radius:6px; font-family:inherit; font-size:13px; }
+    input:focus, textarea:focus, select:focus { outline:none; border-color:var(--ac); background:var(--b4); box-shadow:0 0 0 3px var(--ac08); }
+    textarea { resize:vertical; min-height:80px; }
+    button { padding:10px 16px; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; transition:all .12s; font-family:inherit; }
+    .btn-primary { background:var(--ac); color:var(--b0); }
+    .btn-primary:hover { background:#F0FF7A; transform:translateY(-1px); box-shadow:0 8px 16px rgba(232,255,90,.2); }
+    .btn-secondary { background:var(--bd); color:var(--t1); border:1px solid var(--bd2); }
+    .btn-secondary:hover { background:var(--b3); border-color:var(--bd2); }
+    .btn-small { padding:6px 12px; font-size:11px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+    .card { padding:12px; border:1px solid var(--bd); border-radius:6px; background:var(--b2); }
+    .card:hover { border-color:var(--bd2); background:var(--b3); }
+    .clients-list { display:flex; flex-direction:column; gap:6px; }
+    .client-item { padding:10px 12px; border:1px solid var(--bd); border-radius:6px; cursor:pointer; background:rgba(255,255,255,.02); transition:all .12s; }
+    .client-item:hover { background:rgba(255,255,255,.05); border-color:var(--bd2); }
+    .client-item.active { border-color:var(--ac); background:var(--ac08); }
+    .platform-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin:12px 0; }
+    .platform-btn { padding:12px; border:1.5px solid var(--bd); border-radius:9px; background:rgba(255,255,255,.02); cursor:pointer; text-align:center; transition:all .15s; }
+    .platform-btn:hover { border-color:var(--bd2); background:rgba(255,255,255,.05); }
+    .platform-btn.selected { border-color:var(--ac); background:var(--ac15); }
+    .content-variations { display:grid; gap:12px; margin:12px 0; }
+    .variation-card { padding:12px; border:1px solid var(--bd); border-radius:6px; background:var(--b2); }
+    .variation-card h3 { font-size:13px; font-weight:600; color:var(--ac); margin-bottom:8px; }
+    .variation-card p { font-size:12px; color:var(--t2); line-height:1.6; }
+    .rating { display:flex; gap:4px; margin-top:8px; }
+    .star { font-size:16px; cursor:pointer; color:var(--t3); }
+    .star.active { color:var(--ac); }
+    .loading { display:inline-block; width:12px; height:12px; border:2px solid var(--bd); border-top-color:var(--ac); border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .toast { position:fixed; bottom:20px; right:20px; padding:12px 16px; background:var(--ac); color:var(--b0); border-radius:6px; font-size:12px; font-weight:600; z-index:1000; }
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:100; align-items:center; justify-content:center; }
+    .modal.open { display:flex; }
+    .modal-content { background:var(--b1); padding:24px; border-radius:12px; border:1px solid var(--bd); max-width:500px; width:90%; max-height:80vh; overflow-y:auto; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">⚡</div>
+        <span>Flux Strategy</span>
+      </div>
+      
+      <div class="nav">
+        <div class="nav-item active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+        <div class="nav-item" onclick="switchTab('clients')">👥 Client Management</div>
+        <div class="nav-item" onclick="switchTab('topics')">🔥 Discover Topics</div>
+        <div class="nav-item" onclick="switchTab('generate')">✍️ Generate Content</div>
+        <div class="nav-item" onclick="switchTab('calendar')">📅 Calendar</div>
+        <div class="nav-item" onclick="switchTab('history')">📜 History</div>
+        <div class="nav-item" onclick="switchTab('templates')">📋 Prompt Templates</div>
+        <div class="nav-item" onclick="switchTab('competitor')">🎯 Competitor Tracking</div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div style="margin-bottom:8px;">
+          <button class="btn-primary btn-small" style="width:100%; margin-bottom:4px;" onclick="exportJSON()">📤 Backup</button>
+          <button class="btn-secondary btn-small" style="width:100%;" onclick="importJSON()">📥 Import</button>
+        </div>
+        <div>Flux Strategy Content Engine</div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <!-- Dashboard -->
+      <div class="section active" id="dashboard">
+        <h1>Dashboard</h1>
+        <div class="form-group">
+          <label>API Key</label>
+          <input type="password" id="apiKey" placeholder="sk-ant-..." onchange="saveSettings()">
+        </div>
+        <div class="grid">
+          <div class="card">
+            <div style="font-size:24px; font-weight:700; color:var(--ac);" id="clientCount">0</div>
+            <div style="font-size:12px; color:var(--t2);">Clients</div>
+          </div>
+          <div class="card">
+            <div style="font-size:24px; font-weight:700; color:var(--ac);" id="contentCount">0</div>
+            <div style="font-size:12px; color:var(--t2);">Content Generated</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client Management -->
+      <div class="section" id="clients">
+        <h1>Client Management</h1>
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" id="clientName" placeholder="Your client name">
+        </div>
+        <div class="form-group">
+          <label>Brand Tone</label>
+          <select id="brandTone">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual & Friendly</option>
+            <option value="luxury">Luxury & Elegant</option>
+            <option value="energetic">Energetic & Fun</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="addClient()">Add Client</button>
+        
+        <h2 style="margin-top:24px;">Your Clients</h2>
+        <div class="clients-list" id="clientsList"></div>
+      </div>
+
+      <!-- Discover Topics -->
+      <div class="section" id="topics">
+        <h1>Discover Trending Topics</h1>
+        <button class="btn-primary" onclick="discoverTopics()" id="discoverBtn">🔍 Discover Topics</button>
+        <div id="topicsLoading" style="display:none; margin-top:12px;"><span class="loading"></span> Finding trends...</div>
+        <div id="topicsList" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- Generate Content -->
+      <div class="section" id="generate">
+        <h1>Generate Content</h1>
+        <div class="form-group">
+          <label>Select Client</label>
+          <select id="genClient"></select>
+        </div>
+        <div class="form-group">
+          <label>Topic / Custom Idea</label>
+          <input type="text" id="genTopic" placeholder="e.g., 春季新品發布">
+        </div>
+        <div class="form-group">
+          <label>Select Platforms</label>
+          <div class="platform-grid" id="platformGrid"></div>
+        </div>
+        <div class="form-group">
+          <label>Format</label>
+          <select id="genFormat">
+            <option value="">Select format...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Language</label>
+          <select id="genLanguage">
+            <option value="tc">繁體中文</option>
+            <option value="sc">簡體中文</option>
+            <option value="cant">廣東話</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Length</label>
+          <select id="genLength">
+            <option value="short">Short (50-100 words)</option>
+            <option value="medium">Medium (200-400 words)</option>
+            <option value="long">Long (500-800 words)</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="generateContent()">✍️ Generate Content</button>
+        <div id="genLoading" style="display:none; margin-top:12px;"><span class="loading"></span> Creating content...</div>
+        <div id="generatedContent" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="section" id="calendar">
+        <h1>Content Calendar</h1>
+        <div class="form-group">
+          <label>Select Client</label>
+          <select id="calClient"></select>
+        </div>
+        <div id="calendarView" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- History -->
+      <div class="section" id="history">
+        <h1>Content History</h1>
+        <div class="form-group">
+          <label>Filter by Client</label>
+          <select id="histClient" onchange="updateHistory()"></select>
+        </div>
+        <div id="historyList" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- Prompt Templates -->
+      <div class="section" id="templates">
+        <h1>Prompt Templates</h1>
+        <button class="btn-primary" onclick="showTemplateModal()">+ New Template</button>
+        <div id="templatesList" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- Competitor Tracking -->
+      <div class="section" id="competitor">
+        <h1>Competitor Tracking</h1>
+        <div class="form-group">
+          <label>Competitor Name</label>
+          <input type="text" id="compName" placeholder="Competitor name">
+        </div>
+        <div class="form-group">
+          <label>Your Strengths</label>
+          <textarea id="compStrengths" placeholder="Our unique advantages..."></textarea>
+        </div>
+        <button class="btn-primary" onclick="addCompetitor()">Add Competitor</button>
+        <div id="competitorList" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════
+    // FLUX STRATEGY - CONTENT ENGINE (Standalone HTML)
+    // ═══════════════════════════════════════════════════════
+
+    const PLATFORMS = [
+      { id:"facebook", name:"Facebook", icon:"f" },
+      { id:"instagram", name:"Instagram", icon:"IG" },
+      { id:"threads", name:"Threads", icon:"@" },
+      { id:"linkedin", name:"LinkedIn", icon:"in" },
+      { id:"xiaohongshu", name:"小紅書", icon:"紅" },
+      { id:"wechat", name:"微信", icon:"微" },
+    ];
+
+    const LANGUAGES = {
+      tc: "繁體中文",
+      sc: "簡體中文",
+      cant: "廣東話",
+      en: "English"
+    };
+
+    let state = {
+      clients: [],
+      currentClient: null,
+      history: [],
+      templates: [],
+      competitors: [],
+      apiKey: '',
+      selectedPlatforms: [],
+    };
+
+    // ════ INIT ════
+    function init() {
+      loadState();
+      renderClients();
+      renderPlatformGrid();
+      renderTemplates();
+      updateDashboard();
+      updateHistory();
+    }
+
+    // ════ STATE MANAGEMENT ════
+    function loadState() {
+      const saved = localStorage.getItem('flux_state');
+      if (saved) {
+        state = JSON.parse(saved);
+      }
+      const apiKey = localStorage.getItem('anthropic_api_key') || '';
+      document.getElementById('apiKey').value = apiKey;
+      state.apiKey = apiKey;
+    }
+
+    function saveState() {
+      localStorage.setItem('flux_state', JSON.stringify(state));
+      localStorage.setItem('anthropic_api_key', state.apiKey);
+    }
+
+    function saveSettings() {
+      state.apiKey = document.getElementById('apiKey').value;
+      saveState();
+      showToast('Settings saved!');
+    }
+
+    // ════ NAVIGATION ════
+    function switchTab(tab) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    // ════ CLIENT MANAGEMENT ════
+    function addClient() {
+      const name = document.getElementById('clientName').value;
+      const tone = document.getElementById('brandTone').value;
+      if (!name) return showToast('Please enter client name');
+      
+      state.clients.push({
+        id: Date.now(),
+        name,
+        tone,
+        createdAt: new Date().toISOString()
+      });
+      saveState();
+      document.getElementById('clientName').value = '';
+      renderClients();
+      updateDashboard();
+      showToast(`Client "${name}" added!`);
+    }
+
+    function renderClients() {
+      const list = document.getElementById('clientsList');
+      list.innerHTML = state.clients.map(c => `
+        <div class="client-item ${state.currentClient?.id === c.id ? 'active' : ''}" onclick="selectClient(${c.id})">
+          <div style="font-weight:600;">${c.name}</div>
+          <div style="font-size:11px; color:var(--t2);">${c.tone}</div>
+        </div>
+      `).join('');
+
+      const select = document.getElementById('genClient');
+      select.innerHTML = state.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      
+      const calSelect = document.getElementById('calClient');
+      calSelect.innerHTML = state.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+      const histSelect = document.getElementById('histClient');
+      histSelect.innerHTML = state.clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+
+    function selectClient(id) {
+      state.currentClient = state.clients.find(c => c.id === id);
+      saveState();
+      renderClients();
+    }
+
+    // ════ PLATFORMS ════
+    function renderPlatformGrid() {
+      const grid = document.getElementById('platformGrid');
+      grid.innerHTML = PLATFORMS.map(p => `
+        <button class="platform-btn" onclick="togglePlatform('${p.id}')" data-platform="${p.id}">
+          ${p.icon}<br>${p.name}
+        </button>
+      `).join('');
+    }
+
+    function togglePlatform(id) {
+      const idx = state.selectedPlatforms.indexOf(id);
+      if (idx > -1) {
+        state.selectedPlatforms.splice(idx, 1);
+      } else {
+        state.selectedPlatforms.push(id);
+      }
+      document.querySelectorAll(`[data-platform]`).forEach(btn => {
+        if (state.selectedPlatforms.includes(btn.dataset.platform)) {
+          btn.classList.add('selected');
+        } else {
+          btn.classList.remove('selected');
+        }
+      });
+    }
+
+    // ════ CONTENT GENERATION ════
+    async function generateContent() {
+      if (!state.apiKey) return showToast('Please set your API Key in Dashboard');
+      if (!state.currentClient) return showToast('Please select a client');
+      if (state.selectedPlatforms.length === 0) return showToast('Please select platforms');
+
+      const topic = document.getElementById('genTopic').value;
+      const lang = document.getElementById('genLanguage').value;
+      const length = document.getElementById('genLength').value;
+
+      if (!topic) return showToast('Please enter a topic');
+
+      const loading = document.getElementById('genLoading');
+      loading.style.display = 'block';
+
+      try {
+        const prompt = `Generate engaging social media content for "${topic}" in ${LANGUAGES[lang]}. 
+Brand tone: ${state.currentClient.tone}. 
+Platforms: ${state.selectedPlatforms.join(', ')}. 
+Length: ${length}. 
+Create 3 variations.`;
+
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': state.apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API Error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        const content = data.content[0].text;
+
+        const entry = {
+          id: Date.now(),
+          clientId: state.currentClient.id,
+          topic,
+          content,
+          platforms: state.selectedPlatforms,
+          language: lang,
+          createdAt: new Date().toISOString()
+        };
+
+        state.history.push(entry);
+        saveState();
+        
+        document.getElementById('generatedContent').innerHTML = `
+          <div class="content-variations">
+            <h3>Generated Content:</h3>
+            <p style="white-space:pre-wrap; color:var(--t1); padding:12px; background:var(--b2); border-radius:6px;">${content}</p>
+          </div>
+        `;
+
+        updateDashboard();
+        showToast('Content generated!');
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      } finally {
+        loading.style.display = 'none';
+      }
+    }
+
+    // ════ DISCOVER TOPICS ════
+    async function discoverTopics() {
+      if (!state.apiKey) return showToast('Please set your API Key in Dashboard');
+
+      const loading = document.getElementById('discoverLoading');
+      document.getElementById('discoverBtn').style.display = 'none';
+      document.getElementById('topicsLoading').style.display = 'block';
+
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': state.apiKey,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 800,
+            messages: [{
+              role: 'user',
+              content: 'List 10 trending topics for social media content in 2026. Format as bullet points with brief description.'
+            }]
+          })
+        });
+
+        const data = await response.json();
+        const topics = data.content[0].text;
+
+        document.getElementById('topicsList').innerHTML = `
+          <div style="white-space:pre-wrap; color:var(--t2); padding:12px; background:var(--b2); border-radius:6px; font-size:12px;">
+            ${topics}
+          </div>
+        `;
+      } catch (err) {
+        showToast('Error: ' + err.message);
+      } finally {
+        document.getElementById('topicsLoading').style.display = 'none';
+        document.getElementById('discoverBtn').style.display = 'block';
+      }
+    }
+
+    // ════ HISTORY ════
+    function updateHistory() {
+      const clientId = document.getElementById('histClient').value;
+      const list = document.getElementById('historyList');
+      
+      const filtered = clientId ? state.history.filter(h => h.clientId == clientId) : state.history;
+      
+      list.innerHTML = filtered.reverse().map(h => `
+        <div class="card">
+          <div style="font-weight:600; margin-bottom:4px;">${h.topic}</div>
+          <div style="font-size:11px; color:var(--t2); margin-bottom:8px;">${new Date(h.createdAt).toLocaleDateString()}</div>
+          <div style="font-size:12px; color:var(--t2); white-space:pre-wrap;">${h.content.substring(0, 200)}...</div>
+        </div>
+      `).join('') || '<div style="color:var(--t3);">No content yet</div>';
+    }
+
+    // ════ TEMPLATES ════
+    function renderTemplates() {
+      const list = document.getElementById('templatesList');
+      list.innerHTML = state.templates.map(t => `
+        <div class="card">
+          <div style="font-weight:600; margin-bottom:4px;">${t.name}</div>
+          <div style="font-size:12px; color:var(--t2);">${t.prompt}</div>
+        </div>
+      `).join('') || '<div style="color:var(--t3);">No templates yet. Create one to get started!</div>';
+    }
+
+    function showTemplateModal() {
+      const name = prompt('Template name:');
+      if (!name) return;
+      const prompt = prompt('Template prompt:');
+      if (!prompt) return;
+      
+      state.templates.push({ id: Date.now(), name, prompt });
+      saveState();
+      renderTemplates();
+      showToast('Template saved!');
+    }
+
+    // ════ COMPETITOR ════
+    function addCompetitor() {
+      const name = document.getElementById('compName').value;
+      const strengths = document.getElementById('compStrengths').value;
+      if (!name) return showToast('Please enter competitor name');
+      
+      state.competitors.push({
+        id: Date.now(),
+        name,
+        strengths
+      });
+      saveState();
+      document.getElementById('compName').value = '';
+      document.getElementById('compStrengths').value = '';
+      updateCompetitors();
+      showToast('Competitor added!');
+    }
+
+    function updateCompetitors() {
+      const list = document.getElementById('competitorList');
+      list.innerHTML = state.competitors.map(c => `
+        <div class="card">
+          <div style="font-weight:600; margin-bottom:8px;">${c.name}</div>
+          <div style="font-size:12px; color:var(--t2);">${c.strengths}</div>
+        </div>
+      `).join('');
+    }
+
+    // ════ DASHBOARD ════
+    function updateDashboard() {
+      document.getElementById('clientCount').textContent = state.clients.length;
+      document.getElementById('contentCount').textContent = state.history.length;
+    }
+
+    // ════ JSON EXPORT/IMPORT ════
+    function exportJSON() {
+      const dataStr = JSON.stringify(state, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `flux-backup-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      showToast('Backup downloaded!');
+    }
+
+    function importJSON() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            state = JSON.parse(event.target.result);
+            saveState();
+            location.reload();
+            showToast('Data imported!');
+          } catch (err) {
+            showToast('Invalid JSON file');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    // ════ UI UTILS ════
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ════ INIT ════
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
