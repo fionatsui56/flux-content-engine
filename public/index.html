@@ -289,6 +289,14 @@ const LANGS = {
   }
 };
 
+let currentLang = 'tc';
+let clients = [];
+let currentClient = null;
+let history = [];
+let selectedPlatforms = [];
+let generatedVariations = [];
+let editingClientId = null;
+
 // ─── Gemini API helper (calls our Render backend) ─────────
 async function callGemini(prompt) {
   const response = await fetch('/api/generate', {
@@ -300,12 +308,6 @@ async function callGemini(prompt) {
   if (data.error) throw new Error(data.error);
   return data.text;
 }
-let clients = [];
-let currentClient = null;
-let history = [];
-let selectedPlatforms = [];
-let generatedVariations = [];
-let editingClientId = null;
 
 // ─── Sidebar Mobile ───────────────────────────────────────
 function toggleSidebar() {
