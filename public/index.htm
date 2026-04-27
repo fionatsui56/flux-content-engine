@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flux Strategy Content Engine</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: #FFF; }
+.app { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 260px; background: #F5F5F5; border-right: 1px solid #E0E0E0; padding: 20px 0; overflow-y: auto; display: flex; flex-direction: column; }
+.logo { padding: 0 16px 24px; }
+.logo-text { font-size: 20px; font-weight: 800; color: #1B4D7C; line-height: 1.1; }
+.nav { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
+.nav-item { padding: 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #666; border: none; background: transparent; transition: all 0.2s; font-family: inherit; text-align: left; width: 100%; }
+.nav-item.active { background: #E8F0F8; color: #1B4D7C; font-weight: 600; border-left: 3px solid #1B4D7C; }
+.sidebar-footer { padding: 12px; border-top: 1px solid #E0E0E0; display: flex; gap: 6px; }
+.sidebar-footer button { flex: 1; padding: 8px; font-size: 11px; background: #1B4D7C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.main { flex: 1; overflow-y: auto; padding: 32px; max-width: 1200px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.h1 { font-size: 32px; font-weight: 700; color: #1B4D7C; margin: 0; }
+.lang-toggle { display: flex; gap: 8px; }
+.lang-btn { padding: 8px 12px; border: 1px solid #1B4D7C; background: transparent; color: #1B4D7C; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
+.lang-btn.active { background: #1B4D7C; color: white; }
+.form-group { margin-bottom: 16px; }
+.label { display: block; font-size: 12px; font-weight: 600; color: #1B4D7C; margin-bottom: 8px; text-transform: uppercase; }
+input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; font-family: inherit; }
+.platform-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+.platform-btn { padding: 10px; border: 1px solid #E0E0E0; background: white; border-radius: 6px; cursor: pointer; text-align: center; font-size: 12px; color: #666; }
+.platform-btn.active { border-color: #1B4D7C; background: #E8F0F8; color: #1B4D7C; font-weight: 600; }
+.button { padding: 12px 20px; background: #1B4D7C; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; font-family: inherit; }
+.button:hover { opacity: 0.9; }
+.button:disabled { opacity: 0.6; cursor: not-allowed; }
+.card { padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px; background: white; margin-bottom: 12px; }
+.variation-card { padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px; background: white; margin-bottom: 16px; }
+.variation-title { font-weight: 600; color: #1B4D7C; margin-bottom: 8px; }
+.variation-content { white-space: pre-wrap; font-size: 13px; color: #333; margin-bottom: 12px; line-height: 1.6; }
+.rating { display: flex; gap: 4px; margin-top: 8px; }
+.star { font-size: 20px; cursor: pointer; color: #D0D0D0; transition: color 0.15s; }
+.star.active { color: #1B4D7C; }
+.section { display: none; }
+.section.active { display: block; }
+.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.stat-card { padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px; background: #F5F5F5; }
+.stat-number { font-size: 24px; font-weight: 700; color: #1B4D7C; }
+.stat-label { font-size: 12px; color: #999; margin-top: 4px; }
+.best-badge { margin-top: 8px; font-size: 12px; color: #1B4D7C; font-weight: 600; }
+.generated-title { color: #1B4D7C; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+.api-badge { display: inline-block; background: #4285F4; color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; letter-spacing: 0.5px; }
+.api-note { font-size: 12px; color: #999; margin-top: 6px; }
+
+/* Mobile */
+.hamburger { display: none; }
+@media (max-width: 768px) {
+  .hamburger { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: #1B4D7C; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 20px; position: fixed; top: 12px; left: 12px; z-index: 200; }
+  .sidebar { position: fixed; left: -280px; top: 0; height: 100vh; z-index: 150; transition: left 0.3s ease; width: 260px; }
+  .sidebar.open { left: 0; }
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 140; }
+  .overlay.visible { display: block; }
+  .main { padding: 16px; padding-top: 64px; }
+  .platform-grid { grid-template-columns: repeat(3, 1fr); }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .h1 { font-size: 22px; }
+}
+@media (max-width: 480px) {
+  .platform-grid { grid-template-columns: repeat(2, 1fr); }
+  .lang-toggle { gap: 4px; }
+  .lang-btn { padding: 6px 8px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<button class="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <div class="logo-text">FLUX<br>STRATEGY</div>
+      <div style="font-size: 20px; font-weight: 800; color: #999; margin-top: 6px;">CONTENT ENGINE</div>
+      <span class="api-badge">GEMINI</span>
+    </div>
+    <div class="nav">
+      <button class="nav-item active" onclick="switchTab('dashboard', this)">Dashboard</button>
+      <button class="nav-item" onclick="switchTab('clients', this)">Client Mgmt</button>
+      <button class="nav-item" onclick="switchTab('discover', this)">Topics</button>
+      <button class="nav-item" onclick="switchTab('generate', this)">Generate</button>
+      <button class="nav-item" onclick="switchTab('history', this)">History</button>
+    </div>
+    <div class="sidebar-footer">
+      <button onclick="exportData()">Backup</button>
+      <button onclick="importData()">Import</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <h1 class="h1" id="pageTitle">Dashboard</h1>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLanguage('tc', this)">繁</button>
+        <button class="lang-btn" onclick="setLanguage('sc', this)">简</button>
+        <button class="lang-btn" onclick="setLanguage('en', this)">EN</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="dashboard">
+      <div style="background:#E8F0F8; border:1px solid #1B4D7C; border-radius:8px; padding:16px; margin-bottom:20px;">
+        <div style="font-weight:700; color:#1B4D7C; margin-bottom:4px;">✅ Powered by Gemini AI</div>
+        <div style="font-size:13px; color:#555;">Ready to generate content. Select a client and start creating!</div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="clientCount">0</div>
+          <div class="stat-label" id="statClients">Clients</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="contentCount">0</div>
+          <div class="stat-label" id="statContent">Content Items</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="section" id="clients">
+      <div class="form-group">
+        <label class="label" data-key="clientName" data-required="true">Client Name *</label>
+        <input type="text" id="clientName" placeholder="Enter client name...">
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="industry">Industry</label>
+        <select id="clientIndustry">
+          <option value="">Select industry...</option>
+          <option value="beauty">Beauty & Personal Care (美容護膚)</option>
+          <option value="fashion">Fashion & Apparel (時尚服裝)</option>
+          <option value="food">Food & Beverage (食品飲料)</option>
+          <option value="technology">Technology (科技)</option>
+          <option value="finance">Finance & Banking (金融)</option>
+          <option value="health">Health & Wellness (健康)</option>
+          <option value="realestate">Real Estate (房地產)</option>
+          <option value="travel">Travel & Tourism (旅遊)</option>
+          <option value="education">Education (教育)</option>
+          <option value="entertainment">Entertainment (娛樂)</option>
+          <option value="ecommerce">E-commerce (電商)</option>
+          <option value="luxury">Luxury Goods (奢侈品)</option>
+          <option value="automotive">Automotive (汽車)</option>
+          <option value="fitness">Fitness & Sports (運動健身)</option>
+          <option value="home">Home & Living (家居生活)</option>
+          <option value="other">Other (其他)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="brandTone" data-required="true">Brand Tone *</label>
+        <select id="clientTone">
+          <option value="professional">Professional</option>
+          <option value="casual">Casual</option>
+          <option value="luxury">Luxury</option>
+          <option value="energetic">Energetic</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="brandStory">Brand Story</label>
+        <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." style="min-height: 80px; resize: vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="targetAudience">Target Audience</label>
+        <textarea id="clientTargetAudience" placeholder="Age, gender, interests, income level..." style="min-height: 80px; resize: vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="competitors">Competitors</label>
+        <textarea id="clientCompetitors" placeholder="Main competitors, e.g., Brand A, Brand B..." style="min-height: 80px; resize: vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="forbiddenWords">Forbidden Words</label>
+        <textarea id="clientForbiddenWords" placeholder="Words to avoid, e.g., cheap, discount, sale..." style="min-height: 80px; resize: vertical;"></textarea>
+      </div>
+      <button class="button" id="addClientBtn" onclick="addClient()">Add Client</button>
+      <h2 style="color: #1B4D7C; margin-top: 24px; font-size: 18px;" id="yourClientsHeader">Your Clients</h2>
+      <div id="clientsList"></div>
+    </div>
+
+    <!-- GENERATE -->
+    <div class="section" id="generate">
+      <div class="form-group">
+        <label class="label" data-key="selectClient" data-required="true">Select Client *</label>
+        <select id="selectClient" onchange="selectCurrentClient()">
+          <option value="">Choose client...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="topic" data-required="true">Topic / Idea *</label>
+        <input type="text" id="topic" placeholder="e.g., Spring Collection">
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="platforms" data-required="true">Select Platforms *</label>
+        <div class="platform-grid">
+          <button class="platform-btn" onclick="togglePlatform('facebook', this)">Facebook</button>
+          <button class="platform-btn" onclick="togglePlatform('instagram', this)">Instagram</button>
+          <button class="platform-btn" onclick="togglePlatform('threads', this)">Threads</button>
+          <button class="platform-btn" onclick="togglePlatform('linkedin', this)">LinkedIn</button>
+          <button class="platform-btn" onclick="togglePlatform('xiaohongshu', this)">小紅書</button>
+          <button class="platform-btn" onclick="togglePlatform('wechat', this)">微信</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="contentLanguage">Content Language</label>
+        <select id="contentLanguage">
+          <option value="tc">Traditional Chinese (繁體中文)</option>
+          <option value="sc">Simplified Chinese (簡體中文)</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <button class="button" id="generateBtn" onclick="generateContent()">Generate</button>
+      <div id="generatedContent" style="margin-top:24px;"></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="section" id="history">
+      <div id="historyList"></div>
+    </div>
+
+    <!-- DISCOVER -->
+    <div class="section" id="discover">
+      <div class="form-group">
+        <label class="label" data-key="selectClient" data-required="true">Select Client *</label>
+        <select id="discoverSelectClient">
+          <option value="">Choose client...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label">Content Direction (Optional)</label>
+        <input type="text" id="discoverContentDirection" placeholder="e.g., Health Insurance, Retirement Life...">
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="platforms" data-required="true">Select Platform *</label>
+        <select id="discoverPlatform">
+          <option value="">Choose platform...</option>
+          <option value="facebook">Facebook</option>
+          <option value="instagram">Instagram</option>
+          <option value="threads">Threads</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="xiaohongshu">小紅書</option>
+          <option value="wechat">WeChat</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label" data-key="contentLanguage" data-required="true">Content Language *</label>
+        <select id="discoverContentLanguage">
+          <option value="tc">Traditional Chinese (繁體中文)</option>
+          <option value="sc">Simplified Chinese (簡體中文)</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <button class="button" id="topicBtn" onclick="generateTopicSuggestions()">Generate Topic Suggestions</button>
+      <div id="topicSuggestions" style="margin-top: 24px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LANGS = {
+  tc: {
+    dashboard: '儀表板', clients: '客戶管理', discover: '發現趨勢', generate: '生成內容', history: '歷史記錄',
+    clientName: '客戶名稱', brandTone: '品牌語氣', addClient: '添加客戶', selectClient: '選擇客戶',
+    topic: '話題', platforms: '選擇平台', yourClients: '你的客戶', generated: '生成的內容',
+    chooseClient: '選擇客戶', topicPlaceholder: '例如：春季系列', generateTopics: '生成話題建議',
+    backup: '備份', import: '匯入', generate: '生成', contentLanguage: '生成內容語言',
+    brandStory: '品牌背景', targetAudience: '目標受眾', competitors: '競爭對手', forbiddenWords: '禁用詞彙',
+    industry: '行業'
+  },
+  sc: {
+    dashboard: '仪表板', clients: '客户管理', discover: '发现趋势', generate: '生成内容', history: '历史记录',
+    clientName: '客户名称', brandTone: '品牌语气', addClient: '添加客户', selectClient: '选择客户',
+    topic: '话题', platforms: '选择平台', yourClients: '你的客户', generated: '生成的内容',
+    chooseClient: '选择客户', topicPlaceholder: '例如：春季系列', generateTopics: '生成话题建议',
+    backup: '备份', import: '导入', generate: '生成', contentLanguage: '生成内容语言',
+    brandStory: '品牌背景', targetAudience: '目标受众', competitors: '竞争对手', forbiddenWords: '禁用词汇',
+    industry: '行业'
+  },
+  en: {
+    dashboard: 'Dashboard', clients: 'Client Mgmt', discover: 'Topics', generate: 'Generate', history: 'History',
+    clientName: 'Client Name', brandTone: 'Brand Tone', addClient: 'Add Client', selectClient: 'Select Client',
+    topic: 'Topic', platforms: 'Select Platforms', yourClients: 'Your Clients', generated: 'Generated Content',
+    chooseClient: 'Choose client', topicPlaceholder: 'e.g., Spring Collection', generateTopics: 'Generate Topic Suggestions',
+    backup: 'Backup', import: 'Import', generate: 'Generate', contentLanguage: 'Content Language',
+    brandStory: 'Brand Story', targetAudience: 'Target Audience', competitors: 'Competitors', forbiddenWords: 'Forbidden Words',
+    industry: 'Industry'
+  }
+};
+
+// ─── Gemini API helper (calls our Render backend) ─────────
+async function callGemini(prompt) {
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt })
+  });
+  const data = await response.json();
+  if (data.error) throw new Error(data.error);
+  return data.text;
+}
+let clients = [];
+let currentClient = null;
+let history = [];
+let selectedPlatforms = [];
+let generatedVariations = [];
+let editingClientId = null;
+
+// ─── Sidebar Mobile ───────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('visible');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('visible');
+}
+
+// ─── Language ─────────────────────────────────────────────
+function setLanguage(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  updateAllUI();
+  saveData();
+}
+
+function updateAllUI() {
+  const t = LANGS[currentLang];
+  updatePageTitle();
+
+  const navItems = document.querySelectorAll('.nav-item');
+  const navKeys = ['dashboard', 'clients', 'discover', 'generate', 'history'];
+  navItems.forEach((item, i) => { if (t[navKeys[i]]) item.textContent = t[navKeys[i]]; });
+
+  document.querySelectorAll('.label[data-key]').forEach(label => {
+    const key = label.getAttribute('data-key');
+    const req = label.getAttribute('data-required') === 'true';
+    if (t[key]) label.textContent = t[key].toUpperCase() + (req ? ' *' : '');
+  });
+
+  const addBtn = document.getElementById('addClientBtn');
+  if (addBtn) addBtn.textContent = editingClientId ? (currentLang === 'en' ? 'Update Client' : '更新客戶') : t.addClient;
+
+  const genBtn = document.getElementById('generateBtn');
+  if (genBtn && !genBtn.disabled) genBtn.textContent = t.generate;
+
+  const topicBtn = document.getElementById('topicBtn');
+  if (topicBtn && !topicBtn.disabled) topicBtn.textContent = t.generateTopics;
+
+  const footer = document.querySelectorAll('.sidebar-footer button');
+  if (footer[0]) footer[0].textContent = t.backup;
+  if (footer[1]) footer[1].textContent = t.import;
+
+  const sel = document.getElementById('selectClient');
+  if (sel && sel.options[0]) sel.options[0].textContent = t.chooseClient;
+
+  const topicInput = document.getElementById('topic');
+  if (topicInput) topicInput.placeholder = t.topicPlaceholder;
+
+  const header = document.getElementById('yourClientsHeader');
+  if (header) header.textContent = t.yourClients;
+}
+
+function updatePageTitle() {
+  const t = LANGS[currentLang];
+  const active = document.querySelector('.section.active')?.id || 'dashboard';
+  const titles = { dashboard: t.dashboard, clients: t.clients, discover: t.discover, generate: t.generate, history: t.history };
+  document.getElementById('pageTitle').textContent = titles[active] || 'Dashboard';
+}
+
+// ─── Tab switching ────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  updatePageTitle();
+  if (tab === 'history') renderHistory();
+  closeSidebar();
+}
+
+// ─── Clients ──────────────────────────────────────────────
+function addClient() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { alert('Please enter a client name'); return; }
+
+  const clientData = {
+    name,
+    industry: document.getElementById('clientIndustry').value,
+    tone: document.getElementById('clientTone').value,
+    brandStory: document.getElementById('clientBrandStory').value,
+    targetAudience: document.getElementById('clientTargetAudience').value,
+    competitors: document.getElementById('clientCompetitors').value,
+    forbiddenWords: document.getElementById('clientForbiddenWords').value
+  };
+
+  if (editingClientId) {
+    const idx = clients.findIndex(c => c.id === editingClientId);
+    if (idx !== -1) { clients[idx] = { ...clients[idx], ...clientData }; }
+    editingClientId = null;
+    alert('✅ Client updated: ' + name);
+  } else {
+    clients.push({ id: Date.now(), ...clientData });
+    alert('✅ Client added: ' + name);
+  }
+
+  clearClientForm();
+  updateClientsList();
+  updateClientSelect();
+  updateStats();
+  saveData();
+}
+
+function clearClientForm() {
+  ['clientName','clientBrandStory','clientTargetAudience','clientCompetitors','clientForbiddenWords'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('clientIndustry').value = '';
+  document.getElementById('clientTone').value = 'professional';
+  editingClientId = null;
+  const btn = document.getElementById('addClientBtn');
+  if (btn) btn.textContent = LANGS[currentLang].addClient;
+}
+
+function editClient(id) {
+  const c = clients.find(cl => cl.id === id);
+  if (!c) return;
+  document.getElementById('clientName').value = c.name;
+  document.getElementById('clientIndustry').value = c.industry || '';
+  document.getElementById('clientTone').value = c.tone;
+  document.getElementById('clientBrandStory').value = c.brandStory || '';
+  document.getElementById('clientTargetAudience').value = c.targetAudience || '';
+  document.getElementById('clientCompetitors').value = c.competitors || '';
+  document.getElementById('clientForbiddenWords').value = c.forbiddenWords || '';
+  editingClientId = id;
+  const btn = document.getElementById('addClientBtn');
+  if (btn) btn.textContent = currentLang === 'en' ? 'Update Client' : '更新客戶';
+  document.getElementById('clientName').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteClient(id) {
+  const c = clients.find(cl => cl.id === id);
+  if (!c) return;
+  if (!confirm('Delete client: ' + c.name + '?')) return;
+  clients = clients.filter(cl => cl.id !== id);
+  updateClientsList();
+  updateClientSelect();
+  updateStats();
+  saveData();
+}
+
+function updateClientsList() {
+  const list = document.getElementById('clientsList');
+  if (!clients.length) {
+    list.innerHTML = '<p style="color:#999; margin-top:12px;">No clients yet.</p>';
+    return;
+  }
+  list.innerHTML = clients.map(c => `
+    <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-weight:600; color:#1B4D7C;">${c.name}</div>
+        <div style="font-size:12px; color:#999; margin-top:4px;">${c.industry || ''} · ${c.tone}</div>
+        ${c.brandStory ? '<div style="font-size:11px;color:#BBB;margin-top:2px;">📝 Has story</div>' : ''}
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="editClient(${c.id})" style="padding:6px 10px;background:#1B4D7C;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;">Edit</button>
+        <button onclick="deleteClient(${c.id})" style="padding:6px 10px;background:#E53935;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateClientSelect() {
+  const opts = '<option value="">Choose client...</option>' + clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('selectClient').innerHTML = opts;
+  document.getElementById('discoverSelectClient').innerHTML = opts;
+}
+
+function selectCurrentClient() {
+  const id = parseInt(document.getElementById('selectClient').value);
+  currentClient = clients.find(c => c.id === id) || null;
+}
+
+// ─── Platforms ────────────────────────────────────────────
+function togglePlatform(id, btn) {
+  if (selectedPlatforms.includes(id)) {
+    selectedPlatforms = selectedPlatforms.filter(p => p !== id);
+    btn.classList.remove('active');
+  } else {
+    selectedPlatforms.push(id);
+    btn.classList.add('active');
+  }
+}
+
+
+
+// ─── Discover Topics ──────────────────────────────────────
+async function generateTopicSuggestions() {
+  const clientId = parseInt(document.getElementById('discoverSelectClient').value);
+  const platform = document.getElementById('discoverPlatform').value;
+  const direction = document.getElementById('discoverContentDirection').value;
+  const lang = document.getElementById('discoverContentLanguage').value;
+
+  if (!clientId || !platform) { alert('Please select client and platform'); return; }
+
+  const client = clients.find(c => c.id === clientId);
+  if (!client) { alert('Client not found'); return; }
+
+  const langNames = { tc: 'Traditional Chinese', sc: 'Simplified Chinese', en: 'English' };
+  const btn = document.getElementById('topicBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  const prompt = `Generate 8 social media content topic suggestions for ${client.name} (Industry: ${client.industry || 'General'})
+
+Client Info:
+Brand tone: ${client.tone}
+${client.brandStory ? 'Brand story: ' + client.brandStory : ''}
+${client.targetAudience ? 'Target audience: ' + client.targetAudience : ''}
+${client.competitors ? 'Competitors: ' + client.competitors : ''}
+
+Platform: ${platform}
+Content Language: ${langNames[lang]}
+${direction ? 'Content Direction: ' + direction : ''}
+
+Generate 8 topics using these 7 angles (mix them for 8 total):
+1. Sales/Promotion
+2. Education/Tips
+3. Entertainment/Fun
+4. Engagement/Interaction
+5. Seasonal/Trending
+6. Daily Life/Relatable
+7. Habits/Routines
+
+Format EXACTLY like this for each topic:
+[Topic #]
+Angle: [angle name]
+Title: [2-3 word title]
+Description: [2-3 sentence explanation of why this topic is good for this client on this platform]`;
+
+  try {
+    const text = await callGemini(prompt);
+    const suggestions = parseTopicSuggestions(text);
+    displayTopicSuggestions(suggestions);
+  } catch (err) {
+    alert('❌ Error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = LANGS[currentLang].generateTopics;
+  }
+}
+
+function parseTopicSuggestions(text) {
+  const suggestions = [];
+  const blocks = text.split(/\[Topic \d+\]/i).filter(b => b.trim());
+  blocks.forEach((block, idx) => {
+    const lines = block.trim().split('\n');
+    let angle = '', title = '', description = '';
+    lines.forEach(line => {
+      if (line.includes('Angle:')) angle = line.replace('Angle:', '').trim();
+      else if (line.includes('Title:')) title = line.replace('Title:', '').trim();
+      else if (line.includes('Description:')) description = line.replace('Description:', '').trim();
+    });
+    if (!title) { const ne = lines.filter(l => l.trim()); if (ne.length) title = ne[0].trim(); }
+    if (title) suggestions.push({ id: 'topic_' + Date.now() + '_' + idx, angle: angle || 'General', title, description });
+  });
+  return suggestions.slice(0, 8);
+}
+
+function displayTopicSuggestions(suggestions) {
+  const div = document.getElementById('topicSuggestions');
+  if (!suggestions.length) { div.innerHTML = '<p style="color:#999;">No suggestions generated. Please try again.</p>'; return; }
+  div.innerHTML = suggestions.map(s => `
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="color:#1B4D7C;font-weight:600;margin-bottom:4px;">${s.title}</div>
+          <div style="color:#999;font-size:12px;margin-bottom:8px;">📍 ${s.angle}</div>
+          <div style="color:#666;font-size:13px;line-height:1.5;">${s.description}</div>
+        </div>
+        <button onclick="useTopic('${s.title.replace(/'/g,"\\'")}', this)" style="margin-left:12px;padding:8px 12px;background:#1B4D7C;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;">Use Topic</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function useTopic(title, btn) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[3].classList.add('active');
+  switchTab('generate', null);
+  document.getElementById('topic').value = title;
+  document.getElementById('topic').focus();
+}
+
+// ─── Generate Content ─────────────────────────────────────
+async function generateContent() {
+  const clientId = parseInt(document.getElementById('selectClient').value);
+  currentClient = clients.find(c => c.id === clientId) || null;
+  const topic = document.getElementById('topic').value.trim();
+
+  if (!currentClient) { alert('Please select a client'); return; }
+  if (!selectedPlatforms.length) { alert('Please select at least one platform'); return; }
+  if (!topic) { alert('Please enter a topic'); return; }
+
+  const langNames = { tc: 'Traditional Chinese (繁體中文)', sc: 'Simplified Chinese (簡體中文)', en: 'English' };
+  const contentLang = document.getElementById('contentLanguage').value;
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  const prompt = `Generate 5 creative social media content variations for: "${topic}"
+
+BRAND INFORMATION:
+${currentClient.industry ? 'Industry: ' + currentClient.industry : ''}
+Brand tone: ${currentClient.tone}
+${currentClient.brandStory ? 'Brand story: ' + currentClient.brandStory : ''}
+${currentClient.targetAudience ? 'Target audience: ' + currentClient.targetAudience : ''}
+${currentClient.competitors ? 'Competitors: ' + currentClient.competitors : ''}
+${currentClient.forbiddenWords ? 'Avoid these words: ' + currentClient.forbiddenWords : ''}
+
+Platforms: ${selectedPlatforms.join(', ')}
+Content Language: ${langNames[contentLang]}
+
+Format each variation clearly with [Variation 1], [Variation 2], [Variation 3], [Variation 4], [Variation 5]
+Include captions, emojis, and hashtags.`;
+
+  try {
+    const text = await callGemini(prompt);
+    generatedVariations = parseVariations(text);
+
+    const entry = {
+      id: Date.now(),
+      clientId: currentClient.id,
+      clientName: currentClient.name,
+      topic,
+      variations: generatedVariations,
+      platforms: [...selectedPlatforms],
+      contentLanguage: contentLang,
+      createdAt: new Date().toISOString()
+    };
+    history.unshift(entry);
+    renderVariations();
+
+    document.getElementById('topic').value = '';
+    selectedPlatforms = [];
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+    updateStats();
+    saveData();
+  } catch (err) {
+    alert('❌ ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = LANGS[currentLang].generate;
+  }
+}
+
+function parseVariations(content) {
+  const variations = [];
+  const parts = content.split(/\[Variation \d+\]/i);
+  for (let i = 1; i < parts.length; i++) {
+    const text = parts[i].trim();
+    if (text) variations.push({ id: 'var_' + Date.now() + '_' + i, number: i, content: text, rating: 0, isBest: false });
+  }
+  return variations.length > 0 ? variations : [{ id: 'var_' + Date.now() + '_1', number: 1, content, rating: 0, isBest: false }];
+}
+
+function renderVariations() {
+  const div = document.getElementById('generatedContent');
+  if (!generatedVariations.length) { div.innerHTML = '<p>No content generated yet</p>'; return; }
+
+  const t = LANGS[currentLang];
+  let html = `<div class="generated-title">${t.generated} (${generatedVariations.length})</div>`;
+  generatedVariations.forEach(v => {
+    const stars = Array.from({length: 5}, (_, i) => {
+      const filled = i + 1 <= v.rating;
+      return `<span class="star${filled ? ' active' : ''}" onclick="rateVariation('${v.id}', ${i+1})">${filled ? '★' : '☆'}</span>`;
+    }).join('');
+    html += `
+      <div class="variation-card">
+        <div class="variation-title">Variation ${v.number}</div>
+        <div class="variation-content">${v.content}</div>
+        <div class="rating">${stars}</div>
+        ${v.isBest ? '<div class="best-badge">✓ Best</div>' : ''}
+      </div>`;
+  });
+  div.innerHTML = html;
+}
+
+function rateVariation(varId, rating) {
+  const v = generatedVariations.find(v => v.id === varId);
+  if (v) { v.rating = rating; v.isBest = rating >= 4; renderVariations(); saveData(); }
+}
+
+// ─── History ──────────────────────────────────────────────
+function renderHistory() {
+  const div = document.getElementById('historyList');
+  if (!history.length) { div.innerHTML = '<p style="color:#999;">No history yet.</p>'; return; }
+  div.innerHTML = history.map(entry => `
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-weight:600;color:#1B4D7C;">${entry.clientName || ''} · ${entry.topic}</div>
+        <div style="font-size:11px;color:#999;">${new Date(entry.createdAt).toLocaleDateString()}</div>
+      </div>
+      <div style="font-size:12px;color:#999;margin-bottom:8px;">📍 ${entry.platforms.join(', ')}</div>
+      ${entry.variations.map(v => `
+        <div style="padding:10px;border:1px solid #F0F0F0;border-radius:4px;margin-bottom:8px;">
+          <div style="font-size:12px;font-weight:600;color:#666;margin-bottom:4px;">Variation ${v.number} ${v.rating ? '· ' + '★'.repeat(v.rating) : ''}</div>
+          <div style="font-size:13px;color:#333;white-space:pre-wrap;">${v.content.substring(0, 200)}${v.content.length > 200 ? '...' : ''}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+// ─── Stats ────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('clientCount').textContent = clients.length;
+  document.getElementById('contentCount').textContent = history.length;
+}
+
+// ─── Persistence ──────────────────────────────────────────
+function saveData() {
+  localStorage.setItem('flux_gemini_data', JSON.stringify({ clients, history, currentLang }));
+}
+
+function loadData() {
+  const saved = localStorage.getItem('flux_gemini_data');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      clients = data.clients || [];
+      history = data.history || [];
+      currentLang = data.currentLang || 'tc';
+    } catch(e) { clients = []; history = []; }
+  }
+  updateClientsList();
+  updateClientSelect();
+  updateStats();
+}
+
+
+
+// ─── Backup / Import ──────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify({ clients, history }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flux-gemini-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = function(e) {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      try {
+        const data = JSON.parse(evt.target.result);
+        clients = data.clients || [];
+        history = data.history || [];
+        saveData();
+        updateClientsList();
+        updateClientSelect();
+        updateStats();
+        alert('✅ Data imported!');
+      } catch { alert('❌ Invalid JSON file'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  input.click();
+}
+
+// ─── Init ─────────────────────────────────────────────────
+window.addEventListener('load', function() {
+  loadData();
+
+  // Set correct active lang button
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim().toLowerCase().startsWith(currentLang === 'tc' ? '繁'.charAt(0) : currentLang === 'sc' ? '简'.charAt(0) : 'e'));
+  });
+
+  updateAllUI();
+});
+</script>
+</body>
+</html>
