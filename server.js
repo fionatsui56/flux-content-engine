@@ -5,6 +5,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.htm');
+});
 
 // Single API endpoint for all Gemini calls
 app.post('/api/generate', async (req, res) => {
