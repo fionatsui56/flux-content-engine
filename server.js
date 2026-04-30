@@ -1,21 +1,28 @@
 const express = require('express');
 const cors = require('cors');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 app.use(cors());
 app.use(express.json());
 
-app.get('/ping', (req, res) => {
-  res.json({ status: 'alive', time: new Date().toISOString() });
+app.get('/ping', (req, res) => res.json({ status: 'alive', time: new Date().toISOString() }));
+app.get('/', (req, res) => res.json({ service: 'Flux Strategy Content Engine', status: 'running' }));
+
+// LIST all available models for this API key
+app.get('/list-models', async (req, res) => {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) return res.json({ error: 'No GEMINI_API_KEY' });
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    const d = await r.json();
+    if (d.error) return res.json({ error: d.error.message });
+    const names = (d.models || [])
+      .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+      .map(m => m.name);
+    res.json({ available_models: names });
+  } catch(e) { res.json({ error: e.message }); }
 });
 
-app.get('/', (req, res) => {
-  res.json({ service: 'Flux Strategy Content Engine', status: 'running' });
-});
-
-// TEST endpoint - open in browser to find working Gemini model
 app.get('/test-gemini', async (req, res) => {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.json({ error: 'No GEMINI_API_KEY' });
@@ -36,8 +43,8 @@ app.get('/test-gemini', async (req, res) => {
           body: JSON.stringify({ contents: [{ parts: [{ text: 'Say hi' }] }] }) }
       );
       const d = await r.json();
-      if (d.error) { results.push({ model, status: 'FAIL', error: d.error.message }); }
-      else { results.push({ model, status: 'OK', text: d.candidates?.[0]?.content?.parts?.[0]?.text }); }
+      if (d.error) results.push({ model, status: 'FAIL', error: d.error.message });
+      else results.push({ model, status: 'OK', text: d.candidates?.[0]?.content?.parts?.[0]?.text });
     } catch (e) { results.push({ model, status: 'ERROR', error: e.message }); }
   }
   res.json({ results });
@@ -67,7 +74,7 @@ async function callGemini(prompt, maxTokens) {
       return { text, provider: 'gemini' };
     } catch (e) { console.log(`Gemini ${model} error: ${e.message}`); continue; }
   }
-  throw new Error('All Gemini models failed. Visit /test-gemini to diagnose.');
+  throw new Error('All Gemini models failed. Visit /list-models to see available models.');
 }
 
 async function callAI(prompt, maxTokens = 2000) {
@@ -94,22 +101,19 @@ app.post('/api/topics', async (req, res) => {
     const langName = langMap[language] || 'Traditional Chinese';
     const prompt = `Generate 8 social media content topic suggestions for ${clientName}.
 CLIENT INFO:
-Industry: ${industry || 'General'}
-Brand Tone: ${tone || 'Professional'}
+Industry: ${industry || 'General'} | Brand Tone: ${tone || 'Professional'}
 ${brandStory ? `Brand Story: ${brandStory}` : ''}
 ${targetAudience ? `Target Audience: ${targetAudience}` : ''}
 ${competitors ? `Competitors: ${competitors}` : ''}
 ${contentDirection ? `Content Direction: ${contentDirection}` : ''}
-Platform: ${platform || 'General'}
-Output Language: ${langName}
-Generate exactly 8 topics using these 7 angles (mix them):
-1. Sales/Promotion 2. Education/Tips 3. Entertainment/Fun 4. Engagement/Interaction 5. Seasonal/Trending 6. Daily Life/Relatable 7. Habits/Routines
-Format EXACTLY like this for each:
+Platform: ${platform || 'General'} | Output Language: ${langName}
+Generate exactly 8 topics using these angles (mix them): Sales/Promotion, Education/Tips, Entertainment/Fun, Engagement/Interaction, Seasonal/Trending, Daily Life/Relatable, Habits/Routines
+Format EXACTLY:
 [Topic 1]
-Angle: [angle name]
-Title: [concise title]
-Description: [2 sentences why this works]
-[Topic 2]...and so on until [Topic 8]`;
+Angle: [angle]
+Title: [title]
+Description: [2 sentences]
+[Topic 2]...until [Topic 8]`;
     const result = await callAI(prompt, 2000);
     res.json({ success: true, text: result.text, provider: result.provider });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
@@ -125,9 +129,8 @@ BRAND: ${clientName} | Industry: ${industry || 'General'} | Tone: ${tone}
 ${brandStory ? `Brand Story: ${brandStory}` : ''}
 ${targetAudience ? `Target Audience: ${targetAudience}` : ''}
 ${forbiddenWords ? `FORBIDDEN WORDS: ${forbiddenWords}` : ''}
-Platforms: ${platforms ? platforms.join(', ') : 'General'}
-Output Language: ${langName}
-Write all content in ${langName}. Include emojis and 3-5 hashtags per variation. Each variation different angle.
+Platforms: ${platforms ? platforms.join(', ') : 'General'} | Output Language: ${langName}
+Write all content in ${langName}. Include emojis and 3-5 hashtags. Each variation different angle.
 Format:
 [Variation 1]
 [content]
