@@ -1,1025 +1,1502 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Flux Strategy — Content Engine</title>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'DM Sans', sans-serif; background: #FFF; }
-.app { display: flex; height: 100vh; overflow: hidden; }
-.sidebar { width: 260px; background: #F5F5F5; border-right: 1px solid #E0E0E0; padding: 20px 0; overflow-y: auto; display: flex; flex-direction: column; }
-.logo { padding: 0 16px 24px; }
-.logo-text { font-size: 20px; font-weight: 800; color: #1B4D7C; line-height: 1.1; }
-.nav { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; }
-.nav-item { padding: 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #666; border: none; background: transparent; transition: all 0.2s; font-family: inherit; text-align: left; width: 100%; }
-.nav-item.active { background: #E8F0F8; color: #1B4D7C; font-weight: 600; border-left: 3px solid #1B4D7C; }
-.sidebar-footer { padding: 12px; border-top: 1px solid #E0E0E0; display: flex; gap: 6px; }
-.sidebar-footer button { flex: 1; padding: 8px; font-size: 11px; background: #1B4D7C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
-.main { flex: 1; overflow-y: auto; padding: 32px; max-width: 1200px; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.h1 { font-size: 32px; font-weight: 700; color: #1B4D7C; margin: 0; }
-.lang-toggle { display: flex; gap: 8px; }
-.lang-btn { padding: 8px 12px; border: 1px solid #1B4D7C; background: transparent; color: #1B4D7C; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
-.lang-btn.active { background: #1B4D7C; color: white; }
-.form-group { margin-bottom: 16px; }
-.label { display: block; font-size: 12px; font-weight: 600; color: #1B4D7C; margin-bottom: 8px; text-transform: uppercase; }
-input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #E0E0E0; border-radius: 6px; font-size: 14px; font-family: inherit; }
-.platform-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
-.platform-btn { padding: 10px; border: 1px solid #E0E0E0; background: white; border-radius: 6px; cursor: pointer; text-align: center; font-size: 12px; color: #666; }
-.platform-btn.active { border-color: #1B4D7C; background: #E8F0F8; color: #1B4D7C; font-weight: 600; }
-.button { padding: 12px 20px; background: #1B4D7C; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; font-family: inherit; }
-.button:hover { opacity: 0.9; }
-.card { padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px; background: white; margin-bottom: 12px; }
-.variation-card { padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px; background: white; margin-bottom: 16px; }
-.variation-title { font-weight: 600; color: #1B4D7C; margin-bottom: 8px; }
-.variation-content { white-space: pre-wrap; font-size: 13px; color: #333; margin-bottom: 12px; line-height: 1.6; }
-.rating { display: flex; gap: 4px; margin-top: 8px; }
-.star { font-size: 20px; cursor: pointer; color: #D0D0D0; }
-.star.active { color: #1B4D7C; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background: #F7F8FA;
+  color: #1A1A2E;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════
+   DESKTOP LAYOUT (≥ 1024px)
+═══════════════════════════════════════════ */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── SIDEBAR (desktop) ── */
+.sidebar {
+  width: 240px;
+  background: #1B4D7C;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 100vh;
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 100;
+}
+
+.logo-area {
+  padding: 28px 20px 22px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo-main {
+  font-size: 21px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.logo-sub {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.2em;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.58);
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  transition: all 0.15s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.09); }
+.nav-item.active { background: rgba(255,255,255,0.16); color: #fff; font-weight: 700; }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+.sidebar-footer {
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  gap: 6px;
+}
+
+.footer-btn {
+  flex: 1;
+  padding: 9px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.09);
+  color: rgba(255,255,255,0.75);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  min-height: 36px;
+}
+
+.footer-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+/* ── MAIN (desktop) ── */
+.main {
+  flex: 1;
+  margin-left: 240px;
+  overflow-y: auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: #fff;
+  border-bottom: 1px solid #E8EAED;
+  padding: 0 28px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1B4D7C;
+}
+
+.lang-toggle { display: flex; gap: 4px; }
+
+.lang-btn {
+  padding: 7px 11px;
+  border: 1.5px solid #D0DAE8;
+  background: transparent;
+  color: #1B4D7C;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.15s;
+  min-height: 36px;
+  min-width: 40px;
+}
+
+.lang-btn:hover { border-color: #1B4D7C; }
+.lang-btn.active { background: #1B4D7C; color: #fff; border-color: #1B4D7C; }
+
+/* ── CONTENT AREA ── */
+.content-area {
+  padding: 26px 28px 40px;
+  max-width: 800px;
+  flex: 1;
+}
+
+/* ── BOTTOM NAV (iPad/mobile) ── */
+.bottom-nav { display: none; }
+
+/* ═══════════════════════════════════════════
+   IPAD LAYOUT (768px – 1023px)
+═══════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .app { flex-direction: column; height: 100vh; }
+
+  /* Hide sidebar, show bottom nav */
+  .sidebar { display: none; }
+
+  .main {
+    margin-left: 0;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  .top-bar {
+    padding: 0 18px;
+    height: 54px;
+  }
+
+  .page-title { font-size: 15px; }
+
+  .content-area {
+    padding: 20px 18px 32px;
+    max-width: 100%;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 64px;
+    background: #1B4D7C;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-family: inherit;
+    transition: all 0.15s;
+    padding: 8px 4px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .bottom-nav-item.active {
+    color: #fff;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .bottom-nav-item:active { background: rgba(255,255,255,0.2); }
+
+  .bnav-icon { font-size: 18px; line-height: 1; }
+  .bnav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+
+  /* iPad: Logo in top bar */
+  .topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-logo-text {
+    font-size: 14px;
+    font-weight: 800;
+    color: #1B4D7C;
+    line-height: 1.1;
+  }
+
+  .topbar-logo-sub {
+    font-size: 8px;
+    color: #999;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* Backup/import buttons move to top bar on iPad */
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-icon-btn {
+    padding: 7px 11px;
+    border: 1.5px solid #D0DAE8;
+    background: transparent;
+    color: #1B4D7C;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    min-height: 36px;
+  }
+
+  /* Wider platform grid on iPad */
+  .platform-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .platform-btn {
+    padding: 14px 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* Bigger touch targets */
+  .btn-primary { min-height: 48px; font-size: 15px !important; }
+  .btn-secondary { min-height: 40px; }
+  .btn-copy { min-height: 36px; padding: 8px 14px !important; }
+
+  input, select, textarea {
+    font-size: 16px !important; /* prevents iOS zoom */
+    min-height: 46px;
+  }
+
+  textarea { min-height: 90px !important; }
+
+  .nav-item { min-height: 48px; }
+
+  /* Stats row stacks nicely */
+  .stats-row { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Variation cards bigger */
+  .variation-card { padding: 20px !important; }
+  .star { font-size: 24px !important; }
+}
+
+/* ═══════════════════════════════════════════
+   SMALL PHONE (< 480px)
+═══════════════════════════════════════════ */
+@media (max-width: 479px) {
+  .platform-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .content-area { padding: 16px 14px 28px; }
+  .top-bar { padding: 0 14px; }
+}
+
+/* ═══════════════════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════════════════ */
 .section { display: none; }
 .section.active { display: block; }
-.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.stat-card { padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px; background: #F5F5F5; }
-.stat-number { font-size: 24px; font-weight: 700; color: #1B4D7C; }
-.stat-label { font-size: 12px; color: #999; margin-top: 4px; }
-.best-badge { margin-top: 8px; font-size: 12px; color: #1B4D7C; font-weight: 600; }
-.generated-title { color: #1B4D7C; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+
+.form-group { margin-bottom: 18px; }
+
+.label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1B4D7C;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+input[type="text"], input[type="password"], select, textarea {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid #E0E6ED;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1A1A2E;
+  background: #fff;
+  transition: border-color 0.15s;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%231B4D7C' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #1B4D7C;
+  box-shadow: 0 0 0 3px rgba(27,77,124,0.08);
+}
+
+textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
+
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.platform-btn {
+  padding: 11px 6px;
+  border: 1.5px solid #E0E6ED;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #666;
+  font-family: inherit;
+  transition: all 0.15s;
+  min-height: 44px;
+}
+
+.platform-btn:hover { border-color: #1B4D7C; color: #1B4D7C; }
+.platform-btn.active { border-color: #1B4D7C; background: #EAF1FA; color: #1B4D7C; }
+
+/* Buttons */
+.btn-primary {
+  padding: 12px 22px;
+  background: #1B4D7C;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.btn-primary:hover { background: #163d63; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  padding: 8px 14px;
+  background: transparent;
+  color: #1B4D7C;
+  border: 1.5px solid #1B4D7C;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all 0.15s;
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+.btn-secondary:hover { background: #EAF1FA; }
+.btn-secondary:active { transform: scale(0.97); }
+
+.btn-copy {
+  padding: 7px 13px;
+  background: #EAF1FA;
+  color: #1B4D7C;
+  border: 1px solid #C5D8EE;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.btn-copy:hover { background: #D4E8F7; }
+.btn-copy.copied { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
+
+/* Cards */
+.card {
+  background: #fff;
+  border: 1px solid #E0E6ED;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.variation-card {
+  background: #fff;
+  border: 1px solid #E0E6ED;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.variation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.variation-num {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1B4D7C;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.variation-content {
+  white-space: pre-wrap;
+  font-size: 13.5px;
+  color: #333;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+.variation-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stars { display: flex; gap: 4px; }
+.star {
+  font-size: 20px;
+  cursor: pointer;
+  color: #D8DEE6;
+  transition: color 0.1s, transform 0.1s;
+  line-height: 1;
+  padding: 2px;
+}
+.star:active { transform: scale(1.3); }
+.star.active { color: #1B4D7C; }
+
+.client-card {
+  background: #fff;
+  border: 1px solid #E0E6ED;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.client-name { font-weight: 700; color: #1A1A2E; font-size: 14px; }
+.client-meta { font-size: 12px; color: #999; margin-top: 3px; }
+
+.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 22px; }
+
+.stat-card {
+  background: #fff;
+  border: 1px solid #E0E6ED;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.stat-num { font-size: 30px; font-weight: 800; color: #1B4D7C; line-height: 1; }
+.stat-label { font-size: 12px; color: #999; margin-top: 5px; font-weight: 500; }
+
+.topic-card {
+  background: #fff;
+  border: 1px solid #E0E6ED;
+  border-radius: 10px;
+  padding: 15px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.15s;
+}
+
+.topic-card:active { background: #F5F9FF; border-color: #1B4D7C; }
+.topic-angle { font-size: 11px; color: #1B4D7C; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.topic-title { font-size: 14px; font-weight: 700; color: #1A1A2E; margin-bottom: 5px; }
+.topic-desc { font-size: 12.5px; color: #666; line-height: 1.5; }
+
+.status-msg {
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+.status-loading { background: #EAF1FA; color: #1B4D7C; display: flex; align-items: center; gap: 10px; }
+.status-error { background: #FFEBEE; color: #C62828; }
+
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1B4D7C;
+  margin-bottom: 16px;
+}
+
+.divider { height: 1px; background: #E8EAED; margin: 20px 0; }
+
+.history-item {
+  background: #fff;
+  border: 1px solid #E0E6ED;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.history-meta { font-size: 12px; color: #999; margin-top: 5px; }
+
+.platform-tag {
+  display: inline-block;
+  background: #EAF1FA;
+  color: #1B4D7C;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-right: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.empty-state { text-align: center; padding: 52px 24px; color: #BBB; }
+.empty-icon { font-size: 32px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; font-weight: 500; }
+
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner-blue {
+  border-color: rgba(27,77,124,0.2);
+  border-top-color: #1B4D7C;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Form helper text */
+.form-hint { font-size: 11px; color: #999; margin-top: 5px; line-height: 1.4; }
+
+/* Welcome card */
+.welcome-card {
+  background: linear-gradient(135deg, #EAF1FA 0%, #F0F6FF 100%);
+  border: 1px solid #C5D8EE;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.welcome-card h3 { font-size: 14px; font-weight: 700; color: #1B4D7C; margin-bottom: 8px; }
+.welcome-card p { font-size: 13px; color: #555; line-height: 1.6; }
 </style>
 </head>
 <body>
 
 <div class="app">
+
+  <!-- ═══ DESKTOP SIDEBAR ═══════════════════════════════ -->
   <div class="sidebar">
-    <div class="logo">
-      <div class="logo-text">FLUX<br>STRATEGY</div>
-      <div style="font-size: 20px; font-weight: 800; color: #999; margin-top: 6px; text-align: left;">CONTENT ENGINE</div>
+    <div class="logo-area">
+      <div class="logo-main">FLUX<br>STRATEGY</div>
+      <div class="logo-sub">Content Engine</div>
     </div>
-    <div class="nav">
-      <button class="nav-item active" onclick="switchTab('dashboard')">Dashboard</button>
-      <button class="nav-item" onclick="switchTab('clients')">Client Mgmt</button>
-      <button class="nav-item" onclick="switchTab('discover')">Topics</button>
-      <button class="nav-item" onclick="switchTab('generate')">Generate</button>
-      <button class="nav-item" onclick="switchTab('history')">History</button>
-    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="dashboard">
+        <span class="nav-icon">◈</span>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-item" data-tab="clients">
+        <span class="nav-icon">○</span>
+        <span class="nav-label">Clients</span>
+      </button>
+      <button class="nav-item" data-tab="topics">
+        <span class="nav-icon">◉</span>
+        <span class="nav-label">Topics</span>
+      </button>
+      <button class="nav-item" data-tab="generate">
+        <span class="nav-icon">◆</span>
+        <span class="nav-label">Generate</span>
+      </button>
+      <button class="nav-item" data-tab="history">
+        <span class="nav-icon">◇</span>
+        <span class="nav-label">History</span>
+      </button>
+    </nav>
+
     <div class="sidebar-footer">
-      <button onclick="exportData()">Backup</button>
-      <button onclick="importData()">Import</button>
+      <button class="footer-btn" id="exportBtn">Backup</button>
+      <button class="footer-btn" id="importBtn">Import</button>
     </div>
   </div>
 
+  <!-- ═══ MAIN ═══════════════════════════════════════════ -->
   <div class="main">
-    <div class="header">
-      <h1 class="h1" id="pageTitle">Dashboard</h1>
-      <div class="lang-toggle">
-        <button class="lang-btn active" onclick="setLanguage('tc')">繁</button>
-        <button class="lang-btn" onclick="setLanguage('sc')">简</button>
-        <button class="lang-btn" onclick="setLanguage('en')">EN</button>
-      </div>
-    </div>
 
-    <div class="section active" id="dashboard">
-      <div class="form-group">
-        <label class="label" data-key="apiKey" data-required="true">API Key *</label>
-        <input type="password" id="apiKey" placeholder="sk-ant-..." onchange="saveApiKey()">
-      </div>
-      <div class="dashboard-grid">
-        <div class="stat-card">
-          <div class="stat-number" id="clientCount">0</div>
-          <div class="stat-label">Clients</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="contentCount">0</div>
-          <div class="stat-label">Content Items</div>
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <!-- Desktop: just title -->
+      <div class="page-title" id="pageTitle">Dashboard</div>
+
+      <!-- iPad: logo + backup buttons replace sidebar -->
+      <div class="topbar-logo" style="display:none;" id="topbarLogo">
+        <div>
+          <div class="topbar-logo-text">FLUX STRATEGY</div>
+          <div class="topbar-logo-sub">Content Engine</div>
         </div>
       </div>
-    </div>
 
-    <div class="section" id="clients">
-      <div class="form-group">
-        <label class="label" data-key="clientName" data-required="true">Client Name *</label>
-        <input type="text" id="clientName" placeholder="Enter client name...">
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="industry">Industry</label>
-        <select id="clientIndustry">
-          <option value="">Select industry...</option>
-          <option value="beauty">Beauty & Personal Care (美容護膚)</option>
-          <option value="fashion">Fashion & Apparel (時尚服裝)</option>
-          <option value="food">Food & Beverage (食品飲料)</option>
-          <option value="technology">Technology (科技)</option>
-          <option value="finance">Finance & Banking (金融)</option>
-          <option value="health">Health & Wellness (健康)</option>
-          <option value="realestate">Real Estate (房地產)</option>
-          <option value="travel">Travel & Tourism (旅遊)</option>
-          <option value="education">Education (教育)</option>
-          <option value="entertainment">Entertainment (娛樂)</option>
-          <option value="ecommerce">E-commerce (電商)</option>
-          <option value="luxury">Luxury Goods (奢侈品)</option>
-          <option value="automotive">Automotive (汽車)</option>
-          <option value="fitness">Fitness & Sports (運動健身)</option>
-          <option value="home">Home & Living (家居生活)</option>
-          <option value="other">Other (其他)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="brandTone" data-required="true">Brand Tone *</label>
-        <select id="clientTone">
-          <option value="professional">Professional</option>
-          <option value="casual">Casual</option>
-          <option value="luxury">Luxury</option>
-          <option value="energetic">Energetic</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="brandStory">Brand Story</label>
-        <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." style="min-height: 80px; resize: vertical;"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="targetAudience">Target Audience</label>
-        <textarea id="clientTargetAudience" placeholder="Age, gender, interests, income level..." style="min-height: 80px; resize: vertical;"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="competitors">Competitors</label>
-        <textarea id="clientCompetitors" placeholder="Main competitors, e.g., Brand A, Brand B..." style="min-height: 80px; resize: vertical;"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="forbiddenWords">Forbidden Words</label>
-        <textarea id="clientForbiddenWords" placeholder="Words to avoid, e.g., cheap, discount, sale..." style="min-height: 80px; resize: vertical;"></textarea>
-      </div>
-      <button class="button" onclick="addClient()">Add Client</button>
-      <h2 style="color: #1B4D7C; margin-top: 24px; font-size: 18px;">Your Clients</h2>
-      <div id="clientsList"></div>
-    </div>
-
-    <div class="section" id="generate">
-      <div class="form-group">
-        <label class="label" data-key="selectClient" data-required="true">Select Client *</label>
-        <select id="selectClient" onchange="selectCurrentClient()">
-          <option value="">Choose client...</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="topic" data-required="true">Topic / Idea *</label>
-        <input type="text" id="topic" placeholder="e.g., Spring Collection">
-      </div>
-      <div class="form-group">
-        <label class="label" data-key="platforms" data-required="true">Select Platforms *</label>
-        <div class="platform-grid">
-          <button class="platform-btn" onclick="togglePlatform('facebook')">Facebook</button>
-          <button class="platform-btn" onclick="togglePlatform('instagram')">Instagram</button>
-          <button class="platform-btn" onclick="togglePlatform('threads')">Threads</button>
-          <button class="platform-btn" onclick="togglePlatform('linkedin')">LinkedIn</button>
-          <button class="platform-btn" onclick="togglePlatform('xiaohongshu')">小紅書</button>
-          <button class="platform-btn" onclick="togglePlatform('wechat')">微信</button>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <!-- Backup/Import only shown on iPad in topbar -->
+        <button class="topbar-icon-btn" id="exportBtnTop" style="display:none;">📤</button>
+        <button class="topbar-icon-btn" id="importBtnTop" style="display:none;">📥</button>
+        <div class="lang-toggle">
+          <button class="lang-btn active" data-lang="tc">繁</button>
+          <button class="lang-btn" data-lang="sc">简</button>
+          <button class="lang-btn" data-lang="en">EN</button>
         </div>
       </div>
-      <div class="form-group">
-        <label class="label" data-key="contentLanguage">Content Language</label>
-        <select id="contentLanguage">
-          <option value="tc">Traditional Chinese (繁體中文)</option>
-          <option value="sc">Simplified Chinese (簡體中文)</option>
-          <option value="en">English</option>
-        </select>
-      </div>
-      <button class="button" onclick="generateContent()">Generate</button>
-      <div id="generatedContent"></div>
     </div>
 
-    <div class="section" id="history">
-      <div id="historyList"></div>
-    </div>
+    <!-- Content -->
+    <div class="content-area">
 
-    <div class="section" id="discover">
-      <div class="form-group">
-        <label class="label" data-key="selectClient" data-required="true">Select Client *</label>
-        <select id="discoverSelectClient">
-          <option value="">Choose client...</option>
-        </select>
+      <!-- ── DASHBOARD ── -->
+      <div class="section active" id="sec-dashboard">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num" id="statClients">0</div>
+            <div class="stat-label" data-i18n="statClients">Clients</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statContent">0</div>
+            <div class="stat-label" data-i18n="statContent">Content Generated</div>
+          </div>
+        </div>
+        <div class="welcome-card">
+          <h3 data-i18n="welcomeTitle">👋 Welcome to Flux Content Engine</h3>
+          <p data-i18n="welcomeText">Start by adding a client, then discover topics or generate content directly.</p>
+        </div>
       </div>
-      <div class="form-group">
-        <label class="label">Content Direction (Optional)</label>
-        <input type="text" id="discoverContentDirection" placeholder="e.g., Health Insurance, Retirement Life...">
+
+      <!-- ── CLIENTS ── -->
+      <div class="section" id="sec-clients">
+        <div class="form-group">
+          <label class="label" data-i18n="labelClientName">Client Name *</label>
+          <input type="text" id="clientName" data-i18n-placeholder="placeholderClientName">
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelIndustry">Industry</label>
+          <select id="clientIndustry">
+            <option value="">—</option>
+            <option value="beauty">Beauty & Personal Care</option>
+            <option value="fashion">Fashion & Apparel</option>
+            <option value="food">Food & Beverage</option>
+            <option value="technology">Technology</option>
+            <option value="finance">Finance & Banking</option>
+            <option value="insurance">Insurance 保險</option>
+            <option value="health">Health & Wellness</option>
+            <option value="realestate">Real Estate 房地產</option>
+            <option value="travel">Travel & Tourism</option>
+            <option value="education">Education 教育</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="ecommerce">E-commerce 電商</option>
+            <option value="luxury">Luxury Goods 奢侈品</option>
+            <option value="fitness">Fitness & Sports</option>
+            <option value="home">Home & Living</option>
+            <option value="other">Other 其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelTone">Brand Tone *</label>
+          <select id="clientTone">
+            <option value="professional" data-i18n="tonePro">Professional</option>
+            <option value="casual" data-i18n="toneCasual">Casual</option>
+            <option value="luxury" data-i18n="toneLuxury">Luxury</option>
+            <option value="energetic" data-i18n="toneEnergetic">Energetic</option>
+            <option value="trustworthy" data-i18n="toneTrust">Trustworthy</option>
+            <option value="educational" data-i18n="toneEdu">Educational</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelBrandStory">Brand Story</label>
+          <textarea id="clientBrandStory" data-i18n-placeholder="placeholderBrandStory"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelAudience">Target Audience</label>
+          <textarea id="clientAudience" data-i18n-placeholder="placeholderAudience"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelCompetitors">Competitors</label>
+          <input type="text" id="clientCompetitors" data-i18n-placeholder="placeholderCompetitors">
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelForbidden">Forbidden Words</label>
+          <input type="text" id="clientForbidden" data-i18n-placeholder="placeholderForbidden">
+          <div class="form-hint" data-i18n="hintForbidden">保險業例如：保證、必賺、零風險</div>
+        </div>
+
+        <button class="btn-primary" id="saveClientBtn">
+          <span data-i18n="btnSaveClient">Save Client</span>
+        </button>
+        <div id="clientMsg" style="margin-top:10px; font-size:13px; font-weight:600;"></div>
+
+        <div class="divider"></div>
+        <div class="section-title" data-i18n="yourClients">Your Clients</div>
+        <div id="clientsList"></div>
       </div>
-      <div class="form-group">
-        <label class="label" data-key="platforms" data-required="true">Select Platform *</label>
-        <select id="discoverPlatform">
-          <option value="">Choose platform...</option>
-          <option value="facebook">Facebook</option>
-          <option value="instagram">Instagram</option>
-          <option value="threads">Threads</option>
-          <option value="linkedin">LinkedIn</option>
-          <option value="xiaohongshu">小紅書</option>
-          <option value="wechat">WeChat</option>
-        </select>
+
+      <!-- ── TOPICS ── -->
+      <div class="section" id="sec-topics">
+        <div class="form-group">
+          <label class="label" data-i18n="labelSelectClient">Select Client *</label>
+          <select id="topicsClient"></select>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelPlatform">Platform *</label>
+          <select id="topicsPlatform">
+            <option value="facebook">Facebook</option>
+            <option value="instagram">Instagram</option>
+            <option value="threads">Threads</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="xiaohongshu">小紅書 XHS</option>
+            <option value="wechat">WeChat 微信</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelContentDir">Content Direction (Optional)</label>
+          <input type="text" id="topicsDirection" data-i18n-placeholder="placeholderDir">
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelLanguage">Output Language</label>
+          <select id="topicsLanguage">
+            <option value="tc">繁體中文</option>
+            <option value="sc">簡體中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="discoverBtn">
+          <span data-i18n="btnDiscover">Generate Topics</span>
+        </button>
+        <div id="topicsResult" style="margin-top:20px;"></div>
       </div>
-      <div class="form-group">
-        <label class="label" data-key="contentLanguage" data-required="true">Content Language *</label>
-        <select id="discoverContentLanguage">
-          <option value="tc">Traditional Chinese (繁體中文)</option>
-          <option value="sc">Simplified Chinese (簡體中文)</option>
-          <option value="en">English</option>
-        </select>
+
+      <!-- ── GENERATE ── -->
+      <div class="section" id="sec-generate">
+        <div class="form-group">
+          <label class="label" data-i18n="labelSelectClient">Select Client *</label>
+          <select id="genClient"></select>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelTopic">Topic *</label>
+          <input type="text" id="genTopic" data-i18n-placeholder="placeholderTopic">
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelPlatforms">Platforms *</label>
+          <div class="platform-grid">
+            <button class="platform-btn" data-platform="facebook">Facebook</button>
+            <button class="platform-btn" data-platform="instagram">Instagram</button>
+            <button class="platform-btn" data-platform="threads">Threads</button>
+            <button class="platform-btn" data-platform="linkedin">LinkedIn</button>
+            <button class="platform-btn" data-platform="xiaohongshu">小紅書</button>
+            <button class="platform-btn" data-platform="wechat">微信</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="label" data-i18n="labelLanguage">Output Language</label>
+          <select id="genLanguage">
+            <option value="tc">繁體中文</option>
+            <option value="sc">簡體中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="generateBtn">
+          <span data-i18n="btnGenerate">Generate Content</span>
+        </button>
+        <div id="genResult" style="margin-top:20px;"></div>
       </div>
-      <button class="button" onclick="generateTopicSuggestions()">Generate Topic Suggestions</button>
-      <div id="topicSuggestions" style="margin-top: 24px;"></div>
+
+      <!-- ── HISTORY ── -->
+      <div class="section" id="sec-history">
+        <div id="historyList"></div>
+      </div>
+
     </div>
   </div>
-</div>
+
+  <!-- ═══ IPAD BOTTOM NAV ════════════════════════════════ -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bottom-nav-item active" data-tab="dashboard">
+      <span class="bnav-icon">◈</span>
+      <span class="bnav-label" data-i18n="navDashboard">Dashboard</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="clients">
+      <span class="bnav-icon">○</span>
+      <span class="bnav-label" data-i18n="navClients">Clients</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="topics">
+      <span class="bnav-icon">◉</span>
+      <span class="bnav-label" data-i18n="navTopics">Topics</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="generate">
+      <span class="bnav-icon">◆</span>
+      <span class="bnav-label" data-i18n="navGenerate">Generate</span>
+    </button>
+    <button class="bottom-nav-item" data-tab="history">
+      <span class="bnav-icon">◇</span>
+      <span class="bnav-label" data-i18n="navHistory">History</span>
+    </button>
+  </nav>
+
+</div><!-- /app -->
 
 <script>
-const LANGS = {
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+const API_BASE = 'https://flux-content-engine.onrender.com';
+
+// Keep-alive: ping every 14 min to prevent Render cold start
+const pingRender = () => fetch(API_BASE + '/ping').catch(() => {});
+pingRender();
+setInterval(pingRender, 14 * 60 * 1000);
+
+// ═══════════════════════════════════════════════════════
+//  RESPONSIVE: detect iPad vs desktop
+// ═══════════════════════════════════════════════════════
+function isIPad() { return window.innerWidth < 1024; }
+
+function applyResponsiveLayout() {
+  const ipad = isIPad();
+  // Show/hide topbar logo on iPad
+  document.getElementById('topbarLogo').style.display = ipad ? 'flex' : 'none';
+  document.getElementById('pageTitle').style.display = ipad ? 'none' : 'block';
+  // Show backup buttons in topbar on iPad
+  document.getElementById('exportBtnTop').style.display = ipad ? 'block' : 'none';
+  document.getElementById('importBtnTop').style.display = ipad ? 'block' : 'none';
+}
+
+window.addEventListener('resize', applyResponsiveLayout);
+
+// ═══════════════════════════════════════════════════════
+//  I18N
+// ═══════════════════════════════════════════════════════
+const STRINGS = {
   tc: {
-    dashboard: '儀表板', clients: '客戶管理', discover: '發現趨勢', generate: '生成內容', history: '歷史記錄',
-    apiKey: 'API Key', clientName: '客戶名稱', brandTone: '品牌語氣', addClient: '添加客戶', selectClient: '選擇客戶',
-    topic: '話題', platforms: '選擇平台', yourClients: '你的客戶', generated: '生成的內容',
-    chooseClient: '選擇客戶', topicPlaceholder: '例如：春季系列',
-    professional: '專業', casual: '輕鬆', luxury: '奢華', energetic: '活力',
-    backup: '備份', import: '匯入', generate: '生成', contentLanguage: '生成內容語言',
-    brandStory: '品牌背景', targetAudience: '目標受眾', competitors: '競爭對手', forbiddenWords: '禁用詞彙',
-    industry: '行業'
+    navDashboard:'儀表板', navClients:'客戶管理', navTopics:'主題發現', navGenerate:'生成內容', navHistory:'歷史記錄',
+    statClients:'客戶數量', statContent:'已生成內容',
+    welcomeTitle:'👋 歡迎使用 Flux Content Engine',
+    welcomeText:'先新增客戶，然後發現主題或直接生成內容。',
+    labelClientName:'客戶名稱 *', labelIndustry:'行業', labelTone:'品牌語氣 *',
+    labelBrandStory:'品牌故事', labelAudience:'目標受眾', labelCompetitors:'競爭對手',
+    labelForbidden:'禁用詞彙', labelSelectClient:'選擇客戶 *', labelPlatform:'平台 *',
+    labelPlatforms:'選擇平台 *', labelContentDir:'內容方向（選填）',
+    labelLanguage:'輸出語言', labelTopic:'話題 *',
+    hintForbidden:'保險業例如：保證、必賺、零風險',
+    placeholderClientName:'例如：友邦保險、我的品牌',
+    placeholderBrandStory:'品牌背景、使命、價值觀...',
+    placeholderAudience:'年齡、職業、興趣、收入水平...',
+    placeholderCompetitors:'例如：保誠、宏利、友邦...',
+    placeholderForbidden:'例如：保證、零風險、必賺...',
+    placeholderDir:'例如：退休規劃、教育保障...',
+    placeholderTopic:'例如：為子女規劃未來',
+    tonePro:'專業', toneCasual:'輕鬆', toneLuxury:'高端', toneEnergetic:'活力', toneTrust:'值得信賴', toneEdu:'教育性',
+    btnSaveClient:'儲存客戶', btnDiscover:'生成主題建議', btnGenerate:'生成內容',
+    yourClients:'你的客戶', noClients:'未有客戶，請先新增。', noHistory:'未有歷史記錄。',
+    generating:'生成中...', useTopic:'使用此主題', copy:'複製', copied:'已複製！',
+    clientSaved:'✅ 客戶已儲存', clientUpdated:'✅ 客戶已更新',
+    errorSelect:'請選擇客戶', errorTopic:'請輸入話題', errorPlatform:'請選擇至少一個平台',
+    backupBtn:'備份', importBtn:'匯入', variation:'版本', generated:'生成結果', editClient:'編輯',
   },
   sc: {
-    dashboard: '仪表板', clients: '客户管理', discover: '发现趋势', generate: '生成内容', history: '历史记录',
-    apiKey: 'API Key', clientName: '客户名称', brandTone: '品牌语气', addClient: '添加客户', selectClient: '选择客户',
-    topic: '话题', platforms: '选择平台', yourClients: '你的客户', generated: '生成的内容',
-    chooseClient: '选择客户', topicPlaceholder: '例如：春季系列',
-    professional: '专业', casual: '轻松', luxury: '奢华', energetic: '活力',
-    backup: '备份', import: '导入', generate: '生成', contentLanguage: '生成内容语言',
-    brandStory: '品牌背景', targetAudience: '目标受众', competitors: '竞争对手', forbiddenWords: '禁用词汇',
-    industry: '行业'
+    navDashboard:'仪表板', navClients:'客户管理', navTopics:'主题发现', navGenerate:'生成内容', navHistory:'历史记录',
+    statClients:'客户数量', statContent:'已生成内容',
+    welcomeTitle:'👋 欢迎使用 Flux Content Engine',
+    welcomeText:'先添加客户，然后发现主题或直接生成内容。',
+    labelClientName:'客户名称 *', labelIndustry:'行业', labelTone:'品牌语气 *',
+    labelBrandStory:'品牌故事', labelAudience:'目标受众', labelCompetitors:'竞争对手',
+    labelForbidden:'禁用词汇', labelSelectClient:'选择客户 *', labelPlatform:'平台 *',
+    labelPlatforms:'选择平台 *', labelContentDir:'内容方向（选填）',
+    labelLanguage:'输出语言', labelTopic:'话题 *',
+    hintForbidden:'保险业例如：保证、必赚、零风险',
+    placeholderClientName:'例如：友邦保险、我的品牌',
+    placeholderBrandStory:'品牌背景、使命、价值观...',
+    placeholderAudience:'年龄、职业、兴趣、收入水平...',
+    placeholderCompetitors:'例如：保诚、宏利、友邦...',
+    placeholderForbidden:'例如：保证、零风险、必赚...',
+    placeholderDir:'例如：退休规划、教育保障...',
+    placeholderTopic:'例如：为子女规划未来',
+    tonePro:'专业', toneCasual:'轻松', toneLuxury:'高端', toneEnergetic:'活力', toneTrust:'值得信赖', toneEdu:'教育性',
+    btnSaveClient:'保存客户', btnDiscover:'生成主题建议', btnGenerate:'生成内容',
+    yourClients:'你的客户', noClients:'暂无客户，请先添加。', noHistory:'暂无历史记录。',
+    generating:'生成中...', useTopic:'使用此主题', copy:'复制', copied:'已复制！',
+    clientSaved:'✅ 客户已保存', clientUpdated:'✅ 客户已更新',
+    errorSelect:'请选择客户', errorTopic:'请输入话题', errorPlatform:'请选择至少一个平台',
+    backupBtn:'备份', importBtn:'导入', variation:'版本', generated:'生成结果', editClient:'编辑',
   },
   en: {
-    dashboard: 'Dashboard', clients: 'Client Mgmt', discover: 'Topics', generate: 'Generate', history: 'History',
-    apiKey: 'API Key', clientName: 'Client Name', brandTone: 'Brand Tone', addClient: 'Add Client', selectClient: 'Select Client',
-    topic: 'Topic', platforms: 'Select Platforms', yourClients: 'Your Clients', generated: 'Generated Content',
-    chooseClient: 'Choose client', topicPlaceholder: 'e.g., Spring Collection',
-    professional: 'Professional', casual: 'Casual', luxury: 'Luxury', energetic: 'Energetic',
-    backup: 'Backup', import: 'Import', generate: 'Generate', contentLanguage: 'Content Language',
-    brandStory: 'Brand Story', targetAudience: 'Target Audience', competitors: 'Competitors', forbiddenWords: 'Forbidden Words',
-    industry: 'Industry'
+    navDashboard:'Dashboard', navClients:'Clients', navTopics:'Topics', navGenerate:'Generate', navHistory:'History',
+    statClients:'Clients', statContent:'Content Generated',
+    welcomeTitle:'👋 Welcome to Flux Content Engine',
+    welcomeText:'Start by adding a client, then discover topics or generate content.',
+    labelClientName:'Client Name *', labelIndustry:'Industry', labelTone:'Brand Tone *',
+    labelBrandStory:'Brand Story', labelAudience:'Target Audience', labelCompetitors:'Competitors',
+    labelForbidden:'Forbidden Words', labelSelectClient:'Select Client *', labelPlatform:'Platform *',
+    labelPlatforms:'Select Platforms *', labelContentDir:'Content Direction (Optional)',
+    labelLanguage:'Output Language', labelTopic:'Topic *',
+    hintForbidden:'Insurance e.g.: guaranteed, risk-free, zero loss',
+    placeholderClientName:'e.g., AIA Insurance',
+    placeholderBrandStory:'Brand background, mission, values...',
+    placeholderAudience:'Age, occupation, interests, income...',
+    placeholderCompetitors:'e.g., Prudential, Manulife...',
+    placeholderForbidden:'e.g., guaranteed, risk-free...',
+    placeholderDir:'e.g., retirement planning, education...',
+    placeholderTopic:"e.g., Planning your child's future",
+    tonePro:'Professional', toneCasual:'Casual', toneLuxury:'Luxury', toneEnergetic:'Energetic', toneTrust:'Trustworthy', toneEdu:'Educational',
+    btnSaveClient:'Save Client', btnDiscover:'Generate Topics', btnGenerate:'Generate Content',
+    yourClients:'Your Clients', noClients:'No clients yet. Add one above.', noHistory:'No history yet.',
+    generating:'Generating...', useTopic:'Use Topic', copy:'Copy', copied:'Copied!',
+    clientSaved:'✅ Client saved', clientUpdated:'✅ Client updated',
+    errorSelect:'Please select a client', errorTopic:'Please enter a topic', errorPlatform:'Please select at least one platform',
+    backupBtn:'Backup', importBtn:'Import', variation:'Variation', generated:'Generated Content', editClient:'Edit',
   }
 };
 
-let currentLang = 'tc';
+let lang = 'tc';
+function t(k) { return STRINGS[lang][k] || STRINGS.en[k] || k; }
+
+function applyI18n() {
+  const s = STRINGS[lang];
+  // Nav items (sidebar + bottom nav)
+  const navOrder = ['navDashboard','navClients','navTopics','navGenerate','navHistory'];
+  document.querySelectorAll('.nav-item .nav-label').forEach((el, i) => {
+    if (navOrder[i]) el.textContent = s[navOrder[i]] || '';
+  });
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (s[k]) el.textContent = s[k];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const k = el.getAttribute('data-i18n-placeholder');
+    if (s[k]) el.placeholder = s[k];
+  });
+  document.getElementById('exportBtn').textContent = s.backupBtn;
+  document.getElementById('importBtn').textContent = s.importBtn;
+  updatePageTitle(currentTab);
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
 let clients = [];
-let currentClient = null;
 let history = [];
 let selectedPlatforms = [];
+let editingClientId = null;
 let generatedVariations = [];
+let currentTab = 'dashboard';
 
-function setLanguage(lang) {
-  currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
-  updatePageTitle();
-  updateAllUI();
-  saveData();
-}
-
-function updatePageTitle() {
-  const titles = {
-    dashboard: LANGS[currentLang].dashboard,
-    clients: LANGS[currentLang].clients,
-    discover: LANGS[currentLang].discover,
-    generate: LANGS[currentLang].generate,
-    history: LANGS[currentLang].history
-  };
-  const activeTab = document.querySelector('.section.active')?.id || 'dashboard';
-  document.getElementById('pageTitle').textContent = titles[activeTab] || 'Dashboard';
-}
-
-function updateAllUI() {
-  const t = LANGS[currentLang];
-  
-  // Update sidebar nav items
-  const navItems = document.querySelectorAll('.nav-item');
-  const navLabels = [t.dashboard, t.clients, t.discover, t.generate, t.history];
-  navItems.forEach((item, i) => {
-    if (navLabels[i]) item.textContent = navLabels[i];
-  });
-  
-  // Update all labels using data-key attribute
-  document.querySelectorAll('.label[data-key]').forEach(label => {
-    const key = label.getAttribute('data-key');
-    const isRequired = label.getAttribute('data-required') === 'true';
-    const suffix = isRequired ? ' *' : '';
-    
-    if (t[key]) {
-      label.textContent = t[key].toUpperCase() + suffix;
-    }
-  });
-  
-  document.querySelector('button[onclick="addClient()"]').textContent = t.addClient;
-  document.querySelector('button[onclick="generateContent()"]').textContent = t.generate;
-  
-  const backup = document.querySelector('button[onclick="exportData()"]');
-  const importBtn = document.querySelector('button[onclick="importData()"]');
-  if (backup) backup.textContent = t.backup;
-  if (importBtn) importBtn.textContent = t.import;
-  
-  const selectClient = document.getElementById('selectClient');
-  if (selectClient && selectClient.options[0]) {
-    selectClient.options[0].textContent = t.chooseClient;
-  }
-  
-  document.getElementById('topic').placeholder = t.topicPlaceholder;
-  
-  const yourClientsHeader = document.querySelector('h2');
-  if (yourClientsHeader) yourClientsHeader.textContent = t.yourClients;
-}
-
-function switchTab(tab) {
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function switchTab(tabName) {
+  currentTab = tabName;
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(tab).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.target.classList.add('active');
-  updatePageTitle();
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + tabName).classList.add('active');
+  document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(b => b.classList.add('active'));
+  updatePageTitle(tabName);
+  if (tabName === 'history') renderHistory();
+  // Scroll to top on tab switch (iPad)
+  document.querySelector('.main').scrollTo(0, 0);
 }
 
-function addClient() {
-  const name = document.getElementById('clientName').value;
-  const industry = document.getElementById('clientIndustry').value;
-  const tone = document.getElementById('clientTone').value;
-  const brandStory = document.getElementById('clientBrandStory').value;
-  const targetAudience = document.getElementById('clientTargetAudience').value;
-  const competitors = document.getElementById('clientCompetitors').value;
-  const forbiddenWords = document.getElementById('clientForbiddenWords').value;
-  
-  if (!name) return;
-  
-  // Check if editing existing client
-  if (currentClient && clients.find(c => c.id === currentClient.id)) {
-    // Update existing client
-    const clientIndex = clients.findIndex(c => c.id === currentClient.id);
-    clients[clientIndex] = {
-      id: currentClient.id,
-      name: name,
-      industry: industry,
-      tone: tone,
-      brandStory: brandStory,
-      targetAudience: targetAudience,
-      competitors: competitors,
-      forbiddenWords: forbiddenWords
-    };
-    alert('✅ Client updated: ' + name);
+function updatePageTitle(tab) {
+  const map = { dashboard:'navDashboard', clients:'navClients', topics:'navTopics', generate:'navGenerate', history:'navHistory' };
+  document.getElementById('pageTitle').textContent = t(map[tab] || 'navDashboard');
+}
+
+// ═══════════════════════════════════════════════════════
+//  CLIENT MANAGEMENT
+// ═══════════════════════════════════════════════════════
+function saveClient() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { showMsg('clientMsg', '⚠️ ' + t('labelClientName'), 'error'); return; }
+
+  const data = {
+    name,
+    industry: document.getElementById('clientIndustry').value,
+    tone: document.getElementById('clientTone').value,
+    brandStory: document.getElementById('clientBrandStory').value.trim(),
+    targetAudience: document.getElementById('clientAudience').value.trim(),
+    competitors: document.getElementById('clientCompetitors').value.trim(),
+    forbiddenWords: document.getElementById('clientForbidden').value.trim()
+  };
+
+  if (editingClientId !== null) {
+    const idx = clients.findIndex(c => c.id === editingClientId);
+    if (idx !== -1) { clients[idx] = { id: editingClientId, ...data }; }
+    showMsg('clientMsg', t('clientUpdated'), 'ok');
+    editingClientId = null;
   } else {
-    // Add new client
-    const newClient = {
-      id: Date.now(),
-      name: name,
-      industry: industry,
-      tone: tone,
-      brandStory: brandStory,
-      targetAudience: targetAudience,
-      competitors: competitors,
-      forbiddenWords: forbiddenWords
-    };
-    clients.push(newClient);
-    currentClient = newClient;
-    alert('✅ Client added: ' + name);
+    clients.push({ id: Date.now(), ...data });
+    showMsg('clientMsg', t('clientSaved'), 'ok');
   }
-  
-  // Clear all inputs
-  document.getElementById('clientName').value = '';
+
+  // Clear form
+  ['clientName','clientBrandStory','clientAudience','clientCompetitors','clientForbidden'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('clientIndustry').value = '';
   document.getElementById('clientTone').value = 'professional';
-  document.getElementById('clientBrandStory').value = '';
-  document.getElementById('clientTargetAudience').value = '';
-  document.getElementById('clientCompetitors').value = '';
-  document.getElementById('clientForbiddenWords').value = '';
-  
-  currentClient = null;
-  updateClientsList();
-  updateClientSelect();
-  saveData();
-}
 
-function selectCurrentClient() {
-  const id = parseInt(document.getElementById('selectClient').value);
-  currentClient = clients.find(c => c.id === id) || null;
-}
-
-function togglePlatform(id) {
-  const btn = event.target;
-  if (selectedPlatforms.includes(id)) {
-    selectedPlatforms = selectedPlatforms.filter(p => p !== id);
-    btn.classList.remove('active');
-  } else {
-    selectedPlatforms.push(id);
-    btn.classList.add('active');
-  }
-}
-
-function updateClientsList() {
-  const list = document.getElementById('clientsList');
-  list.innerHTML = clients.map(c => {
-    let cardHtml = '<div class="card" style="padding: 12px; border: 1px solid #E0E0E0; border-radius: 6px; margin-bottom: 12px;">';
-    cardHtml += '<div style="display: flex; justify-content: space-between; align-items: center;">';
-    cardHtml += '<div onclick="selectClientById(' + c.id + ')" style="cursor:pointer; flex: 1;">';
-    cardHtml += '<div style="font-weight:600; color: #1B4D7C;">' + c.name + '</div>';
-    cardHtml += '<div style="font-size:12px; color:#999; margin-top: 4px;">Tone: ' + c.tone + '</div>';
-    if (c.brandStory) cardHtml += '<div style="font-size:11px; color:#BBB; margin-top: 2px;">📝 Has story</div>';
-    cardHtml += '</div>';
-    cardHtml += '<button onclick="editClient(' + c.id + ')" style="padding: 6px 12px; background: #1B4D7C; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">Edit</button>';
-    cardHtml += '</div>';
-    cardHtml += '</div>';
-    return cardHtml;
-  }).join('');
-}
-
-function selectClientById(id) {
-  currentClient = clients.find(c => c.id === id);
-  document.getElementById('selectClient').value = id;
+  persistData();
+  renderClientsList();
+  updateClientDropdowns();
+  updateStats();
 }
 
 function editClient(id) {
-  const client = clients.find(c => c.id === id);
-  if (!client) return;
-  
-  // Load client data into form
-  document.getElementById('clientName').value = client.name;
-  document.getElementById('clientIndustry').value = client.industry || '';
-  document.getElementById('clientTone').value = client.tone;
-  document.getElementById('clientBrandStory').value = client.brandStory || '';
-  document.getElementById('clientTargetAudience').value = client.targetAudience || '';
-  document.getElementById('clientCompetitors').value = client.competitors || '';
-  document.getElementById('clientForbiddenWords').value = client.forbiddenWords || '';
-  
-  currentClient = client;
-  
-  // Scroll to form
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  editingClientId = id;
+  document.getElementById('clientName').value = c.name;
+  document.getElementById('clientIndustry').value = c.industry || '';
+  document.getElementById('clientTone').value = c.tone || 'professional';
+  document.getElementById('clientBrandStory').value = c.brandStory || '';
+  document.getElementById('clientAudience').value = c.targetAudience || '';
+  document.getElementById('clientCompetitors').value = c.competitors || '';
+  document.getElementById('clientForbidden').value = c.forbiddenWords || '';
+  document.querySelector('.content-area').scrollTo({ top: 0, behavior: 'smooth' });
   document.getElementById('clientName').focus();
-  alert('Editing: ' + client.name + '\n\nUpdate and click "Add Client" to save');
 }
 
-function updateClientSelect() {
-  const sel = document.getElementById('selectClient');
-  const discoverSel = document.getElementById('discoverSelectClient');
-  const optionsHtml = '<option value="">Choose client...</option>' + clients.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join('');
-  
-  sel.innerHTML = optionsHtml;
-  if (discoverSel) {
-    discoverSel.innerHTML = optionsHtml;
-  }
-}
-
-function generateTopicSuggestions() {
-  const clientId = parseInt(document.getElementById('discoverSelectClient').value);
-  const platform = document.getElementById('discoverPlatform').value;
-  const contentDirection = document.getElementById('discoverContentDirection').value;
-  const contentLang = document.getElementById('discoverContentLanguage').value;
-  
-  if (!clientId || !platform) {
-    alert('Please select client and platform');
+function renderClientsList() {
+  const el = document.getElementById('clientsList');
+  if (!clients.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">○</div><div class="empty-text">${t('noClients')}</div></div>`;
     return;
   }
-  
+  el.innerHTML = clients.map(c => `
+    <div class="client-card">
+      <div style="flex:1; min-width:0;">
+        <div class="client-name">${escHtml(c.name)}</div>
+        <div class="client-meta">${c.industry || '—'} · ${c.tone}</div>
+      </div>
+      <button class="btn-secondary" onclick="editClient(${c.id})">${t('editClient')}</button>
+    </div>
+  `).join('');
+}
+
+function updateClientDropdowns() {
+  const opts = `<option value="">—</option>` + clients.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+  ['topicsClient','genClient'].forEach(id => { document.getElementById(id).innerHTML = opts; });
+}
+
+function showMsg(elId, msg, type) {
+  const el = document.getElementById(elId);
+  el.textContent = msg;
+  el.style.color = type === 'error' ? '#C62828' : '#2E7D32';
+  setTimeout(() => { el.textContent = ''; }, 3000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  TOPIC DISCOVERY
+// ═══════════════════════════════════════════════════════
+async function discoverTopics() {
+  const clientId = parseInt(document.getElementById('topicsClient').value);
+  if (!clientId) { alert(t('errorSelect')); return; }
+
   const client = clients.find(c => c.id === clientId);
-  if (!client) {
-    alert('Client not found');
-    return;
-  }
-  
-  const apiKey = document.getElementById('apiKey').value;
-  if (!apiKey) {
-    alert('Please set API Key first');
-    return;
-  }
-  
-  const languageMap = {
-    tc: 'Traditional Chinese',
-    sc: 'Simplified Chinese',
-    en: 'English'
-  };
-  
-  const btn = document.querySelector('button[onclick="generateTopicSuggestions()"]');
+  const btn = document.getElementById('discoverBtn');
+  const result = document.getElementById('topicsResult');
+
   btn.disabled = true;
-  btn.textContent = 'Generating...';
-  
-  const prompt = 'Generate 8 social media content topic suggestions for ' + client.name + ' (Industry: ' + client.industry + ')\n\n' +
-    'Client Info:\n' +
-    'Brand tone: ' + client.tone + '\n' +
-    (client.brandStory ? 'Brand story: ' + client.brandStory + '\n' : '') +
-    (client.targetAudience ? 'Target audience: ' + client.targetAudience + '\n' : '') +
-    (client.competitors ? 'Competitors: ' + client.competitors + '\n' : '') +
-    '\nPlatform: ' + platform + '\n' +
-    'Content Language: ' + languageMap[contentLang] + '\n' +
-    (contentDirection ? 'Content Direction: ' + contentDirection + '\n' : '') +
-    '\nGenerate 8 topics using these 7 angles (mix them for 8 total):\n' +
-    '1. Sales/Promotion\n' +
-    '2. Education/Tips\n' +
-    '3. Entertainment/Fun\n' +
-    '4. Engagement/Interaction\n' +
-    '5. Seasonal/Trending\n' +
-    '6. Daily Life/Relatable\n' +
-    '7. Habits/Routines\n\n' +
-    'Format EXACTLY like this for each topic:\n' +
-    '[Topic #]\n' +
-    'Angle: [angle name]\n' +
-    'Title: [2-3 word title]\n' +
-    'Description: [2-3 sentence explanation of why this topic is good for this client on this platform]';
-  
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    if (data.error) {
-      alert('API Error: ' + data.error.message);
-      btn.disabled = false;
-      btn.textContent = 'Generate Topic Suggestions';
-      return;
-    }
-    
-    if (!data.content || !data.content[0]) {
-      alert('No response from API');
-      btn.disabled = false;
-      btn.textContent = 'Generate Topic Suggestions';
-      return;
-    }
-    
-    const suggestions = parseTopicSuggestions(data.content[0].text);
-    displayTopicSuggestions(suggestions);
-    
-    btn.disabled = false;
-    btn.textContent = 'Generate Topic Suggestions';
-  })
-  .catch(err => {
-    alert('Error: ' + err.message);
-    btn.disabled = false;
-    btn.textContent = 'Generate Topic Suggestions';
-  });
-}
+  btn.innerHTML = `<span class="spinner"></span> ${t('generating')}`;
+  result.innerHTML = `<div class="status-msg status-loading"><span class="spinner spinner-blue"></span> ${t('generating')}</div>`;
 
-function parseTopicSuggestions(text) {
-  const suggestions = [];
-  const topicBlocks = text.split(/\[Topic \d+\]/i).filter(block => block.trim());
-  
-  topicBlocks.forEach((block, index) => {
-    const lines = block.trim().split('\n');
-    let angle = '';
-    let title = '';
-    let description = '';
-    
-    lines.forEach(line => {
-      if (line.includes('Angle:')) angle = line.replace('Angle:', '').trim();
-      if (line.includes('Title:')) title = line.replace('Title:', '').trim();
-      if (line.includes('Description:')) description = line.replace('Description:', '').trim();
+  try {
+    const res = await fetch(`${API_BASE}/api/topics`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName: client.name,
+        industry: client.industry,
+        tone: client.tone,
+        brandStory: client.brandStory,
+        targetAudience: client.targetAudience,
+        competitors: client.competitors,
+        platform: document.getElementById('topicsPlatform').value,
+        language: document.getElementById('topicsLanguage').value,
+        contentDirection: document.getElementById('topicsDirection').value.trim()
+      })
     });
-    
-    // If no title found, use first non-empty line
-    if (!title) {
-      const nonEmptyLines = lines.filter(l => l.trim());
-      if (nonEmptyLines.length > 0) title = nonEmptyLines[0].trim();
-    }
-    
-    if (title) {
-      suggestions.push({
-        id: 'topic_' + Date.now() + '_' + index,
-        angle: angle || 'General',
-        title: title,
-        description: description
-      });
-    }
-  });
-  
-  return suggestions.slice(0, 8);
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    const topics = parseTopics(data.text);
+    renderTopics(topics, result);
+  } catch (err) {
+    result.innerHTML = `<div class="status-msg status-error">⚠️ ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>${t('btnDiscover')}</span>`;
+  }
 }
 
-function displayTopicSuggestions(suggestions) {
-  const div = document.getElementById('topicSuggestions');
-  
-  if (suggestions.length === 0) {
-    div.innerHTML = '<p style="color: #999;">No suggestions generated. Please try again.</p>';
+function parseTopics(text) {
+  const blocks = text.split(/\[Topic \d+\]/i).filter(b => b.trim());
+  return blocks.map((block, i) => {
+    const lines = block.trim().split('\n');
+    let angle = '', title = '', description = '';
+    lines.forEach(l => {
+      if (l.startsWith('Angle:')) angle = l.replace('Angle:', '').trim();
+      else if (l.startsWith('Title:')) title = l.replace('Title:', '').trim();
+      else if (l.startsWith('Description:')) description = l.replace('Description:', '').trim();
+    });
+    if (!title) title = lines.find(l => l.trim()) || 'Topic ' + (i+1);
+    return { angle, title, description };
+  }).slice(0, 8);
+}
+
+function renderTopics(topics, container) {
+  if (!topics.length) {
+    container.innerHTML = `<div class="status-msg status-error">No topics generated. Please try again.</div>`;
     return;
   }
-  
-  let html = '<div style="margin-top: 16px;">';
-  
-  suggestions.forEach(sug => {
-    html += '<div class="card" style="margin-bottom: 16px; padding: 16px; border: 1px solid #E0E0E0; border-radius: 6px;">';
-    html += '<div style="display: flex; justify-content: space-between; align-items: flex-start;">';
-    html += '<div style="flex: 1;">';
-    html += '<div style="color: #1B4D7C; font-weight: 600; margin-bottom: 4px;">' + sug.title + '</div>';
-    html += '<div style="color: #999; font-size: 12px; margin-bottom: 8px;">📍 ' + sug.angle + '</div>';
-    html += '<div style="color: #666; font-size: 13px; line-height: 1.5;">' + sug.description + '</div>';
-    html += '</div>';
-    html += '<button onclick="useTopic(\'' + sug.title + '\')" style="margin-left: 12px; padding: 8px 12px; background: #1B4D7C; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; white-space: nowrap;">Use Topic</button>';
-    html += '</div>';
-    html += '</div>';
-  });
-  
-  html += '</div>';
-  div.innerHTML = html;
+  container.innerHTML = topics.map(tp => `
+    <div class="topic-card">
+      <div style="flex:1;">
+        <div class="topic-angle">${escHtml(tp.angle)}</div>
+        <div class="topic-title">${escHtml(tp.title)}</div>
+        <div class="topic-desc">${escHtml(tp.description)}</div>
+      </div>
+      <button class="btn-secondary" onclick="useTopic('${escAttr(tp.title)}')">${t('useTopic')}</button>
+    </div>
+  `).join('');
 }
 
-function useTopic(topicTitle) {
-  // Jump to Generate section
+function useTopic(title) {
+  document.getElementById('genTopic').value = title;
   switchTab('generate');
-  
-  // Fill in topic
-  document.getElementById('topic').value = topicTitle;
-  
-  // Scroll to topic field
-  document.getElementById('topic').focus();
 }
 
-function cleanHashtags(text) {
-  return text.replace(/`#/g, '#').replace(/#([a-zA-Z0-9_]+)`/g, '#$1');
-}
+// ═══════════════════════════════════════════════════════
+//  CONTENT GENERATION
+// ═══════════════════════════════════════════════════════
+async function generateContent() {
+  const clientId = parseInt(document.getElementById('genClient').value);
+  const topic = document.getElementById('genTopic').value.trim();
 
-function parseVariations(content) {
-  const variations = [];
-  const parts = content.split(/\[Variation \d+\]/i);
-  
-  for (let i = 1; i < parts.length; i++) {
-    const text = parts[i].trim();
-    if (text) {
-      variations.push({
-        id: 'var_' + Date.now() + '_' + i,
-        number: i,
-        content: cleanHashtags(text),
-        rating: 0,
-        isBest: false
-      });
-    }
-  }
-  
-  return variations.length > 0 ? variations : [{
-    id: 'var_' + Date.now() + '_1',
-    number: 1,
-    content: cleanHashtags(content),
-    rating: 0,
-    isBest: false
-  }];
-}
+  if (!clientId) { alert(t('errorSelect')); return; }
+  if (!topic) { alert(t('errorTopic')); return; }
+  if (!selectedPlatforms.length) { alert(t('errorPlatform')); return; }
 
-function generateContent() {
-  if (!currentClient || selectedPlatforms.length === 0 || !document.getElementById('topic').value) {
-    alert('Please fill all fields');
-    return;
-  }
-  
-  const apiKey = document.getElementById('apiKey').value;
-  if (!apiKey) {
-    alert('❌ Please set API Key in Dashboard first!\nFormat: sk-ant-...');
-    return;
-  }
-  
-  if (!apiKey.startsWith('sk-ant-')) {
-    alert('❌ Invalid API Key format!\nShould start with: sk-ant-');
-    return;
-  }
-  
-  const topic = document.getElementById('topic').value;
-  const contentLang = document.getElementById('contentLanguage').value;
-  const languageMap = {
-    tc: 'Traditional Chinese (繁體中文)',
-    sc: 'Simplified Chinese (簡體中文)',
-    en: 'English'
-  };
-  
-  const generateBtn = document.querySelector('button[onclick="generateContent()"]');
-  generateBtn.disabled = true;
-  generateBtn.textContent = 'Generating...';
-  
-  const prompt = 'Generate 5 creative social media content variations for: "' + topic + '"\n\n' +
-    'BRAND INFORMATION:\n' +
-    (currentClient.industry ? 'Industry: ' + currentClient.industry + '\n' : '') +
-    'Brand tone: ' + currentClient.tone + '\n' +
-    (currentClient.brandStory ? 'Brand story: ' + currentClient.brandStory + '\n' : '') +
-    (currentClient.targetAudience ? 'Target audience: ' + currentClient.targetAudience + '\n' : '') +
-    (currentClient.competitors ? 'Competitors: ' + currentClient.competitors + '\n' : '') +
-    (currentClient.forbiddenWords ? 'Avoid these words: ' + currentClient.forbiddenWords + '\n' : '') +
-    '\nPlatforms: ' + selectedPlatforms.join(', ') +
-    '\nContent Language: ' + languageMap[contentLang] + '\n\n' +
-    'Format each variation clearly with [Variation 1], [Variation 2], [Variation 3], [Variation 4], [Variation 5]\n' +
-    'Include captions, emojis, and hashtags.';
-  
-  console.log('API Key:', apiKey.substring(0, 20) + '...');
-  console.log('Topic:', topic);
-  console.log('Content Language:', languageMap[contentLang]);
-  console.log('Platforms:', selectedPlatforms);
-  
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(response => {
-    console.log('Response status:', response.status);
-    return response.json();
-  })
-  .then(data => {
-    console.log('API Response:', data);
-    
-    if (data.error) {
-      alert('❌ API Error:\n' + data.error.message + '\n\nCheck API Key or rate limits');
-      generateBtn.disabled = false;
-      generateBtn.textContent = LANGS[currentLang].generate;
-      return;
-    }
-    
-    if (!data.content || !data.content[0]) {
-      alert('❌ No content in response');
-      generateBtn.disabled = false;
-      generateBtn.textContent = LANGS[currentLang].generate;
-      return;
-    }
-    
-    const content = data.content[0].text;
-    console.log('Generated content:', content);
-    
-    generatedVariations = parseVariations(content);
-    console.log('Parsed variations:', generatedVariations.length);
-    
-    const entry = {
+  const client = clients.find(c => c.id === clientId);
+  const btn = document.getElementById('generateBtn');
+  const result = document.getElementById('genResult');
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> ${t('generating')}`;
+  result.innerHTML = `<div class="status-msg status-loading"><span class="spinner spinner-blue"></span> ${t('generating')}</div>`;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        topic,
+        clientName: client.name,
+        industry: client.industry,
+        tone: client.tone,
+        brandStory: client.brandStory,
+        targetAudience: client.targetAudience,
+        competitors: client.competitors,
+        forbiddenWords: client.forbiddenWords,
+        platforms: selectedPlatforms,
+        language: document.getElementById('genLanguage').value
+      })
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    generatedVariations = parseVariations(data.text);
+
+    history.unshift({
       id: Date.now(),
-      clientId: currentClient.id,
-      topic: topic,
+      clientId,
+      clientName: client.name,
+      topic,
+      platforms: [...selectedPlatforms],
+      language: document.getElementById('genLanguage').value,
       variations: generatedVariations,
-      platforms: selectedPlatforms,
-      contentLanguage: contentLang,
       createdAt: new Date().toISOString()
-    };
-    
-    history.push(entry);
-    renderVariations();
-    document.getElementById('topic').value = '';
-    selectedPlatforms = [];
-    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+    });
+
+    persistData();
     updateStats();
-    saveData();
-    
-    generateBtn.disabled = false;
-    generateBtn.textContent = LANGS[currentLang].generate;
-  })
-  .catch(err => {
-    console.error('Fetch error:', err);
-    alert('❌ Network Error:\n' + err.message + '\n\nCheck internet connection');
-    generateBtn.disabled = false;
-    generateBtn.textContent = LANGS[currentLang].generate;
-  });
+    renderVariations(result);
+
+  } catch (err) {
+    result.innerHTML = `<div class="status-msg status-error">⚠️ ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>${t('btnGenerate')}</span>`;
+  }
 }
 
-function renderVariations() {
-  const div = document.getElementById('generatedContent');
-  const t = LANGS[currentLang];
-  
-  if (!generatedVariations || generatedVariations.length === 0) {
-    div.innerHTML = '<p>No content generated yet</p>';
-    return;
-  }
-  
-  const visibleVariations = generatedVariations.slice(0, 6);
-  
-  let html = '<div class="generated-container">';
-  html += '<div class="generated-title">' + t.generated + ' (' + visibleVariations.length + ')</div>';
-  
-  // Add cards
-  visibleVariations.forEach(v => {
-    html += '<div class="variation-card">';
-    html += '<div class="variation-title">Variation ' + v.number + '</div>';
-    html += '<div class="variation-content">' + v.content + '</div>';
-    html += '<div class="rating">';
-    for (let i = 1; i <= 5; i++) {
-      const starClass = i <= v.rating ? ' active' : '';
-      html += '<span class="star' + starClass + '" onclick="rateVariation(\'' + v.id + '\', ' + i + ')">' + (i <= v.rating ? '★' : '☆') + '</span>';
-    }
-    html += '</div>';
-    if (v.isBest) {
-      html += '<div class="best-badge">✓ Best</div>';
-    }
-    html += '</div>';
-  });
-  
-  html += '</div>';
-  
-  div.innerHTML = html;
-  console.log('Rendered variations:', visibleVariations.length);
+function parseVariations(text) {
+  const parts = text.split(/\[Variation \d+\]/i).filter(p => p.trim());
+  return parts.map((content, i) => ({
+    id: 'v_' + Date.now() + '_' + i,
+    number: i + 1,
+    content: content.trim(),
+    rating: 0
+  }));
 }
 
-function regenerateContent() {
-  alert('🔄 REGENERATE BUTTON WORKS!');
-  console.log('Regenerate clicked');
-  
-  if (!generatedVariations || generatedVariations.length === 0) {
-    alert('No content to regenerate');
-    return;
-  }
-  
-  const retained = generatedVariations.filter(v => v.rating >= 4);
-  
-  // Show custom popup instead of confirm()
-  const popupMsg = '⚠️ REGENERATE\n\n' +
-    '✓ Will keep: ' + retained.length + ' variations (4+ stars)\n' +
-    '+ Generate: 3 new variations\n' +
-    '= Total: up to 6 variations\n\n' +
-    '💡 TIP: Copy content you want first!\n\n' +
-    'Continue?';
-  
-  // Use custom alert with clearer buttons
-  if (!confirm(popupMsg)) {
-    console.log('User cancelled regenerate');
-    return;
-  }
-  
-  console.log('User confirmed regenerate');
-  proceedWithRegenerate(retained);
+function renderVariations(container) {
+  if (!generatedVariations.length) return;
+  container.innerHTML =
+    `<div style="font-weight:700; color:#1B4D7C; margin-bottom:14px; font-size:15px;">${t('generated')} (${generatedVariations.length})</div>` +
+    generatedVariations.map(v => `
+      <div class="variation-card">
+        <div class="variation-header">
+          <div class="variation-num">${t('variation')} ${v.number}</div>
+          <button class="btn-copy" id="copy_${v.id}" onclick="copyVariation(this,'${v.id}')">${t('copy')}</button>
+        </div>
+        <div class="variation-content">${escHtml(v.content)}</div>
+        <div class="variation-footer">
+          <div class="stars">
+            ${[1,2,3,4,5].map(i => `<span class="star ${i <= v.rating ? 'active':''}" onclick="rateVariation('${v.id}',${i})">★</span>`).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
 }
 
-function proceedWithRegenerate(retained) {
-  if (!currentClient) {
-    alert('Select a client first');
-    return;
-  }
-  
-  if (selectedPlatforms.length === 0) {
-    alert('Select platforms first');
-    return;
-  }
-  
-  const apiKey = document.getElementById('apiKey').value;
-  if (!apiKey) {
-    alert('Set API Key first');
-    return;
-  }
-  
-  const topic = document.getElementById('topic').value;
-  const contentLang = document.getElementById('contentLanguage').value;
-  
-  const langNames = {
-    tc: 'Traditional Chinese',
-    sc: 'Simplified Chinese',
-    en: 'English'
-  };
-  
-  const btn = document.getElementById('regenerateBtn');
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = 'Regenerating...';
-  }
-  
-  const prompt = 'Generate 3 COMPLETELY NEW social media variations for: "' + topic + '"\nTone: ' + currentClient.tone + '\nPlatforms: ' + selectedPlatforms.join(', ') + '\nLanguage: ' + langNames[contentLang] + '\n\nMake these DIFFERENT from before.\nFormat: [Variation 1], [Variation 2], [Variation 3]\nAdd captions, emojis, hashtags.';
-  
-  console.log('Calling API... Retaining:', retained.length, 'variations');
-  
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    console.log('API response:', data);
-    
-    if (data.error) {
-      alert('❌ ' + data.error.message);
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '🔄 Regenerate Content';
-      }
-      return;
-    }
-    
-    if (!data.content || !data.content[0]) {
-      alert('❌ No response from API');
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '🔄 Regenerate Content';
-      }
-      return;
-    }
-    
-    const newVars = parseVariations(data.content[0].text);
-    console.log('Generated:', newVars.length, 'new variations');
-    
-    // Merge: keep ≥4 stars + add new ones (max 6)
-    generatedVariations = retained.concat(newVars).slice(0, 6);
-    console.log('Total now:', generatedVariations.length);
-    
-    renderVariations();
-    saveData();
-    
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = '🔄 Regenerate Content';
-    }
-  })
-  .catch(err => {
-    console.error('Error:', err);
-    alert('❌ ' + err.message);
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = '🔄 Regenerate Content';
-    }
+function copyVariation(btn, varId) {
+  const v = generatedVariations.find(x => x.id === varId);
+  if (!v) return;
+  navigator.clipboard.writeText(v.content).then(() => {
+    btn.textContent = t('copied');
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = t('copy'); btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    // Fallback for older iOS
+    const ta = document.createElement('textarea');
+    ta.value = v.content;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = t('copied');
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = t('copy'); btn.classList.remove('copied'); }, 2000);
   });
 }
 
 function rateVariation(varId, rating) {
-  const variation = generatedVariations.find(v => v.id === varId);
-  if (variation) {
-    variation.rating = rating;
-    variation.isBest = rating >= 4;
-    renderVariations();
-    saveData();
+  const v = generatedVariations.find(x => x.id === varId);
+  if (!v) return;
+  v.rating = rating;
+  renderVariations(document.getElementById('genResult'));
+  const entry = history.find(h => h.variations?.some(hv => hv.id === varId));
+  if (entry) { const hv = entry.variations.find(x => x.id === varId); if (hv) hv.rating = rating; }
+  persistData();
+}
+
+// ═══════════════════════════════════════════════════════
+//  HISTORY
+// ═══════════════════════════════════════════════════════
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!history.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">◇</div><div class="empty-text">${t('noHistory')}</div></div>`;
+    return;
   }
+  el.innerHTML = history.slice(0, 50).map(item => `
+    <div class="history-item">
+      <div style="font-weight:700; color:#1A1A2E; font-size:14px;">${escHtml(item.topic)}</div>
+      <div class="history-meta">
+        ${escHtml(item.clientName)} ·
+        ${item.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
+        · ${new Date(item.createdAt).toLocaleDateString()}
+      </div>
+    </div>
+  `).join('');
 }
 
-function updateStats() {
-  document.getElementById('clientCount').textContent = clients.length;
-  document.getElementById('contentCount').textContent = history.length;
-}
+// ═══════════════════════════════════════════════════════
+//  PLATFORM TOGGLE
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.platform-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = btn.dataset.platform;
+    if (selectedPlatforms.includes(p)) {
+      selectedPlatforms = selectedPlatforms.filter(x => x !== p);
+      btn.classList.remove('active');
+    } else {
+      selectedPlatforms.push(p);
+      btn.classList.add('active');
+    }
+  });
+});
 
-function saveData() {
-  localStorage.setItem('flux_data', JSON.stringify({ clients: clients, history: history, currentLang: currentLang }));
-}
+// ═══════════════════════════════════════════════════════
+//  LANGUAGE SWITCHER
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    lang = btn.dataset.lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyI18n();
+    renderClientsList();
+    if (currentTab === 'history') renderHistory();
+    persistData();
+  });
+});
 
-function loadData() {
-  const saved = localStorage.getItem('flux_data');
-  if (saved) {
-    const data = JSON.parse(saved);
-    clients = data.clients || [];
-    history = data.history || [];
-    currentLang = data.currentLang || 'tc';
-    updateClientsList();
-    updateClientSelect();
-    updateStats();
-  }
-}
+// ═══════════════════════════════════════════════════════
+//  ALL NAV ITEMS (sidebar + bottom nav)
+// ═══════════════════════════════════════════════════════
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  if (btn.classList.contains('lang-btn')) return; // skip lang buttons
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
 
-function saveApiKey() {
-  localStorage.setItem('flux_key', document.getElementById('apiKey').value);
-}
+// ═══════════════════════════════════════════════════════
+//  ACTION BUTTONS
+// ═══════════════════════════════════════════════════════
+document.getElementById('saveClientBtn').addEventListener('click', saveClient);
+document.getElementById('discoverBtn').addEventListener('click', discoverTopics);
+document.getElementById('generateBtn').addEventListener('click', generateContent);
 
-function exportData() {
-  const data = { clients: clients, history: history };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+// ═══════════════════════════════════════════════════════
+//  BACKUP / IMPORT
+// ═══════════════════════════════════════════════════════
+function doExport() {
+  const blob = new Blob([JSON.stringify({ clients, history, lang }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = 'flux-backup-' + new Date().toISOString().split('T')[0] + '.json';
   a.click();
 }
 
-function importData() {
+function doImport() {
   const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = function(e) {
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = evt => {
       try {
         const data = JSON.parse(evt.target.result);
         clients = data.clients || [];
         history = data.history || [];
-        saveData();
-        updateClientsList();
-        updateClientSelect();
-        updateStats();
-        alert('Data imported!');
-      } catch (err) {
-        alert('Invalid JSON');
-      }
+        persistData(); renderClientsList(); updateClientDropdowns(); updateStats();
+        alert('✅ Data imported');
+      } catch { alert('Invalid file'); }
     };
     reader.readAsText(e.target.files[0]);
   };
   input.click();
 }
 
-window.addEventListener('load', function() {
-  loadData();
-  const savedKey = localStorage.getItem('flux_key');
-  if (savedKey) document.getElementById('apiKey').value = savedKey;
-  updateAllUI();
-});
-</script>
+document.getElementById('exportBtn').addEventListener('click', doExport);
+document.getElementById('importBtn').addEventListener('click', doImport);
+document.getElementById('exportBtnTop').addEventListener('click', doExport);
+document.getElementById('importBtnTop').addEventListener('click', doImport);
 
+// ═══════════════════════════════════════════════════════
+//  PERSISTENCE
+// ═══════════════════════════════════════════════════════
+function persistData() {
+  try { localStorage.setItem('flux_v2', JSON.stringify({ clients, history, lang })); } catch(e) {}
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem('flux_v2');
+    if (raw) { const d = JSON.parse(raw); clients = d.clients||[]; history = d.history||[]; lang = d.lang||'tc'; }
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════
+function updateStats() {
+  document.getElementById('statClients').textContent = clients.length;
+  document.getElementById('statContent').textContent = history.length;
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function escAttr(s) {
+  return String(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+(function init() {
+  loadData();
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  applyI18n();
+  applyResponsiveLayout();
+  renderClientsList();
+  updateClientDropdowns();
+  updateStats();
+})();
+</script>
 </body>
 </html>
