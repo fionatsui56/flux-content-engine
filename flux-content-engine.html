@@ -1191,7 +1191,7 @@ async function discoverTopics() {
 function parseTopics(text) {
   // blocks[0] = intro text before [Topic 1], skip it
   const blocks = text.split(/\[Topic \d+\]/i);
-  return blocks.slice(1).map((block, i) => {
+  return blocks.slice(1).map(function(block, i) {
     const lines = block.trim().split('\n');
     let angle = '', title = '', description = '';
     lines.forEach(l => {
@@ -1292,19 +1292,14 @@ async function generateContent() {
 }
 
 function parseVariations(text) {
-  // parts[0] = intro text before [Variation 1], always skip it
-  const parts = text.split(/[Variation d+]/i);
+  const parts = text.split(/\[Variation \d+\]/i);
   const variations = parts.slice(1).filter(p => p.trim());
   if (!variations.length) {
     return [{ id: 'v_' + Date.now() + '_0', number: 1, content: text.trim(), rating: 0 }];
   }
-  return variations.map((content, i) => ({
-    id: 'v_' + Date.now() + '_' + i,
-    number: i + 1,
-    content: content.trim(),
-    rating: 0
-  }));
-});
+  return variations.map(function(content, i) {
+    return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim(), rating: 0 };
+  });
 }
 
 function renderVariations(container) {
@@ -1364,42 +1359,40 @@ function rateVariation(varId, rating) {
 function renderHistory() {
   const el = document.getElementById('historyList');
   if (!history.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">◇</div><div class="empty-text">${t('noHistory')}</div></div>`;
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">◇</div><div class="empty-text">' + t('noHistory') + '</div></div>';
     return;
   }
-  el.innerHTML = history.slice(0, 50).map((item, idx) => {
-    const varHtml = (item.variations || []).map(v => `
-      <div style="border:1px solid #E8EAED; border-radius:8px; padding:12px; margin-top:10px; background:#FAFBFC;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <span style="font-size:11px; font-weight:700; color:#1B4D7C; text-transform:uppercase;">${t('variation')} ${v.number}</span>
-          <button class="btn-copy" onclick="copyHistoryVar(this,'${v.id || idx}',${idx},${v.number-1})">${t('copy')}</button>
-        </div>
-        <div style="font-size:13px; color:#333; line-height:1.6; white-space:pre-wrap;">${escHtml(v.content || '')}</div>
-      </div>
-    `).join('');
-
-    return `
-    <div class="history-item" style="cursor:pointer;">
-      <div onclick="toggleHistory(this)" style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <div style="font-weight:700; color:#1A1A2E; font-size:14px;">${escHtml(item.topic)}</div>
-          <div class="history-meta">
-            ${escHtml(item.clientName)} ·
-            ${item.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
-            · ${new Date(item.createdAt).toLocaleDateString()}
-          </div>
-        </div>
-        <span style="color:#1B4D7C; font-size:18px; margin-left:12px;">▸</span>
-      </div>
-      <div class="history-content" style="display:none;">${varHtml}</div>
-    </div>
-    `;
-  }).join('');
+  let html2 = '';
+  history.slice(0, 50).forEach(function(item, idx) {
+    let varHtml = '';
+    (item.variations || []).forEach(function(v, vi) {
+      varHtml += '<div style="border:1px solid #E8EAED;border-radius:8px;padding:12px;margin-top:10px;background:#FAFBFC;">';
+      varHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+      varHtml += '<span style="font-size:11px;font-weight:700;color:#1B4D7C;text-transform:uppercase;">' + t('variation') + ' ' + (vi+1) + '</span>';
+      varHtml += '<button class="btn-copy" onclick="copyHistoryVar(this,' + idx + ',' + vi + ')">' + t('copy') + '</button>';
+      varHtml += '</div>';
+      varHtml += '<div style="font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;">' + escHtml(v.content || '') + '</div>';
+      varHtml += '</div>';
+    });
+    let tags = '';
+    (item.platforms || []).forEach(function(p) { tags += '<span class="platform-tag">' + p + '</span>'; });
+    html2 += '<div class="history-item" style="cursor:pointer;">';
+    html2 += '<div onclick="toggleHistory(this)" style="display:flex;justify-content:space-between;align-items:center;">';
+    html2 += '<div>';
+    html2 += '<div style="font-weight:700;color:#1A1A2E;font-size:14px;">' + escHtml(item.topic) + '</div>';
+    html2 += '<div class="history-meta">' + escHtml(item.clientName) + ' · ' + tags + ' · ' + new Date(item.createdAt).toLocaleDateString() + '</div>';
+    html2 += '</div>';
+    html2 += '<span style="color:#1B4D7C;font-size:18px;margin-left:12px;">▸</span>';
+    html2 += '</div>';
+    html2 += '<div class="history-content" style="display:none;">' + varHtml + '</div>';
+    html2 += '</div>';
+  });
+  el.innerHTML = html2;
 }
 
 function toggleHistory(header) {
   const content = header.parentElement.querySelector('.history-content');
-  const arrow = header.querySelector('span[style*="18px"]');
+  const arrow = header.querySelector('span');
   if (content.style.display === 'none') {
     content.style.display = 'block';
     if (arrow) arrow.textContent = '▾';
@@ -1409,7 +1402,7 @@ function toggleHistory(header) {
   }
 }
 
-function copyHistoryVar(btn, varId, histIdx, varIdx) {
+function copyHistoryVar(btn, histIdx, varIdx) {
   const item = history[histIdx];
   if (!item || !item.variations) return;
   const v = item.variations[varIdx];
