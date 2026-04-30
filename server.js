@@ -97,7 +97,11 @@ async function callAI(prompt, maxTokens = 2000) {
 app.post('/api/topics', async (req, res) => {
   try {
     const { clientName, industry, tone, brandStory, targetAudience, competitors, platform, language, contentDirection } = req.body;
-    const langMap = { tc: 'Traditional Chinese (繁體中文)', sc: 'Simplified Chinese (簡體中文)', en: 'English' };
+    const langMap = { 
+    tc: 'Traditional Chinese (繁體中文) — use Hong Kong Chinese expressions and style', 
+    sc: 'Simplified Chinese — write in authentic Mainland China style, use Mainland Chinese vocabulary, expressions, and tone native to platforms like WeChat and XiaoHongShu. Avoid Hong Kong or Taiwan expressions entirely.', 
+    en: 'English' 
+  };
     const langName = langMap[language] || 'Traditional Chinese';
     const prompt = `Generate 8 social media content topic suggestions for ${clientName}.
 CLIENT INFO:
@@ -122,7 +126,11 @@ Description: [2 sentences]
 app.post('/api/generate', async (req, res) => {
   try {
     const { topic, clientName, industry, tone, brandStory, targetAudience, competitors, forbiddenWords, platforms, language } = req.body;
-    const langMap = { tc: 'Traditional Chinese (繁體中文)', sc: 'Simplified Chinese (簡體中文)', en: 'English' };
+    const langMap = { 
+    tc: 'Traditional Chinese (繁體中文) — use Hong Kong Chinese expressions and style', 
+    sc: 'Simplified Chinese — write in authentic Mainland China style, use Mainland Chinese vocabulary, expressions, and tone native to platforms like WeChat and XiaoHongShu. Avoid Hong Kong or Taiwan expressions entirely.', 
+    en: 'English' 
+  };
     const langName = langMap[language] || 'Traditional Chinese';
     const prompt = `Generate 5 creative social media content variations for: "${topic}"
 BRAND: ${clientName} | Industry: ${industry || 'General'} | Tone: ${tone}
