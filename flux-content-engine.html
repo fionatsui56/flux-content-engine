@@ -634,6 +634,112 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
 
 .welcome-card h3 { font-size: 14px; font-weight: 700; color: #1B4D7C; margin-bottom: 8px; }
 .welcome-card p { font-size: 13px; color: #555; line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   LOGIN GATE
+═══════════════════════════════════════════ */
+#loginGate {
+  position: fixed;
+  inset: 0;
+  background: #1B4D7C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+}
+
+.login-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+}
+
+.login-logo-main {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1B4D7C;
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+}
+
+.login-logo-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: #999;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 6px;
+  margin-bottom: 36px;
+}
+
+.login-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1B4D7C;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid #E0E6ED;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  color: #1A1A2E;
+  outline: none;
+  transition: border-color 0.15s;
+  letter-spacing: 0.05em;
+  margin-bottom: 16px;
+}
+
+.login-input:focus { border-color: #1B4D7C; box-shadow: 0 0 0 3px rgba(27,77,124,0.08); }
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: #1B4D7C;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+
+.login-btn:hover { background: #163d63; transform: translateY(-1px); }
+.login-btn:active { transform: scale(0.98); }
+
+.login-error {
+  color: #C62828;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+.login-footer {
+  margin-top: 28px;
+  font-size: 11px;
+  color: #CCC;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .login-box { padding: 36px 24px; }
+}
 </style>
 </head>
 <body>
@@ -1550,6 +1656,51 @@ function escAttr(s) {
   updateClientDropdowns();
   updateStats();
 })();
+
+// ═══════════════════════════════════════════════════════
+//  LOGIN GATE
+// ═══════════════════════════════════════════════════════
+const BETA_PASSWORD = 'FLUXbeta';
+const DEV_BYPASS = 'fluxdev2026'; // your private dev password
+
+function checkLogin() {
+  const val = document.getElementById('loginInput').value;
+  if (val === BETA_PASSWORD || val === DEV_BYPASS) {
+    document.getElementById('loginGate').style.display = 'none';
+    sessionStorage.setItem('flux_auth', '1');
+  } else {
+    const err = document.getElementById('loginError');
+    err.textContent = '❌ Incorrect password. Please try again.';
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginInput').focus();
+    setTimeout(() => { err.textContent = ''; }, 3000);
+  }
+}
+
+// Check session on load (so refresh doesn't kick out)
+(function checkSession() {
+  // Dev URL bypass: ?dev=flux
+  if (window.location.search.includes('dev=flux')) {
+    document.getElementById('loginGate').style.display = 'none';
+    return;
+  }
+  if (sessionStorage.getItem('flux_auth') === '1') {
+    document.getElementById('loginGate').style.display = 'none';
+  }
+})();
 </script>
+
+<!-- ═══ LOGIN GATE ═══════════════════════════ -->
+<div id="loginGate">
+  <div class="login-box">
+    <div class="login-logo-main">FLUX<br>STRATEGY</div>
+    <div class="login-logo-sub">Content Engine</div>
+    <label class="login-label">Access Password</label>
+    <input class="login-input" type="password" id="loginInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter') checkLogin()">
+    <button class="login-btn" onclick="checkLogin()">Enter</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-footer">Beta Access · Flux Strategy © 2026</div>
+  </div>
+</div>
 </body>
 </html>
