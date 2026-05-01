@@ -111,6 +111,8 @@ ${targetAudience ? `Target Audience: ${targetAudience}` : ''}
 ${competitors ? `Competitors: ${competitors}` : ''}
 ${contentDirection ? `Content Direction: ${contentDirection}` : ''}
 Platform: ${platform || 'General'} | Output Language: ${langName}
+OUTPUT ONLY THE 8 TOPICS BELOW. NO introduction sentence. NO conclusion. START DIRECTLY WITH [Topic 1].
+
 Generate EXACTLY 8 topics. Use these angles (mix them): Sales/Promotion, Education/Tips, Entertainment/Fun, Engagement/Interaction, Seasonal/Trending, Daily Life/Relatable, Habits/Routines.
 
 YOU MUST OUTPUT ALL 8 TOPICS. Format each topic EXACTLY like this with no deviation:
