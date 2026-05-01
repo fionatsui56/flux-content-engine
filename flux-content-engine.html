@@ -189,6 +189,7 @@ body {
     margin-left: 0;
     height: calc(100vh - 64px);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .top-bar {
@@ -199,7 +200,7 @@ body {
   .page-title { font-size: 15px; }
 
   .content-area {
-    padding: 20px 18px 32px;
+    padding: 20px 18px 100px;
     max-width: 100%;
   }
 
@@ -1532,13 +1533,15 @@ function renderVariations(container) {
         </div>
         <div class="variation-content">${escHtml(
           v.content
-            .replace(/^\*\*\s*/gm, '')        // remove ** at line start
-            .replace(/\s*\*\*$/gm, '')        // remove ** at line end
-            .replace(/标题[：:][\s]*\*\*?/gi, '') // remove 标题：**
-            .replace(/標題[：:][\s]*\*\*?/gi, '') // remove 標題：**
-            .replace(/内容[：:][\s]*\*\*?/gi, '') // remove 内容：**
-            .replace(/內容[：:][\s]*\*\*?/gi, '') // remove 內容：**
-            .replace(/\*\*/g, '')               // remove all remaining **
+            .replace(/^\*\*\s*/gm, '')
+            .replace(/\s*\*\*$/gm, '')
+            .replace(/标题[：:][\s]*\*\*?/gi, '')
+            .replace(/標題[：:][\s]*\*\*?/gi, '')
+            .replace(/内容[：:][\s]*\*\*?/gi, '')
+            .replace(/內容[：:][\s]*\*\*?/gi, '')
+            .replace(/\*\*/g, '')
+            .replace(/^---+$/gm, '')               // remove --- separators
+            .replace(/^===+$/gm, '')               // remove === separators
             .trim()
         )}</div>
         <div class="variation-footer">
