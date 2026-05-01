@@ -177,7 +177,7 @@ app.post('/api/generate', async (req, res) => {
       threads: 'Threads: Very short and conversational (under 100 words). Opinion-based or thought-provoking. 0-3 hashtags. Casual tone like talking to a friend.',
       linkedin: 'LinkedIn: Professional tone. 150-300 words. Structured with clear paragraphs. 3-5 hashtags. Include industry insight or data. End with a question to drive comments.',
       xiaohongshu: '小紅書 XiaoHongShu: Use 【】for title. Authentic lifestyle tone. 200-400 words. 8-15 hashtags mixing Chinese and English. Use Mainland Chinese expressions. Include personal experience angle. Emoji after each key point.',
-      wechat: 'WeChat 微信: Warm and trustworthy tone. 150-300 words. Practical and informative. 0-3 hashtags. Focus on value and usefulness. Suitable for sharing in groups.'
+      wechat: '微信朋友圈 WeChat Moments: Short and personal (100-200 words). Warm, genuine and relatable tone like sharing with close friends. NO hashtags. No promotional language. Write as personal reflection or life sharing. First-person voice. End with a soft question or thought to encourage comments. Suitable for personal WeChat Moments feed.'
     };
 
     const selectedPlatforms = platforms || ['general'];
