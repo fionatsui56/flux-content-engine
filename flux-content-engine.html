@@ -1369,16 +1369,24 @@ function parseTopics(text) {
 }
 
 function renderTopics(topics, container) {
-  if (!topics.length) {
+  // Filter out topics that look like raw unparsed format
+  const cleanTopics = topics.filter(tp => {
+    const raw = tp.title || '';
+    return !raw.startsWith('[Topic') && !raw.includes('Angle:') && !raw.includes('Title:') && raw.length > 3;
+  });
+  
+  const display = cleanTopics.length >= 2 ? cleanTopics : topics;
+  
+  if (!display.length) {
     container.innerHTML = `<div class="status-msg status-error">No topics generated. Please try again.</div>`;
     return;
   }
-  container.innerHTML = topics.map(tp => `
+  container.innerHTML = display.map(tp => `
     <div class="topic-card">
       <div style="flex:1;">
-        <div class="topic-angle">${escHtml(tp.angle)}</div>
+        ${tp.angle ? '<div class="topic-angle">' + escHtml(tp.angle) + '</div>' : ''}
         <div class="topic-title">${escHtml(tp.title)}</div>
-        <div class="topic-desc">${escHtml(tp.description)}</div>
+        ${tp.description ? '<div class="topic-desc">' + escHtml(tp.description) + '</div>' : ''}
       </div>
       <button class="btn-secondary" onclick="useTopic('${escAttr(tp.title)}')">${t('useTopic')}</button>
     </div>
