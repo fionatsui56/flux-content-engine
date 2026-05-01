@@ -77,7 +77,7 @@ async function callGemini(prompt, maxTokens) {
   throw new Error('All Gemini models failed. Visit /list-models to see available models.');
 }
 
-async function callAI(prompt, maxTokens = 2000) {
+async function callAI(prompt, maxTokens = 3000) {
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -168,25 +168,46 @@ app.post('/api/generate', async (req, res) => {
     en: 'English' 
   };
     const langName = langMap[language] || 'Traditional Chinese';
-    const prompt = `Generate 5 creative social media content variations for: "${topic}"
-BRAND: ${clientName} | Industry: ${industry || 'General'} | Tone: ${tone}
+    // Platform style guide
+    const platformStyles = {
+      facebook: 'Facebook: Longer captions OK (100-300 words). Conversational, storytelling tone. 2-3 hashtags max. Good for educational and sharing content. Start with a hook question or bold statement.',
+      instagram: 'Instagram: Short punchy caption (50-150 words). Heavy emojis. 5-10 hashtags. Visual-first mindset. First line must be attention-grabbing. Line breaks for readability.',
+      threads: 'Threads: Very short and conversational (under 100 words). Opinion-based or thought-provoking. 0-3 hashtags. Casual tone like talking to a friend.',
+      linkedin: 'LinkedIn: Professional tone. 150-300 words. Structured with clear paragraphs. 3-5 hashtags. Include industry insight or data. End with a question to drive comments.',
+      xiaohongshu: '小紅書 XiaoHongShu: Use 【】for title. Authentic lifestyle tone. 200-400 words. 8-15 hashtags mixing Chinese and English. Use Mainland Chinese expressions. Include personal experience angle. Emoji after each key point.',
+      wechat: 'WeChat 微信: Warm and trustworthy tone. 150-300 words. Practical and informative. 0-3 hashtags. Focus on value and usefulness. Suitable for sharing in groups.'
+    };
+
+    const selectedPlatforms = platforms || ['general'];
+    const platformInstructions = selectedPlatforms.map(p => platformStyles[p] || p).join('
+');
+
+    const prompt = `Generate ONE content variation for EACH of the following platforms for the topic: "${topic}"
+
+BRAND INFORMATION:
+Client: ${clientName}
+Industry: ${industry || 'General'}
+Brand Tone: ${tone}
 ${brandStory ? `Brand Story: ${brandStory}` : ''}
 ${targetAudience ? `Target Audience: ${targetAudience}` : ''}
-${forbiddenWords ? `FORBIDDEN WORDS: ${forbiddenWords}` : ''}
-Platforms: ${platforms ? platforms.join(', ') : 'General'} | Output Language: ${langName}
-Write all content in ${langName}. Include emojis and 3-5 hashtags. Each variation different angle.
-Format:
-[Variation 1]
-[content]
-[Variation 2]
-[content]
-[Variation 3]
-[content]
-[Variation 4]
-[content]
-[Variation 5]
-[content]`;
-    const result = await callAI(prompt, 2500);
+${forbiddenWords ? `FORBIDDEN WORDS - never use these: ${forbiddenWords}` : ''}
+
+Output Language: ${langName}
+Write ALL content in ${langName} only.
+Do NOT use ** markdown formatting anywhere.
+Write plain text only.
+
+PLATFORM STYLE RULES (follow strictly for each platform):
+${platformInstructions}
+
+YOU MUST OUTPUT ONE VARIATION PER PLATFORM. Use this EXACT format:
+
+${selectedPlatforms.map((p, i) => `[Variation ${i+1}] (${p.toUpperCase()})
+[Write ${p} content here following the style rules above]`).join('
+
+')}
+`;
+    const result = await callAI(prompt, 3500);
     res.json({ success: true, text: result.text, provider: result.provider });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
