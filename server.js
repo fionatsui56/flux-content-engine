@@ -111,13 +111,49 @@ ${targetAudience ? `Target Audience: ${targetAudience}` : ''}
 ${competitors ? `Competitors: ${competitors}` : ''}
 ${contentDirection ? `Content Direction: ${contentDirection}` : ''}
 Platform: ${platform || 'General'} | Output Language: ${langName}
-Generate exactly 8 topics using these angles (mix them): Sales/Promotion, Education/Tips, Entertainment/Fun, Engagement/Interaction, Seasonal/Trending, Daily Life/Relatable, Habits/Routines
-Format EXACTLY:
+Generate EXACTLY 8 topics. Use these angles (mix them): Sales/Promotion, Education/Tips, Entertainment/Fun, Engagement/Interaction, Seasonal/Trending, Daily Life/Relatable, Habits/Routines.
+
+YOU MUST OUTPUT ALL 8 TOPICS. Format each topic EXACTLY like this with no deviation:
+
 [Topic 1]
-Angle: [angle]
-Title: [title]
-Description: [2 sentences]
-[Topic 2]...until [Topic 8]`;
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 2]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 3]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 4]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 5]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 6]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 7]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]
+
+[Topic 8]
+Angle: [angle name]
+Title: [topic title]
+Description: [2 sentences explaining why this works]`;
     const result = await callAI(prompt, 2000);
     res.json({ success: true, text: result.text, provider: result.provider });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
