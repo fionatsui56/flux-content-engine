@@ -196,8 +196,7 @@ ${forbiddenWords ? `FORBIDDEN WORDS - never use these: ${forbiddenWords}` : ''}
 
 Output Language: ${langName}
 Write ALL content in ${langName} only.
-Do NOT use ** markdown formatting anywhere.
-Write plain text only.
+CRITICAL: Do NOT use any markdown formatting. No **, no ##, no __, no ---. Do not write 标题: or 内容: labels. Write pure plain text content directly.
 
 PLATFORM STYLE RULES (follow strictly for each platform):
 ${platformInstructions}
