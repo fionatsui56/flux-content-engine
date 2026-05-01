@@ -1465,19 +1465,21 @@ async function generateContent() {
 
 function parseVariations(text) {
   // Strategy 1: [Variation N] (PLATFORM) tags
-  const tagPattern = /\[Variation \d+\]\s*(?:\(([^)]+)\))?/gi;
-  const tagSplit = text.split(/\[Variation \d+\](?:\s*\([^)]*\))?/i);
   const platformMatches = [];
-  let m;
   const tagRe = /\[Variation \d+\]\s*(?:\(([^)]+)\))?/gi;
+  let m;
   while ((m = tagRe.exec(text)) !== null) {
-    platformMatches.push(m[1] ? m[1].toLowerCase() : '');
+    platformMatches.push(m[1] ? m[1].toLowerCase().trim() : '');
   }
+  const tagSplit = text.split(/\[Variation \d+\](?:\s*\([^)]*\))?/gi);
   if (tagSplit.length > 2) {
     const vars = tagSplit.slice(1).filter(p => p.trim());
-    if (vars.length >= 2) {
+    if (vars.length >= 1) {
       return vars.map(function(content, i) {
-        return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim().replace(/^\*\*\n?/, '').replace(/\n?\*\*$/, '').trim(), platform: platformMatches[i] || '', rating: 0 };
+        const cleaned = content.trim()
+          .replace(/^\*\*\n?/, '').replace(/\n?\*\*$/, '')
+          .replace(/^---+\n?/, '').trim();
+        return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: cleaned, platform: platformMatches[i] || '', rating: 0 };
       });
     }
   }
@@ -1520,7 +1522,10 @@ function renderVariations(container) {
     generatedVariations.map(v => `
       <div class="variation-card">
         <div class="variation-header">
-          <div class="variation-num">${t('variation')} ${v.number}${v.platform ? ' — ' + v.platform.toUpperCase() : ''}</div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div class="variation-num">${t('variation')} ${v.number}</div>
+            ${v.platform ? '<span style="background:#1B4D7C; color:white; font-size:10px; font-weight:700; padding:3px 8px; border-radius:4px; letter-spacing:0.05em;">' + v.platform.toUpperCase() + '</span>' : ''}
+          </div>
           <button class="btn-copy" id="copy_${v.id}" onclick="copyVariation(this,'${v.id}')">${t('copy')}</button>
         </div>
         <div class="variation-content">${escHtml(v.content.replace(/^\*\*\n?/,'').replace(/\n?\*\*$/,'').trim())}</div>
