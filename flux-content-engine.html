@@ -1319,19 +1319,53 @@ async function discoverTopics() {
 }
 
 function parseTopics(text) {
-  // blocks[0] = intro text before [Topic 1], skip it
-  const blocks = text.split(/\[Topic \d+\]/i);
-  return blocks.slice(1).map(function(block, i) {
-    const lines = block.trim().split('\n');
-    let angle = '', title = '', description = '';
-    lines.forEach(l => {
-      if (l.startsWith('Angle:')) angle = l.replace('Angle:', '').trim();
-      else if (l.startsWith('Title:')) title = l.replace('Title:', '').trim();
-      else if (l.startsWith('Description:')) description = l.replace('Description:', '').trim();
+  const results = [];
+
+  // Strategy 1: Try [Topic N] format
+  const byTag = text.split(/\[Topic \d+\]/i);
+  if (byTag.length > 2) {
+    byTag.slice(1).forEach(function(block) {
+      const lines = block.trim().split('\n').filter(l => l.trim());
+      let angle = '', title = '', description = '';
+      lines.forEach(l => {
+        const clean = l.replace(/^\*+/, '').trim();
+        if (clean.startsWith('Angle:')) angle = clean.replace('Angle:', '').trim();
+        else if (clean.startsWith('Title:')) title = clean.replace('Title:', '').trim();
+        else if (clean.startsWith('Description:')) description = clean.replace('Description:', '').trim();
+      });
+      if (!title) title = lines[0] || '';
+      if (title.length > 3) results.push({ angle, title, description });
     });
-    if (!title) title = lines.find(l => l.trim()) || '';
-    return { angle, title, description };
-  }).filter(tp => tp.title.length > 3).slice(0, 8);
+    if (results.length >= 4) return results.slice(0, 8);
+  }
+
+  // Strategy 2: Try numbered lines like 1. or 1)
+  const byNumber = text.split(/\n(?=\d+[.)\s])/);
+  byNumber.forEach(function(block) {
+    const lines = block.trim().split('\n').filter(l => l.trim());
+    if (!lines.length) return;
+    let title = lines[0].replace(/^\d+[.)\s]+/, '').replace(/^\*+/, '').trim();
+    let angle = '', description = '';
+    lines.slice(1).forEach(l => {
+      const clean = l.replace(/^\*+/, '').trim();
+      if (clean.toLowerCase().startsWith('angle:')) angle = clean.replace(/angle:/i, '').trim();
+      else if (clean.toLowerCase().startsWith('description:')) description = clean.replace(/description:/i, '').trim();
+      else if (!description && clean.length > 10) description = clean;
+    });
+    if (title.length > 3) results.push({ angle, title, description });
+  });
+  if (results.length >= 4) return results.slice(0, 8);
+
+  // Strategy 3: Split by double newline paragraphs
+  const byPara = text.split(/\n\n+/).filter(p => p.trim().length > 10);
+  byPara.forEach(function(para) {
+    const lines = para.trim().split('\n').filter(l => l.trim());
+    if (!lines.length) return;
+    const title = lines[0].replace(/^[\d.*#-]+\s*/, '').replace(/^\*+/, '').trim();
+    const description = lines.slice(1).join(' ').trim();
+    if (title.length > 3) results.push({ angle: '', title, description });
+  });
+  return results.slice(0, 8);
 }
 
 function renderTopics(topics, container) {
