@@ -1528,7 +1528,17 @@ function renderVariations(container) {
           </div>
           <button class="btn-copy" id="copy_${v.id}" onclick="copyVariation(this,'${v.id}')">${t('copy')}</button>
         </div>
-        <div class="variation-content">${escHtml(v.content.replace(/^\*\*\n?/,'').replace(/\n?\*\*$/,'').trim())}</div>
+        <div class="variation-content">${escHtml(
+          v.content
+            .replace(/^\*\*\s*/gm, '')        // remove ** at line start
+            .replace(/\s*\*\*$/gm, '')        // remove ** at line end
+            .replace(/标题[：:][\s]*\*\*?/gi, '') // remove 标题：**
+            .replace(/標題[：:][\s]*\*\*?/gi, '') // remove 標題：**
+            .replace(/内容[：:][\s]*\*\*?/gi, '') // remove 内容：**
+            .replace(/內容[：:][\s]*\*\*?/gi, '') // remove 內容：**
+            .replace(/\*\*/g, '')               // remove all remaining **
+            .trim()
+        )}</div>
         <div class="variation-footer">
           <div class="stars">
             ${[1,2,3,4,5].map(i => `<span class="star ${i <= v.rating ? 'active':''}" onclick="rateVariation('${v.id}',${i})">★</span>`).join('')}
