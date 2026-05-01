@@ -841,21 +841,25 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.55; }
           <label class="label" data-i18n="labelIndustry">Industry</label>
           <select id="clientIndustry">
             <option value="">—</option>
-            <option value="beauty">Beauty & Personal Care</option>
-            <option value="fashion">Fashion & Apparel</option>
-            <option value="food">Food & Beverage</option>
-            <option value="technology">Technology</option>
-            <option value="finance">Finance & Banking</option>
+            <option value="beauty">Beauty & Personal Care 美容護膚</option>
+            <option value="fashion">Fashion & Apparel 時尚服裝</option>
+            <option value="food">Food & Beverage 食品飲料</option>
+            <option value="technology">Technology 科技</option>
+            <option value="finance">Finance & Banking 金融銀行</option>
             <option value="insurance">Insurance 保險</option>
-            <option value="health">Health & Wellness</option>
+            <option value="health">Health & Wellness 健康養生</option>
             <option value="realestate">Real Estate 房地產</option>
-            <option value="travel">Travel & Tourism</option>
+            <option value="travel">Travel & Tourism 旅遊</option>
             <option value="education">Education 教育</option>
-            <option value="entertainment">Entertainment</option>
+            <option value="entertainment">Entertainment 娛樂</option>
             <option value="ecommerce">E-commerce 電商</option>
             <option value="luxury">Luxury Goods 奢侈品</option>
-            <option value="fitness">Fitness & Sports</option>
-            <option value="home">Home & Living</option>
+            <option value="fitness">Fitness & Sports 運動健身</option>
+            <option value="home">Home & Living 家居生活</option>
+            <option value="marketing">Marketing & Communications 市場推廣</option>
+            <option value="consulting">Consulting & Professional Services 顧問服務</option>
+            <option value="mortgage">Mortgage & Finance Services 按揭財務</option>
+            <option value="events">Events & Exhibitions 展覽活動</option>
             <option value="other">Other 其他</option>
           </select>
         </div>
@@ -1058,7 +1062,7 @@ const STRINGS = {
     generating:'生成中...', useTopic:'使用此主題', copy:'複製', copied:'已複製！',
     clientSaved:'✅ 客戶已儲存', clientUpdated:'✅ 客戶已更新',
     errorSelect:'請選擇客戶', errorTopic:'請輸入話題', errorPlatform:'請選擇至少一個平台',
-    backupBtn:'備份', importBtn:'匯入', variation:'版本', generated:'生成結果', editClient:'編輯',
+    backupBtn:'備份', importBtn:'匯入', variation:'版本', generated:'生成結果', editClient:'編輯', deleteClient:'刪除',
   },
   sc: {
     navDashboard:'仪表板', navClients:'客户管理', navTopics:'主题发现', navGenerate:'生成内容', navHistory:'历史记录',
@@ -1084,7 +1088,7 @@ const STRINGS = {
     generating:'生成中...', useTopic:'使用此主题', copy:'复制', copied:'已复制！',
     clientSaved:'✅ 客户已保存', clientUpdated:'✅ 客户已更新',
     errorSelect:'请选择客户', errorTopic:'请输入话题', errorPlatform:'请选择至少一个平台',
-    backupBtn:'备份', importBtn:'导入', variation:'版本', generated:'生成结果', editClient:'编辑',
+    backupBtn:'备份', importBtn:'导入', variation:'版本', generated:'生成结果', editClient:'编辑', deleteClient:'删除',
   },
   en: {
     navDashboard:'Dashboard', navClients:'Clients', navTopics:'Topics', navGenerate:'Generate', navHistory:'History',
@@ -1110,7 +1114,7 @@ const STRINGS = {
     generating:'Generating...', useTopic:'Use Topic', copy:'Copy', copied:'Copied!',
     clientSaved:'✅ Client saved', clientUpdated:'✅ Client updated',
     errorSelect:'Please select a client', errorTopic:'Please enter a topic', errorPlatform:'Please select at least one platform',
-    backupBtn:'Backup', importBtn:'Import', variation:'Variation', generated:'Generated Content', editClient:'Edit',
+    backupBtn:'Backup', importBtn:'Import', variation:'Variation', generated:'Generated Content', editClient:'Edit', deleteClient:'Delete',
   }
 };
 
@@ -1220,6 +1224,23 @@ function editClient(id) {
   document.getElementById('clientName').focus();
 }
 
+function deleteClient(id) {
+  const client = clients.find(c => c.id === id);
+  if (!client) return;
+  if (!confirm('Delete client: ' + client.name + '?')) return;
+  clients = clients.filter(c => c.id !== id);
+  if (editingClientId === id) {
+    editingClientId = null;
+    ['clientName','clientBrandStory','clientAudience','clientCompetitors','clientForbidden'].forEach(i => document.getElementById(i).value = '');
+    document.getElementById('clientIndustry').value = '';
+    document.getElementById('clientTone').value = 'professional';
+  }
+  persistData();
+  renderClientsList();
+  updateClientDropdowns();
+  updateStats();
+}
+
 function renderClientsList() {
   const el = document.getElementById('clientsList');
   if (!clients.length) {
@@ -1232,7 +1253,10 @@ function renderClientsList() {
         <div class="client-name">${escHtml(c.name)}</div>
         <div class="client-meta">${c.industry || '—'} · ${c.tone}</div>
       </div>
-      <button class="btn-secondary" onclick="editClient(${c.id})">${t('editClient')}</button>
+      <div style="display:flex; gap:6px; flex-shrink:0;">
+        <button class="btn-secondary" onclick="editClient(${c.id})">${t('editClient')}</button>
+        <button class="btn-secondary" onclick="deleteClient(${c.id})" style="color:#C62828; border-color:#C62828;">${t('deleteClient')}</button>
+      </div>
     </div>
   `).join('');
 }
