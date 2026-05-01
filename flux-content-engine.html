@@ -1456,14 +1456,53 @@ async function generateContent() {
 }
 
 function parseVariations(text) {
-  const parts = text.split(/\[Variation \d+\]/i);
-  const variations = parts.slice(1).filter(p => p.trim());
-  if (!variations.length) {
-    return [{ id: 'v_' + Date.now() + '_0', number: 1, content: text.trim(), rating: 0 }];
+  // Strategy 1: [Variation N] (PLATFORM) tags
+  const tagPattern = /\[Variation \d+\]\s*(?:\(([^)]+)\))?/gi;
+  const tagSplit = text.split(/\[Variation \d+\](?:\s*\([^)]*\))?/i);
+  const platformMatches = [];
+  let m;
+  const tagRe = /\[Variation \d+\]\s*(?:\(([^)]+)\))?/gi;
+  while ((m = tagRe.exec(text)) !== null) {
+    platformMatches.push(m[1] ? m[1].toLowerCase() : '');
   }
-  return variations.map(function(content, i) {
-    return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim(), rating: 0 };
-  });
+  if (tagSplit.length > 2) {
+    const vars = tagSplit.slice(1).filter(p => p.trim());
+    if (vars.length >= 2) {
+      return vars.map(function(content, i) {
+        return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim().replace(/^\*\*\n?/, '').replace(/\n?\*\*$/, '').trim(), platform: platformMatches[i] || '', rating: 0 };
+      });
+    }
+  }
+
+  // Strategy 2: **Variation N** or ---Variation N---
+  const byBold = text.split(/\*\*\s*(?:Variation|版本)\s*\d+\s*\*\*/i);
+  if (byBold.length > 2) {
+    const vars = byBold.slice(1).filter(p => p.trim());
+    if (vars.length >= 2) {
+      return vars.map(function(content, i) {
+        return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim(), rating: 0 };
+      });
+    }
+  }
+
+  // Strategy 3: Split by --- separator
+  const byDash = text.split(/\n---+\n/);
+  if (byDash.length >= 3) {
+    return byDash.filter(p => p.trim().length > 20).map(function(content, i) {
+      return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim(), rating: 0 };
+    });
+  }
+
+  // Strategy 4: Split by double newline (paragraphs)
+  const byPara = text.split(/\n\n\n+/).filter(p => p.trim().length > 30);
+  if (byPara.length >= 2) {
+    return byPara.map(function(content, i) {
+      return { id: 'v_' + Date.now() + '_' + i, number: i + 1, content: content.trim(), rating: 0 };
+    });
+  }
+
+  // Fallback: return whole text
+  return [{ id: 'v_' + Date.now() + '_0', number: 1, content: text.trim(), rating: 0 }];
 }
 
 function renderVariations(container) {
@@ -1473,10 +1512,10 @@ function renderVariations(container) {
     generatedVariations.map(v => `
       <div class="variation-card">
         <div class="variation-header">
-          <div class="variation-num">${t('variation')} ${v.number}</div>
+          <div class="variation-num">${t('variation')} ${v.number}${v.platform ? ' — ' + v.platform.toUpperCase() : ''}</div>
           <button class="btn-copy" id="copy_${v.id}" onclick="copyVariation(this,'${v.id}')">${t('copy')}</button>
         </div>
-        <div class="variation-content">${escHtml(v.content)}</div>
+        <div class="variation-content">${escHtml(v.content.replace(/^\*\*\n?/,'').replace(/\n?\*\*$/,'').trim())}</div>
         <div class="variation-footer">
           <div class="stars">
             ${[1,2,3,4,5].map(i => `<span class="star ${i <= v.rating ? 'active':''}" onclick="rateVariation('${v.id}',${i})">★</span>`).join('')}
