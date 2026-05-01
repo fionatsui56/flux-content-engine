@@ -1024,12 +1024,14 @@ function isIPad() { return window.innerWidth < 1024; }
 
 function applyResponsiveLayout() {
   const ipad = isIPad();
-  // Show/hide topbar logo on iPad
-  document.getElementById('topbarLogo').style.display = ipad ? 'flex' : 'none';
-  document.getElementById('pageTitle').style.display = ipad ? 'none' : 'block';
-  // Show backup buttons in topbar on iPad
-  document.getElementById('exportBtnTop').style.display = ipad ? 'block' : 'none';
-  document.getElementById('importBtnTop').style.display = ipad ? 'block' : 'none';
+  const topbarLogo = document.getElementById('topbarLogo');
+  const pageTitle = document.getElementById('pageTitle');
+  const exportBtnTop = document.getElementById('exportBtnTop');
+  const importBtnTop = document.getElementById('importBtnTop');
+  if (topbarLogo) topbarLogo.style.display = ipad ? 'flex' : 'none';
+  if (pageTitle) pageTitle.style.display = ipad ? 'none' : 'block';
+  if (exportBtnTop) exportBtnTop.style.display = ipad ? 'block' : 'none';
+  if (importBtnTop) importBtnTop.style.display = ipad ? 'block' : 'none';
 }
 
 window.addEventListener('resize', applyResponsiveLayout);
