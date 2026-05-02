@@ -112,7 +112,7 @@ app.post('/api/topics', async (req, res) => {
   try {
     const { clientName, industry, tone, brandStory, targetAudience, platform, language, contentDirection } = req.body;
     const langMap = {
-      tc: 'Traditional Chinese (繁體中文) - use Hong Kong expressions',
+      tc: 'Traditional Chinese (Hong Kong). Adjust register based on brand tone: if tone is professional/trustworthy/educational, use formal written Chinese (書面語); if tone is casual/energetic, use natural HK conversational style with local expressions; if tone is luxury, use elegant formal Chinese. Never mix styles.',
       sc: 'Simplified Chinese - use authentic Mainland China style, WeChat/XiaoHongShu native tone. No HK expressions.',
       en: 'English'
     };
@@ -181,7 +181,7 @@ app.post('/api/generate', async (req, res) => {
     const { topic, clientName, industry, tone, brandStory, targetAudience, forbiddenWords, platforms, language } = req.body;
 
     const langMap = {
-      tc: 'Traditional Chinese (繁體中文) - use Hong Kong expressions and style',
+      tc: 'Traditional Chinese (Hong Kong). Adjust register based on brand tone: if tone is professional/trustworthy/educational, use formal written Chinese (書面語); if tone is casual/energetic, use natural HK conversational style with local expressions; if tone is luxury, use elegant formal Chinese. Never mix styles.',
       sc: 'Simplified Chinese - use authentic Mainland China style, native to WeChat and XiaoHongShu. No HK or Taiwan expressions.',
       en: 'English'
     };
@@ -212,7 +212,12 @@ ${targetAudience ? 'Audience: ' + targetAudience.substring(0, 100) : ''}
 ${forbiddenWords ? 'FORBIDDEN WORDS (never use): ' + forbiddenWords : ''}
 
 Output Language: ${langName}
-CRITICAL: No markdown formatting. No **, no ##. Plain text only. No "标题:" or "内容:" labels.
+CRITICAL WRITING RULES:
+- No markdown formatting. No **, no ##. Plain text only.
+- Write like a REAL HUMAN, not an AI. Avoid AI-sounding phrases like "In conclusion", "It is worth noting", "Dive into", "Game-changer", "Unlock your potential".
+- Use natural conversational language matching the brand tone.
+- Vary sentence length. Include specific details, not generic statements.
+- For Chinese content: use natural spoken expressions, not formal written Chinese.
 
 PLATFORM RULES (follow strictly):
 ${platformInstructions}
