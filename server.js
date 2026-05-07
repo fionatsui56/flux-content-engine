@@ -112,9 +112,9 @@ app.post('/api/topics', async (req, res) => {
   try {
     const { clientName, industry, tone, brandStory, targetAudience, platform, language, contentDirection } = req.body;
     const langMap = {
-      tc: 'Traditional Chinese (Hong Kong). Adjust register based on brand tone: if tone is professional/trustworthy/educational, use formal written Chinese (書面語); if tone is casual/energetic, use natural HK conversational style with local expressions; if tone is luxury, use elegant formal Chinese. Never mix styles.',
-      sc: 'Simplified Chinese - use authentic Mainland China style, WeChat/XiaoHongShu native tone. No HK expressions.',
-      en: 'English'
+      tc: 'Traditional Chinese (Hong Kong). Match register to brand tone: professional/educational = formal written Chinese (書面語); casual/energetic = natural HK conversational style; luxury = elegant formal Chinese. NEVER mix registers. NEVER use Taiwan expressions.',
+      sc: 'Simplified Chinese - AUTHENTIC Mainland China style, native to WeChat and XiaoHongShu. No HK or Taiwan expressions.',
+      en: 'Hong Kong Business English — clear, direct, professional but not stiff.'
     };
     const langName = langMap[language] || langMap.tc;
 
@@ -181,19 +181,57 @@ app.post('/api/generate', async (req, res) => {
     const { topic, clientName, industry, tone, brandStory, targetAudience, forbiddenWords, platforms, language } = req.body;
 
     const langMap = {
-      tc: 'Traditional Chinese (Hong Kong). Adjust register based on brand tone: if tone is professional/trustworthy/educational, use formal written Chinese (書面語); if tone is casual/energetic, use natural HK conversational style with local expressions; if tone is luxury, use elegant formal Chinese. Never mix styles.',
-      sc: 'Simplified Chinese - use authentic Mainland China style, native to WeChat and XiaoHongShu. No HK or Taiwan expressions.',
-      en: 'English'
+      tc: 'Traditional Chinese (Hong Kong). Match register to brand tone: professional/educational = formal written Chinese (書面語) e.g. 「我們提供⋯」「協助您⋯」; casual/energetic = natural HK conversational style e.g. 「搞掂！」「係咁先！」; luxury = elegant formal Chinese e.g. 「臻選」「尊享」. NEVER mix registers. NEVER use Taiwan expressions (棒、哦、超級、讚).',
+      sc: 'Simplified Chinese - AUTHENTIC Mainland China style, native to WeChat and XiaoHongShu. No HK or Taiwan expressions. Use 很棒 not 好正; 没问题 not 冇問題; 真的 not 真係.',
+      en: 'Hong Kong Business English. Clear, direct, professional but not stiff. NOT American English (no gonna/wanna). LinkedIn: Hook → Evidence → Insight → Question structure. Instagram/Threads: short punchy sentences. Always vary sentence length.'
     };
     const langName = langMap[language] || langMap.tc;
 
+    // Detect seasonal context from topic
+    const topicLower = topic.toLowerCase();
+    let contentDirectionHint = '';
+    const emotionalKeys = ['母親節','父親節','情人節','christmas','聖誕','valentine','中秋','新年','cny','感恩'];
+    const promoKeys = ['雙十一','11.11','618','black friday','singles day','促銷','優惠','sale'];
+    const culturalKeys = ['清明','重陽','端午','中秋','佛誕','dragon boat','mid-autumn'];
+    const bizKeys = ['財年','quarterly','budget','q1','q2','q3','q4','strategy','annual'];
+    if (emotionalKeys.some(k => topicLower.includes(k))) {
+      contentDirectionHint = 'SEASONAL NOTE: Emotional/festive occasion — prioritise warmth and personal connection. Avoid hard-sell language.';
+    } else if (promoKeys.some(k => topicLower.includes(k))) {
+      contentDirectionHint = 'SEASONAL NOTE: Major promotional season — sales-driven but must feel authentic, not like a pure ad.';
+    } else if (culturalKeys.some(k => topicLower.includes(k))) {
+      contentDirectionHint = 'SEASONAL NOTE: Cultural festival — lead with cultural meaning before any brand message.';
+    } else if (bizKeys.some(k => topicLower.includes(k))) {
+      contentDirectionHint = 'SEASONAL NOTE: Business/professional context — thought leadership tone, lead with insight or data.';
+    }
+
     const platformStyles = {
-      facebook: 'Facebook: 100-200 words. Conversational storytelling. 2-3 hashtags. Start with hook.',
-      instagram: 'Instagram: 50-100 words. Heavy emojis. 5-10 hashtags. Punchy first line. Line breaks.',
-      threads: 'Threads: Under 80 words. Casual opinion. 0-3 hashtags.',
-      linkedin: 'LinkedIn: 150-250 words. Professional tone. 3-5 hashtags. End with question.',
-      xiaohongshu: '小紅書: Use [title] in 【】. 150-250 words. Lifestyle authentic tone. 8-15 hashtags mixing Chinese/English. Mainland Chinese expressions. Emoji after key points.',
-      wechat: '微信朋友圈: 80-150 words. Warm personal tone like sharing with friends. NO hashtags. First-person. End with soft question.'
+      facebook: `Facebook: 100-200 words. Conversational storytelling. 2-3 hashtags.
+HOOK (pick one): Counter-intuitive statement | Pain-point question | Number opener ("3 reasons...") | Story opener
+CTA: Specific comment-driving question | "Tag someone who needs this" | "Save this post"`,
+
+      instagram: `Instagram: 50-100 words. Hook MUST land within first 125 characters. Heavy emojis. 5-10 hashtags. Line breaks between sentences.
+HOOK (pick one): Bold statement | Data drop | Pain point | Contrast ("Before vs After")
+CTA: Drive SAVES ("Save this for later") or SHARES — algorithm prioritises saves+shares over likes in 2025-26.`,
+
+      threads: `Threads: Under 80 words. Sound like talking to a friend. 0-3 hashtags.
+HOOK: Direct opinion | Casual observation | Relatable moment
+CTA: Soft question or light provocation that invites replies. Never corporate tone.`,
+
+      linkedin: `LinkedIn: 150-250 words. Hook in first 210 characters (before "see more"). Personal voice beats brand voice. 3-5 hashtags.
+HOOK (pick one): Number + insight | Personal story | Industry observation | Bold question
+STRUCTURE: Hook → Expand (2-3 sentences) → Key insight → Closing question
+CTA: Genuine discussion question at the end.`,
+
+      xiaohongshu: `小紅書: 150-250 words. Title in 【】brackets. Hook must grab in 3 seconds. 8-15 hashtags Chinese/English mix. Emoji after key points. MAINLAND CHINESE only.
+HOOK: 數字型 "5個方法讓你⋯" | 疑問型 "為什麼你的XX總是失敗？" | 對比型 "用了這個之後再也回不去了"
+STYLE: 種草 mindset — friend sharing a discovery, NOT an advertisement.
+CTA: Drive 收藏 (saves). Soft interactive question at end.
+RULES: No 最/第一/唯一. No guarantee language. No false urgency.`,
+
+      wechat: `微信朋友圈: 80-150 words. Warm and personal like sharing with close friends. NO hashtags. First-person. MAINLAND CHINESE only.
+HOOK: Warm personal opening that feels like a private thought being shared.
+CTA: Soft closing question e.g. 「你呢？」「你也有這種感覺嗎？」— never a hard sell.
+RULES: No superlatives. No promotional language. No hashtags. No links.`
     };
 
     const selectedPlatforms = (platforms && platforms.length) ? platforms : ['general'];
@@ -210,14 +248,17 @@ Client: ${clientName} | Industry: ${industry || 'General'} | Tone: ${tone}
 ${brandStory ? 'Brand story: ' + brandStory.substring(0, 150) : ''}
 ${targetAudience ? 'Audience: ' + targetAudience.substring(0, 100) : ''}
 ${forbiddenWords ? 'FORBIDDEN WORDS (never use): ' + forbiddenWords : ''}
+${contentDirectionHint ? contentDirectionHint : ''}
 
 Output Language: ${langName}
+
 CRITICAL WRITING RULES:
-- No markdown formatting. No **, no ##. Plain text only.
-- Write like a REAL HUMAN, not an AI. Avoid AI-sounding phrases like "In conclusion", "It is worth noting", "Dive into", "Game-changer", "Unlock your potential".
-- Use natural conversational language matching the brand tone.
-- Vary sentence length. Include specific details, not generic statements.
-- For Chinese content: use natural spoken expressions, not formal written Chinese.
+- No markdown. No **, no ##. Plain text only.
+- Write like a REAL HUMAN. NEVER use: "In conclusion", "It is worth noting", "Dive into", "Game-changer", "Unlock your potential", "Leverage", "Empower", "Ecosystem", "Synergy", "Paradigm".
+- Vary sentence length — short sentences and longer ones mixed together.
+- Include specific details, not generic statements.
+- Chinese content: match tone to brand personality as specified in language rules above.
+- English content: HK Business English — clear, direct, not stiff. Vary structure per platform.
 
 PLATFORM RULES (follow strictly):
 ${platformInstructions}
