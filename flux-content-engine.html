@@ -1611,6 +1611,14 @@ function renderHistory() {
       varHtml += '<button class="btn-copy" onclick="copyHistoryVar(this,' + idx + ',' + vi + ')">' + t('copy') + '</button>';
       varHtml += '</div>';
       varHtml += '<div style="font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;">' + escHtml(v.content || '') + '</div>';
+      // Star rating display
+      var stars = '';
+      for (var s = 1; s <= 5; s++) {
+        stars += '<span style="font-size:18px;color:' + (s <= (v.rating||0) ? '#1B4D7C' : '#D0D0D0') + ';">' + (s <= (v.rating||0) ? '★' : '☆') + '</span>';
+      }
+      varHtml += '<div style="margin-top:8px;display:flex;align-items:center;gap:4px;">' + stars;
+      if (v.isBest) varHtml += '<span style="margin-left:8px;font-size:11px;font-weight:700;color:#1B4D7C;">✓ Best</span>';
+      varHtml += '</div>';
       varHtml += '</div>';
     });
     let tags = '';
