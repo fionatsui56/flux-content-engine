@@ -9,8 +9,8 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XEE5CPS3YR');
+  gtag("js", new Date());
+  gtag("config", "G-XEE5CPS3YR");
 </script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -1605,17 +1605,18 @@ function renderHistory() {
   history.slice(0, 50).forEach(function(item, idx) {
     let varHtml = '';
     (item.variations || []).forEach(function(v, vi) {
+      var platformLabel = (item.platforms && item.platforms[vi]) ? item.platforms[vi].toUpperCase() : '';
       varHtml += '<div style="border:1px solid #E8EAED;border-radius:8px;padding:12px;margin-top:10px;background:#FAFBFC;">';
       varHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+      varHtml += '<div style="display:flex;align-items:center;gap:8px;">';
       varHtml += '<span style="font-size:11px;font-weight:700;color:#1B4D7C;text-transform:uppercase;">' + t('variation') + ' ' + (vi+1) + '</span>';
+      if (platformLabel) { varHtml += '<span style="font-size:10px;font-weight:700;color:white;background:#1B4D7C;padding:2px 8px;border-radius:4px;">' + platformLabel + '</span>'; }
+      varHtml += '</div>';
       varHtml += '<button class="btn-copy" onclick="copyHistoryVar(this,' + idx + ',' + vi + ')">' + t('copy') + '</button>';
       varHtml += '</div>';
       varHtml += '<div style="font-size:13px;color:#333;line-height:1.6;white-space:pre-wrap;">' + escHtml(v.content || '') + '</div>';
-      // Star rating display
       var stars = '';
-      for (var s = 1; s <= 5; s++) {
-        stars += '<span style="font-size:18px;color:' + (s <= (v.rating||0) ? '#1B4D7C' : '#D0D0D0') + ';">' + (s <= (v.rating||0) ? '★' : '☆') + '</span>';
-      }
+      for (var s = 1; s <= 5; s++) { stars += '<span style="font-size:18px;color:' + (s <= (v.rating||0) ? '#1B4D7C' : '#D0D0D0') + ';">' + (s <= (v.rating||0) ? '★' : '☆') + '</span>'; }
       varHtml += '<div style="margin-top:8px;display:flex;align-items:center;gap:4px;">' + stars;
       if (v.isBest) varHtml += '<span style="margin-left:8px;font-size:11px;font-weight:700;color:#1B4D7C;">✓ Best</span>';
       varHtml += '</div>';
