@@ -19,16 +19,17 @@
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg-deep:       #080e18;
-    --bg-dark:       #0d1521;
-    --border:        rgba(255,255,255,0.08);
-    --primary:       #ffffff;
-    --secondary:     #9aa3ae;
-    --muted:         rgba(255,255,255,0.45);
-    --accent-mint:   #cdffd8;
-    --accent-blue:   #94b9ff;
-    --grad:          linear-gradient(135deg, #cdffd8, #94b9ff);
-    --error:         #ff6b6b;
+    --bg-deep:      #080e18;
+    --bg-dark:      #0d1521;
+    --border:       rgba(255,255,255,0.08);
+    --border-mid:   rgba(255,255,255,0.12);
+    --primary:      #ffffff;
+    --secondary:    #9aa3ae;
+    --muted:        rgba(255,255,255,0.45);
+    --accent-mint:  #cdffd8;
+    --accent-blue:  #94b9ff;
+    --grad:         linear-gradient(135deg, #cdffd8, #94b9ff);
+    --error:        #ff6b6b;
   }
 
   html { scroll-behavior: smooth; }
@@ -38,18 +39,14 @@
     color: var(--primary);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 24px;
   }
 
+  /* ── OUTER WRAP ── */
   .page-wrap {
     width: 100%;
-    max-width: 480px;
-    padding: 64px 0 80px;
-    display: flex;
-    flex-direction: column;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 48px;
   }
 
   /* ── HEADER ── */
@@ -57,7 +54,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 72px;
+    padding: 36px 0 0;
+    margin-bottom: 80px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 28px;
   }
 
   .logo-block a { text-decoration: none; }
@@ -88,8 +88,17 @@
   }
   .back-link:hover { color: var(--accent-mint); }
 
-  /* ── HERO ── */
-  .hero { margin-bottom: 40px; }
+  /* ── MAIN GRID: 左Hero 右Panel ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 80px;
+    align-items: start;
+    padding-bottom: 80px;
+  }
+
+  /* ── LEFT: HERO ── */
+  .hero-col {}
 
   .hero-eyebrow {
     font-size: 11px;
@@ -97,16 +106,16 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--accent-mint);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
   }
 
   .hero-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 42px;
-    line-height: 1.12;
+    font-size: 56px;
+    line-height: 1.08;
     font-weight: 400;
     color: var(--primary);
-    margin-bottom: 24px;
+    margin-bottom: 28px;
   }
 
   .hero-title em {
@@ -118,24 +127,25 @@
   }
 
   .hero-body {
-    font-size: 15px;
-    line-height: 1.7;
+    font-size: 16px;
+    line-height: 1.75;
     color: var(--secondary);
+    max-width: 480px;
+    margin-bottom: 48px;
   }
 
   /* ── FEATURES ── */
   .features {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 48px;
+    gap: 12px;
   }
 
   .feature-item {
     background: var(--bg-dark);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 16px 14px;
+    padding: 18px 16px;
   }
 
   .feature-number {
@@ -166,12 +176,21 @@
     line-height: 1.5;
   }
 
-  /* ── DIVIDER ── */
-  .divider {
-    width: 100%;
-    height: 1px;
-    background: var(--border);
-    margin: 40px 0;
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    position: sticky;
+    top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .panel-block {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 16px;
   }
 
   /* ── SECTION LABEL ── */
@@ -187,7 +206,7 @@
   /* ── TRIAL ── */
   .trial-heading {
     font-family: 'DM Serif Display', serif;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 400;
     color: var(--primary);
     margin-bottom: 10px;
@@ -195,22 +214,21 @@
   }
 
   .trial-body {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.65;
     color: var(--secondary);
     margin-bottom: 24px;
   }
 
-  /* Primary — gradient fill pill */
   .btn-trial {
     display: block;
     width: 100%;
-    padding: 16px 24px;
+    padding: 15px 24px;
     background: var(--grad);
     color: #0d1521;
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-align: center;
@@ -223,16 +241,23 @@
   .btn-trial:hover { opacity: 0.85; }
 
   .trial-note {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
     margin-top: 10px;
     text-align: center;
   }
 
+  /* ── DIVIDER ── */
+  .panel-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 0 16px;
+  }
+
   /* ── LOGIN ── */
   .login-heading {
     font-family: 'DM Serif Display', serif;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 400;
     color: var(--primary);
     margin-bottom: 24px;
@@ -253,8 +278,8 @@
 
   .form-input {
     width: 100%;
-    padding: 13px 20px;
-    background: var(--bg-dark);
+    padding: 13px 18px;
+    background: var(--bg-deep);
     border: 1px solid var(--border);
     border-radius: 999px;
     color: var(--primary);
@@ -267,10 +292,9 @@
   .form-input::placeholder { color: rgba(255,255,255,0.2); }
   .form-input:focus { border-color: rgba(205,255,216,0.4); }
 
-  /* Ghost pill button */
   .btn-login {
     width: 100%;
-    padding: 16px 24px;
+    padding: 15px 24px;
     background: transparent;
     border: 1px solid rgba(255,255,255,0.2);
     color: rgba(255,255,255,0.7);
@@ -300,19 +324,14 @@
 
   /* ── FOOTER ── */
   .page-footer {
-    margin-top: 64px;
-    padding-top: 28px;
     border-top: 1px solid var(--border);
+    padding: 28px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  .footer-copy {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-  }
+  .footer-copy { font-size: 11px; color: var(--muted); }
 
   .footer-link {
     font-size: 11px;
@@ -323,11 +342,23 @@
   .footer-link:hover { color: var(--secondary); }
 
   /* ── RESPONSIVE ── */
-  @media (max-width: 520px) {
-    .page-wrap { padding: 48px 0 64px; }
+  @media (max-width: 900px) {
+    .page-wrap { padding: 0 32px; }
+    .main-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .right-panel { position: static; }
+    .hero-title { font-size: 42px; }
+    .features { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 560px) {
+    .page-wrap { padding: 0 20px; }
     .hero-title { font-size: 34px; }
-    .site-header { margin-bottom: 56px; }
+    .site-header { margin-bottom: 48px; }
     .features { grid-template-columns: 1fr; gap: 8px; }
+    .panel-block { padding: 24px; }
   }
 </style>
 </head>
@@ -346,77 +377,80 @@
     <a href="https://www.flux-strategy.com/" class="back-link">← Main Site</a>
   </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-eyebrow">AI-Powered Content Tool</div>
-    <h1 class="hero-title">
-      Your brand voice.<br>
-      <em>Six platforms.</em><br>
-      Three languages.
-    </h1>
-    <p class="hero-body">
-      Flux Strategy Content Engine generates platform-ready social content for Hong Kong and Greater Bay Area brands — built on brand strategy logic, not just AI prompting. Every output is calibrated to your brand tone, audience, and platform — and written to sound human.
-    </p>
-  </section>
+  <!-- MAIN GRID -->
+  <div class="main-grid">
 
-  <!-- FEATURES -->
-  <div class="features">
-    <div class="feature-item">
-      <div class="feature-number">01</div>
-      <div class="feature-label">6 Platforms</div>
-      <div class="feature-desc">Facebook, Instagram, Threads, LinkedIn, Xiaohongshu (RED), WeChat</div>
+    <!-- LEFT: HERO + FEATURES -->
+    <div class="hero-col">
+      <div class="hero-eyebrow">AI-Powered Content Tool</div>
+      <h1 class="hero-title">
+        Your brand voice.<br>
+        <em>Six platforms.</em><br>
+        Three languages.
+      </h1>
+      <p class="hero-body">
+        Flux Strategy Content Engine generates platform-ready social content for Hong Kong and Greater Bay Area brands — built on brand strategy logic, not just AI prompting. Every output is calibrated to your brand tone, audience, and platform — and written to sound human.
+      </p>
+
+      <div class="features">
+        <div class="feature-item">
+          <div class="feature-number">01</div>
+          <div class="feature-label">6 Platforms</div>
+          <div class="feature-desc">Facebook, Instagram, Threads, LinkedIn, Xiaohongshu (RED), WeChat</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-number">02</div>
+          <div class="feature-label">3 Languages</div>
+          <div class="feature-desc">Traditional Chinese, Simplified Chinese, English</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-number">03</div>
+          <div class="feature-label">Strategy-Led</div>
+          <div class="feature-desc">Brand rules, audience logic, forbidden words built in</div>
+        </div>
+      </div>
     </div>
-    <div class="feature-item">
-      <div class="feature-number">02</div>
-      <div class="feature-label">3 Languages</div>
-      <div class="feature-desc">Traditional Chinese, Simplified Chinese, English</div>
-    </div>
-    <div class="feature-item">
-      <div class="feature-number">03</div>
-      <div class="feature-label">Strategy-Led</div>
-      <div class="feature-desc">Brand rules, audience logic, forbidden words built in</div>
+
+    <!-- RIGHT: TRIAL + LOGIN -->
+    <div class="right-panel">
+
+      <!-- FREE TRIAL -->
+      <div class="panel-block">
+        <div class="section-label">New Users</div>
+        <h2 class="trial-heading">Request a free trial.</h2>
+        <p class="trial-body">
+          Currently in invite-only access. Send us a request and we'll be in touch within 48 hours to set you up.
+        </p>
+        <a class="btn-trial"
+          href="mailto:hello@flux-strategy.com?subject=Content%20Engine%20%E2%80%94%20Free%20Trial%20Request&body=Hi%20Fiona%2C%0A%0AI%27d%20like%20to%20request%20a%20free%20trial%20for%20Flux%20Strategy%20Content%20Engine.%0A%0AName%3A%20%0ACompany%3A%20%0ARole%3A%20%0APlatforms%20I%20manage%3A%20">
+          Request Free Trial
+        </a>
+        <p class="trial-note">Opens your email app with details pre-filled.</p>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="panel-block">
+        <div class="section-label">Existing Users</div>
+        <h2 class="login-heading">Sign in to your account.</h2>
+
+        <div class="form-field">
+          <label class="form-label" for="loginPassword">Access Password</label>
+          <input
+            class="form-input"
+            type="password"
+            id="loginPassword"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            onkeydown="if(event.key==='Enter') handleLogin()"
+          >
+        </div>
+
+        <div class="error-msg" id="loginError">Incorrect password. Please try again or request access above.</div>
+        <button class="btn-login" onclick="handleLogin()">Enter Content Engine</button>
+      </div>
+
     </div>
   </div>
-
-  <div class="divider"></div>
-
-  <!-- FREE TRIAL -->
-  <section>
-    <div class="section-label">New Users</div>
-    <h2 class="trial-heading">Request a free trial.</h2>
-    <p class="trial-body">
-      Currently in invite-only access. Send us a request and we'll be in touch within 48 hours to set you up.
-    </p>
-    <a class="btn-trial"
-      href="mailto:hello@flux-strategy.com?subject=Content%20Engine%20%E2%80%94%20Free%20Trial%20Request&body=Hi%20Fiona%2C%0A%0AI%27d%20like%20to%20request%20a%20free%20trial%20for%20Flux%20Strategy%20Content%20Engine.%0A%0AName%3A%20%0ACompany%3A%20%0ARole%3A%20%0APlatforms%20I%20manage%3A%20">
-      Request Free Trial
-    </a>
-    <p class="trial-note">Opens your email app with subject &amp; details pre-filled.</p>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- LOGIN -->
-  <section>
-    <div class="section-label">Existing Users</div>
-    <h2 class="login-heading">Sign in to your account.</h2>
-
-    <div class="form-field">
-      <label class="form-label" for="loginPassword">Access Password</label>
-      <input
-        class="form-input"
-        type="password"
-        id="loginPassword"
-        placeholder="Enter your password"
-        autocomplete="current-password"
-        onkeydown="if(event.key==='Enter') handleLogin()"
-      >
-    </div>
-
-    <div class="error-msg" id="loginError">Incorrect password. Please try again or request access above.</div>
-
-    <button class="btn-login" onclick="handleLogin()">Enter Content Engine</button>
-  </section>
 
   <!-- FOOTER -->
   <footer class="page-footer">
