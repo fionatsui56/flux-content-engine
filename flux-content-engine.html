@@ -1863,6 +1863,16 @@ function importData() {
 window.addEventListener('load', function() {
   loadData();
   updateAllUI();
+
+  // Keep Render backend alive — ping every 10 minutes
+  function pingBackend() {
+    fetch('https://flux-content-engine.onrender.com/ping')
+      .then(r => r.json())
+      .then(d => console.log('Backend alive:', d.time))
+      .catch(() => console.log('Backend ping failed — may be waking up'));
+  }
+  pingBackend(); // ping immediately on load
+  setInterval(pingBackend, 10 * 60 * 1000); // then every 10 mins
 });
 </script>
 
