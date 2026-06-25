@@ -318,6 +318,59 @@ select option { background: var(--bg-dark); color: var(--primary); }
   margin-bottom: 16px;
 }
 
+
+/* ── E6: AUDIENCE TAG CHIPS ── */
+.tag-section { margin-bottom: 14px; }
+.tag-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: block;
+}
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--border-mid);
+  background: transparent;
+  color: var(--secondary);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tag-chip:hover {
+  border-color: rgba(205,255,216,0.3);
+  color: var(--primary);
+}
+.tag-chip.selected {
+  background: rgba(205,255,216,0.12);
+  border-color: var(--accent-mint);
+  color: var(--accent-mint);
+  font-weight: 600;
+}
+.audience-summary {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--secondary);
+  line-height: 1.5;
+  display: none;
+}
+.audience-summary.visible { display: block; }
+
 /* API key input override */
 #apiKey { letter-spacing: 0.04em; }
 </style>
@@ -412,7 +465,99 @@ select option { background: var(--bg-dark); color: var(--primary); }
       </div>
       <div class="form-group">
         <label class="label" data-key="targetAudience">Target Audience</label>
-        <textarea id="clientTargetAudience" placeholder="Age, gender, interests, income level..." style="min-height: 80px; resize: vertical;"></textarea>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Gender</span>
+          <div class="tag-chips" id="chips-gender">
+            <button class="tag-chip" data-group="gender" data-val="女性為主" onclick="toggleChip(this)">女性為主</button>
+            <button class="tag-chip" data-group="gender" data-val="男性為主" onclick="toggleChip(this)">男性為主</button>
+            <button class="tag-chip" data-group="gender" data-val="性別均衡" onclick="toggleChip(this)">性別均衡</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Age Group</span>
+          <div class="tag-chips" id="chips-age">
+            <button class="tag-chip" data-group="age" data-val="18-24歲" onclick="toggleChip(this)">18-24</button>
+            <button class="tag-chip" data-group="age" data-val="25-34歲" onclick="toggleChip(this)">25-34</button>
+            <button class="tag-chip" data-group="age" data-val="35-44歲" onclick="toggleChip(this)">35-44</button>
+            <button class="tag-chip" data-group="age" data-val="45-54歲" onclick="toggleChip(this)">45-54</button>
+            <button class="tag-chip" data-group="age" data-val="55歲以上" onclick="toggleChip(this)">55+</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Life Stage</span>
+          <div class="tag-chips" id="chips-lifestage">
+            <button class="tag-chip" data-group="lifestage" data-val="學生" onclick="toggleChip(this)">學生</button>
+            <button class="tag-chip" data-group="lifestage" data-val="初入職場" onclick="toggleChip(this)">初入職場</button>
+            <button class="tag-chip" data-group="lifestage" data-val="專業人士" onclick="toggleChip(this)">專業人士</button>
+            <button class="tag-chip" data-group="lifestage" data-val="新婚" onclick="toggleChip(this)">新婚</button>
+            <button class="tag-chip" data-group="lifestage" data-val="為人父母" onclick="toggleChip(this)">為人父母</button>
+            <button class="tag-chip" data-group="lifestage" data-val="退休準備" onclick="toggleChip(this)">退休準備</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Income Level</span>
+          <div class="tag-chips" id="chips-income">
+            <button class="tag-chip" data-group="income" data-val="大眾消費" onclick="toggleChip(this)">大眾消費</button>
+            <button class="tag-chip" data-group="income" data-val="中產" onclick="toggleChip(this)">中產</button>
+            <button class="tag-chip" data-group="income" data-val="高收入" onclick="toggleChip(this)">高收入</button>
+            <button class="tag-chip" data-group="income" data-val="超高淨值" onclick="toggleChip(this)">超高淨值</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Interests</span>
+          <div class="tag-chips" id="chips-interests">
+            <button class="tag-chip" data-group="interests" data-val="美容護膚" onclick="toggleChip(this)">美容護膚</button>
+            <button class="tag-chip" data-group="interests" data-val="健康養生" onclick="toggleChip(this)">健康養生</button>
+            <button class="tag-chip" data-group="interests" data-val="投資理財" onclick="toggleChip(this)">投資理財</button>
+            <button class="tag-chip" data-group="interests" data-val="旅遊" onclick="toggleChip(this)">旅遊</button>
+            <button class="tag-chip" data-group="interests" data-val="親子" onclick="toggleChip(this)">親子</button>
+            <button class="tag-chip" data-group="interests" data-val="時尚" onclick="toggleChip(this)">時尚</button>
+            <button class="tag-chip" data-group="interests" data-val="飲食" onclick="toggleChip(this)">飲食</button>
+            <button class="tag-chip" data-group="interests" data-val="運動健身" onclick="toggleChip(this)">運動健身</button>
+            <button class="tag-chip" data-group="interests" data-val="科技數碼" onclick="toggleChip(this)">科技數碼</button>
+            <button class="tag-chip" data-group="interests" data-val="家居生活" onclick="toggleChip(this)">家居生活</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Decision Style</span>
+          <div class="tag-chips" id="chips-decision">
+            <button class="tag-chip" data-group="decision" data-val="價格敏感" onclick="toggleChip(this)">價格敏感</button>
+            <button class="tag-chip" data-group="decision" data-val="品質導向" onclick="toggleChip(this)">品質導向</button>
+            <button class="tag-chip" data-group="decision" data-val="品牌忠誠" onclick="toggleChip(this)">品牌忠誠</button>
+            <button class="tag-chip" data-group="decision" data-val="口碑驅動" onclick="toggleChip(this)">口碑驅動</button>
+            <button class="tag-chip" data-group="decision" data-val="衝動消費" onclick="toggleChip(this)">衝動消費</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Pain Points</span>
+          <div class="tag-chips" id="chips-painpoints">
+            <button class="tag-chip" data-group="painpoints" data-val="時間不足" onclick="toggleChip(this)">時間不足</button>
+            <button class="tag-chip" data-group="painpoints" data-val="預算有限" onclick="toggleChip(this)">預算有限</button>
+            <button class="tag-chip" data-group="painpoints" data-val="資訊過載" onclick="toggleChip(this)">資訊過載</button>
+            <button class="tag-chip" data-group="painpoints" data-val="唔信任品牌" onclick="toggleChip(this)">唔信任品牌</button>
+            <button class="tag-chip" data-group="painpoints" data-val="選擇困難" onclick="toggleChip(this)">選擇困難</button>
+            <button class="tag-chip" data-group="painpoints" data-val="缺乏動力" onclick="toggleChip(this)">缺乏動力</button>
+          </div>
+        </div>
+
+        <div class="tag-section">
+          <span class="tag-section-label">Platform Behaviour</span>
+          <div class="tag-chips" id="chips-behaviour">
+            <button class="tag-chip" data-group="behaviour" data-val="主動搜尋型" onclick="toggleChip(this)">主動搜尋型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="被動滾動型" onclick="toggleChip(this)">被動滾動型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="社群互動型" onclick="toggleChip(this)">社群互動型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="只睇唔留言" onclick="toggleChip(this)">只睇唔留言</button>
+          </div>
+        </div>
+
+        <div class="audience-summary" id="audienceSummary"></div>
       </div>
       <div class="form-group">
         <label class="label" data-key="competitors">Competitors</label>
@@ -612,12 +757,78 @@ function switchTab(tab) {
   updatePageTitle();
 }
 
+
+// ── E6: TAG CHIP SYSTEM ──
+const AUDIENCE_GROUPS = ['gender','age','lifestage','income','interests','decision','painpoints','behaviour'];
+
+function toggleChip(el) {
+  const group = el.getAttribute('data-group');
+  const isSingle = ['gender','income'].includes(group);
+  
+  if (isSingle) {
+    // Single-select groups
+    document.querySelectorAll('.tag-chip[data-group="' + group + '"]').forEach(c => c.classList.remove('selected'));
+  }
+  el.classList.toggle('selected');
+  updateAudienceSummary();
+}
+
+function getAudienceTags() {
+  const tags = {};
+  AUDIENCE_GROUPS.forEach(group => {
+    const selected = [...document.querySelectorAll('.tag-chip[data-group="' + group + '"].selected')]
+      .map(c => c.getAttribute('data-val'));
+    if (selected.length > 0) tags[group] = selected;
+  });
+  return tags;
+}
+
+function getAudienceString() {
+  const tags = getAudienceTags();
+  const parts = [];
+  if (tags.gender)      parts.push('Gender: ' + tags.gender.join(', '));
+  if (tags.age)         parts.push('Age: ' + tags.age.join(', '));
+  if (tags.lifestage)   parts.push('Life Stage: ' + tags.lifestage.join(', '));
+  if (tags.income)      parts.push('Income: ' + tags.income.join(', '));
+  if (tags.interests)   parts.push('Interests: ' + tags.interests.join(', '));
+  if (tags.decision)    parts.push('Decision Style: ' + tags.decision.join(', '));
+  if (tags.painpoints)  parts.push('Pain Points: ' + tags.painpoints.join(', '));
+  if (tags.behaviour)   parts.push('Platform Behaviour: ' + tags.behaviour.join(', '));
+  return parts.join(' | ');
+}
+
+function updateAudienceSummary() {
+  const summary = document.getElementById('audienceSummary');
+  const str = getAudienceString();
+  if (str) {
+    summary.textContent = '✓ ' + str;
+    summary.classList.add('visible');
+  } else {
+    summary.classList.remove('visible');
+  }
+}
+
+function loadAudienceTags(audienceObj) {
+  // Clear all chips first
+  document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('selected'));
+  if (!audienceObj) return;
+  
+  Object.entries(audienceObj).forEach(([group, vals]) => {
+    vals.forEach(val => {
+      const chip = document.querySelector('.tag-chip[data-group="' + group + '"][data-val="' + val + '"]');
+      if (chip) chip.classList.add('selected');
+    });
+  });
+  updateAudienceSummary();
+}
+
 function addClient() {
   const name = document.getElementById('clientName').value;
   const industry = document.getElementById('clientIndustry').value;
   const tone = document.getElementById('clientTone').value;
   const brandStory = document.getElementById('clientBrandStory').value;
-  const targetAudience = document.getElementById('clientTargetAudience').value;
+  const targetAudience = getAudienceString();
+  const targetAudienceTags = getAudienceTags();
   const competitors = document.getElementById('clientCompetitors').value;
   const forbiddenWords = document.getElementById('clientForbiddenWords').value;
   
@@ -634,6 +845,7 @@ function addClient() {
       tone: tone,
       brandStory: brandStory,
       targetAudience: targetAudience,
+      targetAudienceTags: targetAudienceTags,
       competitors: competitors,
       forbiddenWords: forbiddenWords
     };
@@ -647,6 +859,7 @@ function addClient() {
       tone: tone,
       brandStory: brandStory,
       targetAudience: targetAudience,
+      targetAudienceTags: targetAudienceTags,
       competitors: competitors,
       forbiddenWords: forbiddenWords
     };
@@ -660,7 +873,7 @@ function addClient() {
   document.getElementById('clientIndustry').value = '';
   document.getElementById('clientTone').value = 'professional';
   document.getElementById('clientBrandStory').value = '';
-  document.getElementById('clientTargetAudience').value = '';
+  loadAudienceTags(null);
   document.getElementById('clientCompetitors').value = '';
   document.getElementById('clientForbiddenWords').value = '';
   
@@ -717,7 +930,7 @@ function editClient(id) {
   document.getElementById('clientIndustry').value = client.industry || '';
   document.getElementById('clientTone').value = client.tone;
   document.getElementById('clientBrandStory').value = client.brandStory || '';
-  document.getElementById('clientTargetAudience').value = client.targetAudience || '';
+  loadAudienceTags(client.targetAudienceTags || null);
   document.getElementById('clientCompetitors').value = client.competitors || '';
   document.getElementById('clientForbiddenWords').value = client.forbiddenWords || '';
   
@@ -772,16 +985,17 @@ function generateTopicSuggestions() {
   btn.disabled = true;
   btn.textContent = 'Generating...';
   
-  const prompt = 'Generate 8 social media content topic suggestions for ' + client.name + ' (Industry: ' + client.industry + ')\n\n' +
-    'Client Info:\n' +
+  const audienceStr = client.targetAudience || '';
+  const prompt = 'Generate EXACTLY 8 social media content topic suggestions for ' + client.name + '\n' +
+    'Industry: ' + (client.industry || 'General') + '\n' +
     'Brand tone: ' + client.tone + '\n' +
     (client.brandStory ? 'Brand story: ' + client.brandStory + '\n' : '') +
-    (client.targetAudience ? 'Target audience: ' + client.targetAudience + '\n' : '') +
+    (audienceStr ? 'Target audience: ' + audienceStr + '\n' : '') +
     (client.competitors ? 'Competitors: ' + client.competitors + '\n' : '') +
-    '\nPlatform: ' + platform + '\n' +
+    'Platform: ' + platform + '\n' +
     'Content Language: ' + languageMap[contentLang] + '\n' +
     (contentDirection ? 'Content Direction: ' + contentDirection + '\n' : '') +
-    '\nGenerate 8 topics using these 7 angles (mix them for 8 total):\n' +
+    '\nYou MUST generate EXACTLY 8 topics. Use one angle from each category below, mixing to reach 8:\n' +
     '1. Sales/Promotion\n' +
     '2. Education/Tips\n' +
     '3. Entertainment/Fun\n' +
@@ -789,11 +1003,17 @@ function generateTopicSuggestions() {
     '5. Seasonal/Trending\n' +
     '6. Daily Life/Relatable\n' +
     '7. Habits/Routines\n\n' +
-    'Format EXACTLY like this for each topic:\n' +
-    '[Topic #]\n' +
-    'Angle: [angle name]\n' +
-    'Title: [2-3 word title]\n' +
-    'Description: [2-3 sentence explanation of why this topic is good for this client on this platform]';
+    'CRITICAL: Use THIS EXACT FORMAT for all 8 topics, no exceptions:\n\n' +
+    '[Topic 1]\n' +
+    'Angle: Sales/Promotion\n' +
+    'Title: Example Title\n' +
+    'Description: 2-3 sentences explaining why this works for this client on this platform.\n\n' +
+    '[Topic 2]\n' +
+    'Angle: Education/Tips\n' +
+    'Title: Example Title\n' +
+    'Description: 2-3 sentences.\n\n' +
+    '...continue for [Topic 3] through [Topic 8]\n\n' +
+    'Do not use any other format. Do not add extra sections. Output all 8 topics.';
   
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -839,27 +1059,46 @@ function generateTopicSuggestions() {
 
 function parseTopicSuggestions(text) {
   const suggestions = [];
-  const topicBlocks = text.split(/\[Topic \d+\]/i).filter(block => block.trim());
   
+  // Strategy 1: Try standard [Topic N] format
+  let topicBlocks = text.split(/\[Topic \d+\]/i).filter(b => b.trim());
+  
+  // Strategy 2: Try numbered list format (1. / 1) / **1.**)
+  if (topicBlocks.length < 4) {
+    topicBlocks = text.split(/(?:^|\n)(?:\*{0,2})(?:\d+)[.)\]]\s*/m).filter(b => b.trim());
+  }
+  
+  // Strategy 3: Try ### or ** heading format
+  if (topicBlocks.length < 4) {
+    topicBlocks = text.split(/\n#{1,3}\s+|\n\*{2}Topic/i).filter(b => b.trim());
+  }
+
   topicBlocks.forEach((block, index) => {
-    const lines = block.trim().split('\n');
+    const lines = block.trim().split('\n').filter(l => l.trim());
+    if (lines.length === 0) return;
+
     let angle = '';
     let title = '';
-    let description = '';
-    
-    lines.forEach(line => {
-      if (line.includes('Angle:')) angle = line.replace('Angle:', '').trim();
-      if (line.includes('Title:')) title = line.replace('Title:', '').trim();
-      if (line.includes('Description:')) description = line.replace('Description:', '').trim();
+    let descLines = [];
+
+    lines.forEach((line, i) => {
+      const clean = line.replace(/^\*+|\*+$/g, '').trim(); // strip markdown bold
+      if (/^angle[:\s]/i.test(clean))       angle = clean.replace(/^angle[:\s]*/i, '').trim();
+      else if (/^title[:\s]/i.test(clean))  title = clean.replace(/^title[:\s]*/i, '').trim();
+      else if (/^desc/i.test(clean))         descLines.push(clean.replace(/^desc[a-z]*[:\s]*/i, '').trim());
+      else if (i === 0 && !title)            title = clean; // first line fallback = title
+      else if (title && i > 0)              descLines.push(clean);
     });
-    
-    // If no title found, use first non-empty line
-    if (!title) {
-      const nonEmptyLines = lines.filter(l => l.trim());
-      if (nonEmptyLines.length > 0) title = nonEmptyLines[0].trim();
-    }
-    
-    if (title) {
+
+    // Last resort: if still no title, use first non-empty line
+    if (!title && lines.length > 0) title = lines[0].replace(/^\*+|\*+$/g, '').trim();
+
+    // Clean title of any residual numbering
+    title = title.replace(/^\d+[.)\]]\s*/, '').replace(/^\*+|\*+$/g, '').trim();
+
+    const description = descLines.join(' ').trim();
+
+    if (title && title.length > 2) {
       suggestions.push({
         id: 'topic_' + Date.now() + '_' + index,
         angle: angle || 'General',
@@ -868,8 +1107,16 @@ function parseTopicSuggestions(text) {
       });
     }
   });
-  
-  return suggestions.slice(0, 8);
+
+  // Deduplicate by title
+  const seen = new Set();
+  const unique = suggestions.filter(s => {
+    if (seen.has(s.title)) return false;
+    seen.add(s.title);
+    return true;
+  });
+
+  return unique.slice(0, 8);
 }
 
 function displayTopicSuggestions(suggestions) {
@@ -940,6 +1187,205 @@ function parseVariations(content) {
   }];
 }
 
+// ============================================================
+// E5: THREE-LAYER PROMPT ARCHITECTURE
+// Layer 1: Fixed Rules (Platform + Language + Anti-AI)
+// Layer 2: Brand Rules (Client Profile)
+// Layer 3: Context Triggers (Compliance + Seasonal)
+// ============================================================
+
+function buildLayer1(platforms, lang) {
+  const platformRules = {
+    facebook: `FACEBOOK RULES:
+- Length: 100-200 characters (300+ for long-form)
+- Style: Conversational, story-driven, warm tone
+- Hook: MUST start with a question or bold statement
+- Hashtags: 2-3 only
+- End with engagement question to drive comments`,
+
+    instagram: `INSTAGRAM RULES:
+- Length: 50-100 characters (caption cuts off after 125 chars)
+- Style: Concise, visual-forward
+- First line MUST be the strongest — it shows before "more"
+- Hashtags: 8-10, placed at end
+- Use line breaks between paragraphs
+- Emoji: use generously for visual rhythm`,
+
+    threads: `THREADS RULES:
+- Length: Under 80 characters per post (can thread)
+- Style: Extremely casual, like talking to a friend
+- Opinion-driven, thought-provoking, sparks discussion
+- Hashtags: 0-3 max
+- Fragments are OK. Open-ended is better than concluded.`,
+
+    linkedin: `LINKEDIN RULES:
+- Length: 150-250 characters
+- Style: Professional, insightful, thought leadership
+- Format: Clear paragraphs, bullet points work well
+- Hashtags: 3-5 precise ones
+- MUST end with a question to drive comments
+- No pure sales language, no fake inspirational stories`,
+
+    xiaohongshu: `XIAOHONGSHU (RED) RULES:
+- Length: 150-250 characters
+- Title: MUST use【】brackets e.g.【這個方法真的有效！】
+- Style: Real-life feel, like sharing with a friend
+- Hashtags: 8-15, mix Chinese and English, placed at end or between paragraphs
+- Emoji after every key point
+- MUST use Mainland Chinese grammar — NO Hong Kong expressions (冇、靠、得啦)
+- Format: Clear paragraphs, max 2-3 sentences each`,
+
+    wechat: `WECHAT MOMENTS RULES:
+- Length: 80-150 characters
+- Style: Warm, personal, like a real friend sharing
+- NO hashtags (WeChat Moments has no hashtag function)
+- First person voice, genuine feel
+- End with a soft question to invite comments (e.g. 你呢？)
+- Natural paragraphs — NO bullet points
+- Emoji: use sparingly and naturally`
+  };
+
+  const langRules = {
+    tc: `LANGUAGE: Traditional Chinese (Hong Kong)
+- Adjust style to brand tone:
+  - Professional/Educational: Written form (書面語): 「我們提供…」「協助您…」
+  - Casual/Energetic: HK colloquial: 「搞掂！」「係咁先！」「得唔得呀？」
+  - Luxury: Elegant written form: 「臻選」「尊享」「精粹」
+- NEVER mix written and colloquial in same piece
+- Avoid Taiwan expressions: 棒、哦、超級、讚 (use: 正、好、非常、好鐘意)`,
+
+    sc: `LANGUAGE: Simplified Chinese (Mainland)
+- This is NOT just font conversion — it is a GRAMMAR and TONE conversion
+- Use genuine Mainland expressions and vocabulary
+- Sound native to XiaoHongShu and WeChat
+- COMPLETELY AVOID: HK expressions (冇、靠、得唔得、係咁先), Taiwan expressions (棒、讚)
+- Use: 很棒 not 好正 | 没问题 not 冇問題 | 试试看 not 試吓 | 非常喜欢 not 好鐘意`,
+
+    en: `LANGUAGE: English (Hong Kong English standard)
+- British spelling: colour, organisation, realise
+- Tone varies by platform (LinkedIn = professional, Threads = casual fragments)
+- AVOID American corporate jargon: leverage, synergise, paradigm shift, game-changer
+- AVOID AI clichés: "I'm thrilled to share", "In today's world", "Unlock your potential"
+- Keep it direct, clear, approachable — real person talking, not corporate memo`
+  };
+
+  const antiAI = `
+ANTI-AI WRITING RULES (CRITICAL — apply to every variation):
+- Write like a real human, NOT a corporate announcement
+- Vary sentence length — short punchy sentences mixed with longer ones
+- Include specific details (names, places, times) not vague descriptions
+- Show emotion and personality — not mechanical statements
+- FORBIDDEN AI phrases: "In conclusion", "It is worth noting", "Dive into", "Game-changer", 
+  "Unlock your potential", "In today's rapidly evolving", "I'm thrilled to share",
+  "Without further ado", "At the end of the day", "Thank you for reading"
+- Instead: Start with a story, a question, a specific moment, or a bold opinion
+- Add dialogue where possible ("My client asked me...")
+- Reference specific times ("Last week", "Yesterday", "3 months ago")`;
+
+  const selectedPlatformRules = platforms
+    .filter(p => platformRules[p])
+    .map(p => platformRules[p])
+    .join('\n\n');
+
+  return `=== LAYER 1: PLATFORM & LANGUAGE RULES ===
+${selectedPlatformRules}
+
+${langRules[lang] || langRules['en']}
+${antiAI}`;
+}
+
+function buildLayer2(client) {
+  let layer = `=== LAYER 2: BRAND RULES ===
+Client: ${client.name}`;
+
+  if (client.industry) layer += `
+Industry: ${client.industry}`;
+  
+  const toneDescriptions = {
+    professional: 'Professional & trustworthy — authoritative but approachable, data-informed, confidence-building',
+    casual: 'Casual & friendly — conversational, warm, relatable, like talking to a knowledgeable friend',
+    luxury: 'Luxury & premium — elegant, aspirational, refined language, exclusivity without arrogance',
+    energetic: 'Energetic & bold — high energy, action-oriented, inspiring, dynamic and motivating'
+  };
+  
+  layer += `
+Brand Tone: ${toneDescriptions[client.tone] || client.tone}`;
+  
+  if (client.brandStory) layer += `
+Brand Story / Background: ${client.brandStory}`;
+  if (client.targetAudience) layer += `
+Target Audience: ${client.targetAudience}`;
+  if (client.competitors) layer += `
+Competitors to differentiate from: ${client.competitors}`;
+  if (client.forbiddenWords) layer += `
+FORBIDDEN WORDS — never use these: ${client.forbiddenWords}`;
+
+  return layer;
+}
+
+function buildLayer3(platforms, topic, industry, lang) {
+  let triggers = [];
+
+  // Trigger: Mainland platforms compliance
+  const mainlandPlatforms = platforms.filter(p => p === 'xiaohongshu' || p === 'wechat');
+  if (mainlandPlatforms.length > 0) {
+    triggers.push(`CHINA ADVERTISING LAW COMPLIANCE (for ${mainlandPlatforms.join(', ')}):
+COMPLETELY FORBIDDEN superlatives: 最優、最好、最佳、最強、第一、唯一、獨一無二、頂級、極致、100%、絕對、完全、革命性、顛覆性
+Replace with: 優質、出色、卓越、備受好評、業界認可、創新方案
+FORBIDDEN exaggeration: 火爆全港、瘋搶、秒空、不買就後悔
+FORBIDDEN false urgency: 限時特惠 (unless genuinely time-limited)
+Content must be EDUCATIONAL in angle, not pure sales`);
+  }
+
+  // Trigger: Financial industry
+  const financialIndustries = ['finance', 'insurance', 'banking', 'investment'];
+  if (industry && financialIndustries.some(f => industry.toLowerCase().includes(f))) {
+    triggers.push(`FINANCIAL CONTENT COMPLIANCE:
+ABSOLUTELY FORBIDDEN: 保本、保息、穩賺、必賺、無風險、零風險、保證收益、確保回報、躺賺
+Replace with: 具保障成分、歷史表現參考、具增值潛力、風險相對較低
+If mentioning specific returns (%), MUST add: 「投資涉及風險，過去表現不代表未來」
+Content must be EDUCATIONAL — build trust, do not hard-sell products
+No specific client testimonials with monetary amounts`);
+  }
+
+  // Trigger: Seasonal detection
+  const topicLower = topic.toLowerCase();
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  
+  const seasonalHooks = {
+    'christmas': '🎄 Christmas seasonal angle — gift-giving, year-end gratitude, family warmth',
+    'new year': '🎊 New Year angle — fresh start, resolutions, reflection on the past year',
+    '新年': '🧧 Chinese New Year angle — reunion, prosperity, family, new beginnings (農曆新年)',
+    '聖誕': '🎄 Christmas angle — gift ideas, year-end warmth, festive spirit',
+    'summer': '☀️ Summer angle — heat, holidays, refreshing moments, energy',
+    "valentine": "💕 Valentine's Day angle — love, appreciation, connection",
+    "mother": "💐 Mother's Day angle — appreciation, family bond, heartfelt gratitude",
+    "mid-autumn": "🥮 Mid-Autumn Festival — reunion, mooncakes, family traditions (中秋節)",
+    '中秋': '🥮 Mid-Autumn Festival angle — reunion, mooncakes, lanterns, family',
+    "dragon boat": "🐉 Dragon Boat Festival angle — tradition, strength, community (端午節)",
+    '端午': '🐉 Dragon Boat Festival angle — 粽子, tradition, family gathering'
+  };
+
+  for (const [keyword, hook] of Object.entries(seasonalHooks)) {
+    if (topicLower.includes(keyword)) {
+      triggers.push(`SEASONAL CONTEXT: ${hook}
+Weave this seasonal angle naturally into the content`);
+      break;
+    }
+  }
+
+  // Month-based seasonal triggers
+  if (month === 1 || month === 2) triggers.push('SEASONAL: Chinese New Year period — prosperity, fresh starts, family reunion themes resonate strongly');
+  if (month === 12) triggers.push('SEASONAL: Year-end period — reflection, gratitude, Christmas, holiday giving themes resonate strongly');
+  if (month === 6 || month === 7 || month === 8) triggers.push('SEASONAL: Summer period — energy, holidays, refreshment themes resonate strongly');
+
+  if (triggers.length === 0) return '';
+
+  return `=== LAYER 3: CONTEXT TRIGGERS ===
+${triggers.join('\n\n')}`;
+}
+
 function generateContent() {
   if (!currentClient || selectedPlatforms.length === 0 || !document.getElementById('topic').value) {
     alert('Please fill all fields');
@@ -968,24 +1414,35 @@ function generateContent() {
   const generateBtn = document.querySelector('button[onclick="generateContent()"]');
   generateBtn.disabled = true;
   generateBtn.textContent = 'Generating...';
-  
-  const prompt = 'Generate 5 creative social media content variations for: "' + topic + '"\n\n' +
-    'BRAND INFORMATION:\n' +
-    (currentClient.industry ? 'Industry: ' + currentClient.industry + '\n' : '') +
-    'Brand tone: ' + currentClient.tone + '\n' +
-    (currentClient.brandStory ? 'Brand story: ' + currentClient.brandStory + '\n' : '') +
-    (currentClient.targetAudience ? 'Target audience: ' + currentClient.targetAudience + '\n' : '') +
-    (currentClient.competitors ? 'Competitors: ' + currentClient.competitors + '\n' : '') +
-    (currentClient.forbiddenWords ? 'Avoid these words: ' + currentClient.forbiddenWords + '\n' : '') +
-    '\nPlatforms: ' + selectedPlatforms.join(', ') +
-    '\nContent Language: ' + languageMap[contentLang] + '\n\n' +
-    'Format each variation clearly with [Variation 1], [Variation 2], [Variation 3], [Variation 4], [Variation 5]\n' +
-    'Include captions, emojis, and hashtags.';
-  
-  console.log('API Key:', apiKey.substring(0, 20) + '...');
-  console.log('Topic:', topic);
-  console.log('Content Language:', languageMap[contentLang]);
-  console.log('Platforms:', selectedPlatforms);
+
+  // Build 3-layer prompt
+  const layer1 = buildLayer1(selectedPlatforms, contentLang);
+  const layer2 = buildLayer2(currentClient);
+  const layer3 = buildLayer3(selectedPlatforms, topic, currentClient.industry, contentLang);
+
+  const prompt = `You are an expert social media content writer for Hong Kong and Greater Bay Area brands.
+
+${layer1}
+
+${layer2}
+
+${layer3 ? layer3 + `\n\n` : ''}=== CONTENT GENERATION TASK ===
+Topic: "${topic}"
+Platforms: ${selectedPlatforms.join(', ')}
+Output Language: ${languageMap[contentLang]}
+
+Generate 5 distinct content variations for this topic. Each variation should:
+- Use a DIFFERENT angle or hook (story, question, tip, behind-the-scenes, client win, etc.)
+- Strictly follow the platform rules above
+- Sound like a real human wrote it — not AI
+- Match the brand tone exactly
+- Include appropriate emojis and hashtags per platform rules
+
+Format each variation with [Variation 1], [Variation 2], [Variation 3], [Variation 4], [Variation 5]
+Label each with: Platform | Angle type
+Then write the full content.`;
+
+  console.log('3-Layer Prompt built. Layers:', layer1.length, layer2.length, layer3.length);
   
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -996,7 +1453,7 @@ function generateContent() {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 3000,
       messages: [{ role: 'user', content: prompt }]
     })
   })
@@ -1073,7 +1530,10 @@ function renderVariations() {
   // Add cards
   visibleVariations.forEach(v => {
     html += '<div class="variation-card">';
-    html += '<div class="variation-title">Variation ' + v.number + '</div>';
+    html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">';
+    html += '<div class="variation-title" style="margin-bottom:0;">Variation ' + v.number + '</div>';
+    html += '<button onclick="copyVariation(\'' + v.id + '\', this)" style="padding:6px 14px; background:transparent; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.6); border-radius:999px; font-size:11px; font-weight:600; cursor:pointer; font-family:inherit; letter-spacing:0.06em; transition:all 0.2s;" onmouseover="this.style.borderColor=\'rgba(205,255,216,0.4)\';this.style.color=\'#cdffd8\';" onmouseout="this.style.borderColor=\'rgba(255,255,255,0.15)\';this.style.color=\'rgba(255,255,255,0.6)\';">Copy</button>';
+    html += '</div>';
     html += '<div class="variation-content">' + v.content + '</div>';
     html += '<div class="rating">';
     for (let i = 1; i <= 5; i++) {
@@ -1215,6 +1675,35 @@ function proceedWithRegenerate(retained) {
       btn.disabled = false;
       btn.textContent = '🔄 Regenerate Content';
     }
+  });
+}
+
+function copyVariation(varId, btn) {
+  const variation = generatedVariations.find(v => v.id === varId);
+  if (!variation) return;
+  
+  navigator.clipboard.writeText(variation.content).then(() => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    btn.style.borderColor = 'rgba(205,255,216,0.4)';
+    btn.style.color = '#cdffd8';
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.style.borderColor = 'rgba(255,255,255,0.15)';
+      btn.style.color = 'rgba(255,255,255,0.6)';
+    }, 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = variation.content;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
   });
 }
 
