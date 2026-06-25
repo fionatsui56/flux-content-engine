@@ -385,7 +385,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
     </div>
     <div class="nav">
       <button class="nav-item active" onclick="switchTab('dashboard')">Dashboard</button>
-      <button class="nav-item" onclick="switchTab('clients')">Client Mgmt</button>
+      <button class="nav-item" onclick="switchTab('clients')">Client Management</button>
       <button class="nav-item" onclick="switchTab('discover')">Topics</button>
       <button class="nav-item" onclick="switchTab('generate')">Generate</button>
       <button class="nav-item" onclick="switchTab('history')">History</button>
@@ -407,10 +407,6 @@ select option { background: var(--bg-dark); color: var(--primary); }
     </div>
 
     <div class="section active" id="dashboard">
-      <div class="form-group">
-        <label class="label" data-key="apiKey" data-required="true">API Key *</label>
-        <input type="password" id="apiKey" placeholder="sk-ant-..." onchange="saveApiKey()">
-      </div>
       <div class="dashboard-grid">
         <div class="stat-card">
           <div class="stat-number" id="clientCount">0</div>
@@ -650,34 +646,52 @@ select option { background: var(--bg-dark); color: var(--primary); }
 <script>
 const LANGS = {
   tc: {
-    dashboard: '儀表板', clients: '客戶管理', discover: '發現趨勢', generate: '生成內容', history: '歷史記錄',
-    apiKey: 'API Key', clientName: '客戶名稱', brandTone: '品牌語氣', addClient: '添加客戶', selectClient: '選擇客戶',
-    topic: '話題', platforms: '選擇平台', yourClients: '你的客戶', generated: '生成的內容',
-    chooseClient: '選擇客戶', topicPlaceholder: '例如：春季系列',
+    dashboard: '儀表板', clients: '客戶管理', discover: '主題探索', generate: '生成內容', history: '歷史記錄',
+    clientName: '客戶名稱', brandTone: '品牌語氣', addClient: '新增客戶', updateClient: '更新客戶',
+    selectClient: '選擇客戶', chooseClient: '選擇客戶…',
+    topic: '主題 / 想法', topicPlaceholder: '例如：春季系列',
+    platforms: '選擇平台', contentLanguage: '內容語言',
+    yourClients: '你的客戶', generated: '生成的內容',
     professional: '專業', casual: '輕鬆', luxury: '奢華', energetic: '活力',
-    backup: '備份', import: '匯入', generate: '生成', contentLanguage: '生成內容語言',
-    brandStory: '品牌背景', targetAudience: '目標受眾', competitors: '競爭對手', forbiddenWords: '禁用詞彙',
-    industry: '行業'
+    backup: '備份', importBtn: '匯入', generate: '生成',
+    brandStory: '品牌背景', targetAudience: '目標受眾', competitors: '競爭對手',
+    forbiddenWords: '禁用詞彙', industry: '行業',
+    contentDirection: '內容方向（選填）', contentDirectionPlaceholder: '例如：健康保險、退休生活…',
+    selectPlatform: '選擇平台', generateTopics: '生成主題建議',
+    clients_label: '客戶數目', content_label: '內容數目',
+    editClient: '編輯', useTopicBtn: '使用主題'
   },
   sc: {
-    dashboard: '仪表板', clients: '客户管理', discover: '发现趋势', generate: '生成内容', history: '历史记录',
-    apiKey: 'API Key', clientName: '客户名称', brandTone: '品牌语气', addClient: '添加客户', selectClient: '选择客户',
-    topic: '话题', platforms: '选择平台', yourClients: '你的客户', generated: '生成的内容',
-    chooseClient: '选择客户', topicPlaceholder: '例如：春季系列',
+    dashboard: '仪表板', clients: '客户管理', discover: '主题探索', generate: '生成内容', history: '历史记录',
+    clientName: '客户名称', brandTone: '品牌语气', addClient: '新增客户', updateClient: '更新客户',
+    selectClient: '选择客户', chooseClient: '选择客户…',
+    topic: '主题 / 想法', topicPlaceholder: '例如：春季系列',
+    platforms: '选择平台', contentLanguage: '内容语言',
+    yourClients: '你的客户', generated: '生成的内容',
     professional: '专业', casual: '轻松', luxury: '奢华', energetic: '活力',
-    backup: '备份', import: '导入', generate: '生成', contentLanguage: '生成内容语言',
-    brandStory: '品牌背景', targetAudience: '目标受众', competitors: '竞争对手', forbiddenWords: '禁用词汇',
-    industry: '行业'
+    backup: '备份', importBtn: '导入', generate: '生成',
+    brandStory: '品牌背景', targetAudience: '目标受众', competitors: '竞争对手',
+    forbiddenWords: '禁用词汇', industry: '行业',
+    contentDirection: '内容方向（选填）', contentDirectionPlaceholder: '例如：健康保险、退休生活…',
+    selectPlatform: '选择平台', generateTopics: '生成主题建议',
+    clients_label: '客户数目', content_label: '内容数目',
+    editClient: '编辑', useTopicBtn: '使用主题'
   },
   en: {
-    dashboard: 'Dashboard', clients: 'Client Mgmt', discover: 'Topics', generate: 'Generate', history: 'History',
-    apiKey: 'API Key', clientName: 'Client Name', brandTone: 'Brand Tone', addClient: 'Add Client', selectClient: 'Select Client',
-    topic: 'Topic', platforms: 'Select Platforms', yourClients: 'Your Clients', generated: 'Generated Content',
-    chooseClient: 'Choose client', topicPlaceholder: 'e.g., Spring Collection',
+    dashboard: 'Dashboard', clients: 'Client Management', discover: 'Topics', generate: 'Generate', history: 'History',
+    clientName: 'Client Name', brandTone: 'Brand Tone', addClient: 'Add Client', updateClient: 'Update Client',
+    selectClient: 'Select Client', chooseClient: 'Choose client…',
+    topic: 'Topic / Idea', topicPlaceholder: 'e.g., Spring Collection',
+    platforms: 'Select Platforms', contentLanguage: 'Content Language',
+    yourClients: 'Your Clients', generated: 'Generated Content',
     professional: 'Professional', casual: 'Casual', luxury: 'Luxury', energetic: 'Energetic',
-    backup: 'Backup', import: 'Import', generate: 'Generate', contentLanguage: 'Content Language',
-    brandStory: 'Brand Story', targetAudience: 'Target Audience', competitors: 'Competitors', forbiddenWords: 'Forbidden Words',
-    industry: 'Industry'
+    backup: 'Backup', importBtn: 'Import', generate: 'Generate',
+    brandStory: 'Brand Story', targetAudience: 'Target Audience', competitors: 'Competitors',
+    forbiddenWords: 'Forbidden Words', industry: 'Industry',
+    contentDirection: 'Content Direction (Optional)', contentDirectionPlaceholder: 'e.g., Health Insurance, Retirement Life…',
+    selectPlatform: 'Select Platform', generateTopics: 'Generate Topic Suggestions',
+    clients_label: 'Clients', content_label: 'Content Items',
+    editClient: 'Edit', useTopicBtn: 'Use Topic'
   }
 };
 
@@ -711,42 +725,52 @@ function updatePageTitle() {
 
 function updateAllUI() {
   const t = LANGS[currentLang];
-  
-  // Update sidebar nav items
+
+  // Nav items
   const navItems = document.querySelectorAll('.nav-item');
-  const navLabels = [t.dashboard, t.clients, t.discover, t.generate, t.history];
-  navItems.forEach((item, i) => {
-    if (navLabels[i]) item.textContent = navLabels[i];
-  });
-  
-  // Update all labels using data-key attribute
+  const navKeys = ['dashboard','clients','discover','generate','history'];
+  navItems.forEach((item, i) => { if (t[navKeys[i]]) item.textContent = t[navKeys[i]]; });
+
+  // Labels with data-key
   document.querySelectorAll('.label[data-key]').forEach(label => {
     const key = label.getAttribute('data-key');
-    const isRequired = label.getAttribute('data-required') === 'true';
-    const suffix = isRequired ? ' *' : '';
-    
-    if (t[key]) {
-      label.textContent = t[key].toUpperCase() + suffix;
-    }
+    const req = label.getAttribute('data-required') === 'true' ? ' *' : '';
+    if (t[key]) label.textContent = t[key].toUpperCase() + req;
   });
-  
-  document.querySelector('button[onclick="addClient()"]').textContent = t.addClient;
-  document.querySelector('button[onclick="generateContent()"]').textContent = t.generate;
-  
-  const backup = document.querySelector('button[onclick="exportData()"]');
+
+  // Buttons
+  const addBtn = document.querySelector('button[onclick="addClient()"]');
+  if (addBtn) addBtn.textContent = currentClient && clients.find(c=>c.id===currentClient.id) ? t.updateClient : t.addClient;
+  const genBtn = document.querySelector('button[onclick="generateContent()"]');
+  if (genBtn) genBtn.textContent = t.generate;
+  const topicBtn = document.querySelector('button[onclick="generateTopicSuggestions()"]');
+  if (topicBtn) topicBtn.textContent = t.generateTopics;
+  const backupBtn = document.querySelector('button[onclick="exportData()"]');
+  if (backupBtn) backupBtn.textContent = t.backup;
   const importBtn = document.querySelector('button[onclick="importData()"]');
-  if (backup) backup.textContent = t.backup;
-  if (importBtn) importBtn.textContent = t.import;
-  
-  const selectClient = document.getElementById('selectClient');
-  if (selectClient && selectClient.options[0]) {
-    selectClient.options[0].textContent = t.chooseClient;
-  }
-  
-  document.getElementById('topic').placeholder = t.topicPlaceholder;
-  
-  const yourClientsHeader = document.querySelector('h2');
-  if (yourClientsHeader) yourClientsHeader.textContent = t.yourClients;
+  if (importBtn) importBtn.textContent = t.importBtn;
+
+  // Placeholders
+  const topicInput = document.getElementById('topic');
+  if (topicInput) topicInput.placeholder = t.topicPlaceholder;
+  const dirInput = document.getElementById('discoverContentDirection');
+  if (dirInput) dirInput.placeholder = t.contentDirectionPlaceholder;
+
+  // Select first options
+  const sc = document.getElementById('selectClient');
+  if (sc && sc.options[0]) sc.options[0].textContent = t.chooseClient;
+  const dsc = document.getElementById('discoverSelectClient');
+  if (dsc && dsc.options[0]) dsc.options[0].textContent = t.chooseClient;
+
+  // Stat labels
+  const cl = document.getElementById('clientCount');
+  const ct = document.getElementById('contentCount');
+  if (cl) cl.nextElementSibling && (cl.nextElementSibling.textContent = t.clients_label);
+  if (ct) ct.nextElementSibling && (ct.nextElementSibling.textContent = t.content_label);
+
+  // Your Clients header
+  const header = document.querySelector('#clients h2');
+  if (header) header.textContent = t.yourClients;
 }
 
 function switchTab(tab) {
@@ -969,12 +993,6 @@ function generateTopicSuggestions() {
     return;
   }
   
-  const apiKey = document.getElementById('apiKey').value;
-  if (!apiKey) {
-    alert('Please set API Key first');
-    return;
-  }
-  
   const languageMap = {
     tc: 'Traditional Chinese',
     sc: 'Simplified Chinese',
@@ -1015,45 +1033,39 @@ function generateTopicSuggestions() {
     '...continue for [Topic 3] through [Topic 8]\n\n' +
     'Do not use any other format. Do not add extra sections. Output all 8 topics.';
   
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('https://flux-content-engine.onrender.com/api/topics', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }]
+      clientName: client.name,
+      industry: client.industry,
+      tone: client.tone,
+      brandStory: client.brandStory,
+      targetAudience: client.targetAudience,
+      platform: platform,
+      language: contentLang,
+      contentDirection: contentDirection
     })
   })
   .then(r => r.json())
   .then(data => {
-    if (data.error) {
-      alert('API Error: ' + data.error.message);
+    if (!data.success) {
+      alert('Error: ' + (data.error || 'Unknown error'));
       btn.disabled = false;
-      btn.textContent = 'Generate Topic Suggestions';
+      btn.textContent = LANGS[currentLang].generateTopics || 'Generate Topic Suggestions';
       return;
     }
-    
-    if (!data.content || !data.content[0]) {
-      alert('No response from API');
-      btn.disabled = false;
-      btn.textContent = 'Generate Topic Suggestions';
-      return;
-    }
-    
-    const suggestions = parseTopicSuggestions(data.content[0].text);
+
+    const suggestions = parseTopicSuggestions(data.text);
     displayTopicSuggestions(suggestions);
     
     btn.disabled = false;
-    btn.textContent = 'Generate Topic Suggestions';
+    btn.textContent = LANGS[currentLang].generateTopics || 'Generate Topic Suggestions';
   })
   .catch(err => {
     alert('Error: ' + err.message);
     btn.disabled = false;
-    btn.textContent = 'Generate Topic Suggestions';
+    btn.textContent = LANGS[currentLang].generateTopics || 'Generate Topic Suggestions';
   });
 }
 
@@ -1392,17 +1404,6 @@ function generateContent() {
     return;
   }
   
-  const apiKey = document.getElementById('apiKey').value;
-  if (!apiKey) {
-    alert('❌ Please set API Key in Dashboard first!\nFormat: sk-ant-...');
-    return;
-  }
-  
-  if (!apiKey.startsWith('sk-ant-')) {
-    alert('❌ Invalid API Key format!\nShould start with: sk-ant-');
-    return;
-  }
-  
   const topic = document.getElementById('topic').value;
   const contentLang = document.getElementById('contentLanguage').value;
   const languageMap = {
@@ -1444,17 +1445,19 @@ Then write the full content.`;
 
   console.log('3-Layer Prompt built. Layers:', layer1.length, layer2.length, layer3.length);
   
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('https://flux-content-engine.onrender.com/api/generate', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 3000,
-      messages: [{ role: 'user', content: prompt }]
+      topic: topic,
+      clientName: currentClient.name,
+      industry: currentClient.industry,
+      tone: currentClient.tone,
+      brandStory: currentClient.brandStory,
+      targetAudience: currentClient.targetAudience,
+      forbiddenWords: currentClient.forbiddenWords,
+      platforms: selectedPlatforms,
+      language: contentLang
     })
   })
   .then(response => {
@@ -1463,22 +1466,15 @@ Then write the full content.`;
   })
   .then(data => {
     console.log('API Response:', data);
-    
-    if (data.error) {
-      alert('❌ API Error:\n' + data.error.message + '\n\nCheck API Key or rate limits');
+
+    if (!data.success) {
+      alert('❌ Error: ' + (data.error || 'Unknown error'));
       generateBtn.disabled = false;
       generateBtn.textContent = LANGS[currentLang].generate;
       return;
     }
-    
-    if (!data.content || !data.content[0]) {
-      alert('❌ No content in response');
-      generateBtn.disabled = false;
-      generateBtn.textContent = LANGS[currentLang].generate;
-      return;
-    }
-    
-    const content = data.content[0].text;
+
+    const content = data.text;
     console.log('Generated content:', content);
     
     generatedVariations = parseVariations(content);
@@ -1593,20 +1589,8 @@ function proceedWithRegenerate(retained) {
     return;
   }
   
-  const apiKey = document.getElementById('apiKey').value;
-  if (!apiKey) {
-    alert('Set API Key first');
-    return;
-  }
-  
   const topic = document.getElementById('topic').value;
   const contentLang = document.getElementById('contentLanguage').value;
-  
-  const langNames = {
-    tc: 'Traditional Chinese',
-    sc: 'Simplified Chinese',
-    en: 'English'
-  };
   
   const btn = document.getElementById('regenerateBtn');
   if (btn) {
@@ -1614,46 +1598,34 @@ function proceedWithRegenerate(retained) {
     btn.textContent = 'Regenerating...';
   }
   
-  const prompt = 'Generate 3 COMPLETELY NEW social media variations for: "' + topic + '"\nTone: ' + currentClient.tone + '\nPlatforms: ' + selectedPlatforms.join(', ') + '\nLanguage: ' + langNames[contentLang] + '\n\nMake these DIFFERENT from before.\nFormat: [Variation 1], [Variation 2], [Variation 3]\nAdd captions, emojis, hashtags.';
-  
-  console.log('Calling API... Retaining:', retained.length, 'variations');
-  
-  fetch('https://api.anthropic.com/v1/messages', {
+  console.log('Regenerating via Render backend...');
+
+  fetch('https://flux-content-engine.onrender.com/api/generate', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: prompt }]
+      topic: topic + ' (generate 3 fresh variations, different angles from before)',
+      clientName: currentClient.name,
+      industry: currentClient.industry,
+      tone: currentClient.tone,
+      brandStory: currentClient.brandStory,
+      targetAudience: currentClient.targetAudience,
+      forbiddenWords: currentClient.forbiddenWords,
+      platforms: selectedPlatforms,
+      language: contentLang
     })
   })
   .then(r => r.json())
   .then(data => {
-    console.log('API response:', data);
-    
-    if (data.error) {
-      alert('❌ ' + data.error.message);
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '🔄 Regenerate Content';
-      }
+    console.log('Regen response:', data);
+
+    if (!data.success) {
+      alert('❌ ' + (data.error || 'Unknown error'));
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 Regenerate Content'; }
       return;
     }
-    
-    if (!data.content || !data.content[0]) {
-      alert('❌ No response from API');
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = '🔄 Regenerate Content';
-      }
-      return;
-    }
-    
-    const newVars = parseVariations(data.content[0].text);
+
+    const newVars = parseVariations(data.text);
     console.log('Generated:', newVars.length, 'new variations');
     
     // Merge: keep ≥4 stars + add new ones (max 6)
@@ -1739,9 +1711,7 @@ function loadData() {
   }
 }
 
-function saveApiKey() {
-  localStorage.setItem('flux_key', document.getElementById('apiKey').value);
-}
+
 
 function exportData() {
   const data = { clients: clients, history: history };
@@ -1780,8 +1750,6 @@ function importData() {
 
 window.addEventListener('load', function() {
   loadData();
-  const savedKey = localStorage.getItem('flux_key');
-  if (savedKey) document.getElementById('apiKey').value = savedKey;
   updateAllUI();
 });
 </script>
