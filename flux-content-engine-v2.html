@@ -1090,28 +1090,26 @@ async function initApp(user) {
 // SUPABASE DATA OPERATIONS
 // ═══════════════════════════════════════════
 async function loadClients() {
-  const { data, error } = await sb
-    .from('clients')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at', { ascending: true });
-
-  if (error) { console.error('Load clients error:', error); return; }
-  clients = (data || []).map(c => ({
-    id: c.id,
-    name: c.name,
-    industry: c.industry,
-    tone: c.tone,
-    brandStory: c.brand_story,
-    targetAudience: c.target_audience,
-    targetAudienceTags: c.target_audience_tags,
-    competitors: c.competitors,
-    forbiddenWords: c.forbidden_words
-  }));
-
-  updateClientsList();
-  updateClientSelect();
-  updateStats();
+  if (!currentUser) return;
+  try {
+    const r = await fetch(BACKEND + '/api/clients?user_id=' + currentUser.id);
+    const res = await r.json();
+    if (!res.success) { console.error('Load clients error:', res.error); return; }
+    clients = (res.data || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      industry: c.industry,
+      tone: c.tone,
+      brandStory: c.brand_story,
+      targetAudience: c.target_audience,
+      targetAudienceTags: c.target_audience_tags,
+      competitors: c.competitors,
+      forbiddenWords: c.forbidden_words
+    }));
+    updateClientsList();
+    updateClientSelect();
+    updateStats();
+  } catch(e) { console.error('Load clients error:', e); }
 }
 
 async function saveClient() {
@@ -1141,19 +1139,29 @@ async function saveClient() {
     is_active: true
   };
 
-  let error;
-  if (editingClientId) {
-    const res = await sb.from('clients').update(record).eq('id', editingClientId).eq('user_id', currentUser.id);
-    error = res.error;
-  } else {
-    const res = await sb.from('clients').insert(record);
-    error = res.error;
-  }
+  let saveError = null;
+  try {
+    if (editingClientId) {
+      const r = await fetch(BACKEND + '/api/clients/' + editingClientId, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...record, user_id: currentUser.id })
+      });
+      const res = await r.json();
+      if (!res.success) saveError = res.error;
+    } else {
+      const r = await fetch(BACKEND + '/api/clients', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      });
+      const res = await r.json();
+      if (!res.success) saveError = res.error;
+    }
+  } catch(e) { saveError = e.message; }
 
   btn.disabled = false;
   btn.textContent = editingClientId ? LANGS[currentLang].updateClient : LANGS[currentLang].addClient;
 
-  if (error) { alert('Error saving client: ' + error.message); return; }
+  if (saveError) { alert('Error saving client: ' + saveError); return; }
 
   // Reset form
   document.getElementById('clientName').value = '';
@@ -1172,31 +1180,29 @@ async function saveClient() {
 
 async function saveContent(entry) {
   if (!currentUser) return;
-  await sb.from('content').insert({
-    user_id: currentUser.id,
-    client_id: entry.clientId,
-    topic: entry.topic,
-    platforms: entry.platforms,
-    content_language: entry.contentLanguage,
-    variations: entry.variations
-  });
-  await sb.from('usage_logs').insert({
-    user_id: currentUser.id,
-    client_id: entry.clientId,
-    action: 'generate'
-  });
+  try {
+    await fetch(BACKEND + '/api/content', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: currentUser.id,
+        client_id: entry.clientId,
+        topic: entry.topic,
+        platforms: entry.platforms,
+        content_language: entry.contentLanguage,
+        variations: entry.variations
+      })
+    });
+  } catch(e) { console.error('Save content error:', e); }
 }
 
 async function loadHistory() {
-  const { data, error } = await sb
-    .from('content')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .order('created_at', { ascending: false })
-    .limit(50);
-
-  if (error) { console.error('Load history error:', error); return []; }
-  return data || [];
+  if (!currentUser) return [];
+  try {
+    const r = await fetch(BACKEND + '/api/content?user_id=' + currentUser.id);
+    const res = await r.json();
+    if (!res.success) { console.error('Load history error:', res.error); return []; }
+    return res.data || [];
+  } catch(e) { console.error('Load history error:', e); return []; }
 }
 
 async function updateContentVariations(contentId, variations) {
@@ -1266,6 +1272,12 @@ function updateAllUI() {
 
 function updateStats() {
   document.getElementById('clientCount').textContent = clients.length;
+  if (currentUser) {
+    fetch(BACKEND + '/api/content/count?user_id=' + currentUser.id)
+      .then(r => r.json())
+      .then(res => { if(res.success) document.getElementById('contentCount').textContent = res.count; })
+      .catch(() => {});
+  }
 }
 
 function updateClientsList() {
@@ -1322,7 +1334,10 @@ function editClient(id) {
 
 async function deleteClient(id) {
   if (!confirm('Delete this client? This cannot be undone.')) return;
-  await sb.from('clients').update({ is_active: false }).eq('id', id).eq('user_id', currentUser.id);
+  await fetch(BACKEND + '/api/clients/' + id, {
+    method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: currentUser.id })
+  });
   await loadClients();
   showSaving('Deleted');
 }
@@ -1450,8 +1465,9 @@ function generateContent() {
     selectedPlatforms = [];
     document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
 
-    const { count } = await sb.from('content').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
-    document.getElementById('contentCount').textContent = count || 0;
+    fetch(BACKEND + '/api/content/count?user_id=' + currentUser.id)
+      .then(r => r.json())
+      .then(res => { if(res.success) document.getElementById('contentCount').textContent = res.count; });
   })
   .catch(err => {
     btn.disabled = false; btn.textContent = LANGS[currentLang].generate_btn;
@@ -1680,11 +1696,14 @@ async function importData() {
         const data = JSON.parse(evt.target.result);
         if (data.clients && data.clients.length) {
           for (const c of data.clients) {
-            await sb.from('clients').insert({
-              user_id: currentUser.id, name: c.name, industry: c.industry, tone: c.tone,
-              brand_story: c.brandStory, target_audience: c.targetAudience,
-              target_audience_tags: c.targetAudienceTags || {}, competitors: c.competitors,
-              forbidden_words: c.forbiddenWords, is_active: true
+            await fetch(BACKEND + '/api/clients', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: currentUser.id, name: c.name, industry: c.industry, tone: c.tone,
+                brand_story: c.brandStory, target_audience: c.targetAudience,
+                target_audience_tags: c.targetAudienceTags || {}, competitors: c.competitors,
+                forbidden_words: c.forbiddenWords, is_active: true
+              })
             });
           }
           await loadClients();
