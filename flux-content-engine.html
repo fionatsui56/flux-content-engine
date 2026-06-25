@@ -1098,7 +1098,7 @@ function generateTopicSuggestions() {
       return;
     }
 
-    console.log('Raw topic response:', data.text.substring(0, 500));
+    console.log('Raw topic response (full):', data.text);
     const suggestions = parseTopicSuggestions(data.text);
     console.log('Parsed', suggestions.length, 'topics');
     displayTopicSuggestions(suggestions);
@@ -1117,7 +1117,7 @@ function parseTopicSuggestions(text) {
   const suggestions = [];
   
   // Strategy 1: Try standard [Topic N] format
-  let topicBlocks = text.split(/\[Topic \d+\]/i).filter(b => b.trim());
+  let topicBlocks = text.split(/\s*\[Topic \d+\]/i).filter(b => b.trim());
   
   // Strategy 2: Try numbered list format (1. / 1) / **1.**)
   if (topicBlocks.length < 4) {
