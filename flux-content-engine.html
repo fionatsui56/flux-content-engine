@@ -577,7 +577,8 @@ select option { background: var(--bg-dark); color: var(--primary); }
       </div>
       <div class="form-group">
         <label class="label" data-key="topic" data-required="true">Topic / Idea *</label>
-        <input type="text" id="topic" placeholder="e.g., Spring Collection">
+        <textarea id="topic" placeholder="e.g., Spring Collection" maxlength="200" oninput="updateTopicCount()" style="min-height: 80px; resize: vertical;"></textarea>
+        <div style="text-align: right; font-size: 11px; color: var(--muted); margin-top: 4px;"><span id="topicCount">0</span> / 200</div>
       </div>
       <div class="form-group">
         <label class="label" data-key="platforms" data-required="true">Select Platforms *</label>
@@ -1212,6 +1213,12 @@ function useTopic(topicTitle) {
   
   // Scroll to topic field
   document.getElementById('topic').focus();
+}
+
+function updateTopicCount() {
+  const ta = document.getElementById('topic');
+  const count = document.getElementById('topicCount');
+  if (ta && count) count.textContent = ta.value.length;
 }
 
 function cleanHashtags(text) {
