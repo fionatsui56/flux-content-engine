@@ -1161,7 +1161,7 @@ async function saveClient() {
   btn.disabled = false;
   btn.textContent = editingClientId ? LANGS[currentLang].updateClient : LANGS[currentLang].addClient;
 
-  if (saveError) { alert('Error saving client: ' + saveError); return; }
+  if (saveError) { alert('Error saving client: ' + (typeof saveError === 'object' ? JSON.stringify(saveError) : saveError)); return; }
 
   // Reset form
   document.getElementById('clientName').value = '';
