@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flux Strategy Content Engine</title>
+
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XEE5CPS3YR"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XEE5CPS3YR');
+</script>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg-deep:     #080e18;
+  --bg-dark:     #0d1521;
+  --bg-card:     #111927;
+  --border:      rgba(255,255,255,0.08);
+  --border-mid:  rgba(255,255,255,0.12);
+  --primary:     #ffffff;
+  --secondary:   #9aa3ae;
+  --muted:       rgba(255,255,255,0.45);
+  --accent-mint: #cdffd8;
+  --accent-blue: #94b9ff;
+  --grad:        linear-gradient(135deg, #cdffd8, #94b9ff);
+  --error:       #ff6b6b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--primary);
+}
+
+/* ── AUTH SCREEN ── */
+#authScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-logo {
+  margin-bottom: 40px;
+}
+
+.auth-logo-text {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.auth-logo-sub {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin-top: 3px;
+}
+
+.auth-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: var(--secondary);
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+
+.auth-tab.active {
+  color: var(--accent-mint);
+  border-bottom-color: var(--accent-mint);
+}
+
+.form-field { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input::placeholder { color: rgba(255,255,255,0.2); }
+.form-input:focus { border-color: rgba(205,255,216,0.4); }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--grad);
+  color: #0d1521;
+  border: none;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-bottom: 12px;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-google {
+  width: 100%;
+  padding: 13px 24px;
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  border-radius: 999px;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.btn-google:hover {
+  border-color: rgba(205,255,216,0.3);
+  color: var(--accent-mint);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-error {
+  padding: 10px 14px;
+  background: rgba(255,107,107,0.1);
+  border: 1px solid rgba(255,107,107,0.3);
+  border-radius: 8px;
+  color: var(--error);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+.auth-error.visible { display: block; }
+
+.auth-success {
+  padding: 10px 14px;
+  background: rgba(205,255,216,0.08);
+  border: 1px solid rgba(205,255,216,0.3);
+  border-radius: 8px;
+  color: var(--accent-mint);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+.auth-success.visible { display: block; }
+
+/* ── LOADING ── */
+#loadingScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+  display: none;
+}
+
+.loading-text {
+  font-size: 13px;
+  color: var(--secondary);
+  letter-spacing: 0.08em;
+}
+
+/* ── MAIN APP ── */
+#appScreen { display: none; }
+
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 260px;
+  background: var(--bg-dark);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo { padding: 0 16px 28px; }
+
+.logo-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.logo-sub {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.nav { flex: 1; padding: 0 10px; display: flex; flex-direction: column; gap: 2px; }
+
+.nav-item {
+  padding: 11px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--secondary);
+  border: none;
+  background: transparent;
+  transition: all 0.2s;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+}
+.nav-item:hover { color: var(--primary); background: rgba(255,255,255,0.04); }
+.nav-item.active {
+  background: rgba(205,255,216,0.08);
+  color: var(--accent-mint);
+  font-weight: 600;
+  border-left: 2px solid var(--accent-mint);
+  padding-left: 12px;
+}
+
+.sidebar-footer {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+  margin-bottom: 8px;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--grad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0d1521;
+  flex-shrink: 0;
+}
+
+.user-email {
+  font-size: 11px;
+  color: var(--secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-btns { display: flex; gap: 6px; }
+
+.sidebar-btn {
+  flex: 1;
+  padding: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  background: transparent;
+  color: var(--secondary);
+  border: 1px solid var(--border-mid);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sidebar-btn:hover { border-color: rgba(205,255,216,0.3); color: var(--accent-mint); }
+.sidebar-btn.logout { color: rgba(255,107,107,0.7); }
+.sidebar-btn.logout:hover { border-color: rgba(255,107,107,0.3); color: var(--error); }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow-y: auto; padding: 32px; max-width: 1200px; }
+
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+
+.h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  font-weight: 400;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.lang-toggle { display: flex; gap: 6px; }
+.lang-btn {
+  padding: 7px 13px;
+  border: 1px solid var(--border-mid);
+  background: transparent;
+  color: var(--secondary);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.lang-btn:hover { color: var(--primary); border-color: rgba(255,255,255,0.2); }
+.lang-btn.active { background: var(--grad); color: #0d1521; border-color: transparent; }
+
+/* ── FORM ── */
+.form-group { margin-bottom: 18px; }
+
+.label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg-card);
+  color: var(--primary);
+  outline: none;
+  transition: border-color 0.2s;
+}
+input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
+input:focus, select:focus, textarea:focus { border-color: rgba(205,255,216,0.35); }
+select option { background: var(--bg-dark); color: var(--primary); }
+
+/* ── TAG CHIPS ── */
+.tag-section { margin-bottom: 14px; }
+.tag-section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block;
+}
+.tag-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag-chip {
+  padding: 6px 12px; border: 1px solid var(--border-mid);
+  background: transparent; color: var(--secondary); border-radius: 999px;
+  font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.tag-chip:hover { border-color: rgba(205,255,216,0.3); color: var(--primary); }
+.tag-chip.selected {
+  background: rgba(205,255,216,0.12); border-color: var(--accent-mint);
+  color: var(--accent-mint); font-weight: 600;
+}
+.audience-summary {
+  margin-top: 10px; padding: 10px 14px; background: var(--bg-dark);
+  border: 1px solid var(--border); border-radius: 8px; font-size: 12px;
+  color: var(--secondary); line-height: 1.5; display: none;
+}
+.audience-summary.visible { display: block; }
+
+/* ── PLATFORM GRID ── */
+.platform-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+.platform-btn {
+  padding: 12px 6px; border: 1px solid var(--border); background: var(--bg-card);
+  border-radius: 10px; cursor: pointer; text-align: center; font-size: 11px;
+  font-weight: 500; font-family: inherit; color: var(--secondary); transition: all 0.2s;
+}
+.platform-btn:hover { border-color: var(--border-mid); color: var(--primary); }
+.platform-btn.active {
+  border-color: var(--accent-mint); background: rgba(205,255,216,0.08); color: var(--accent-mint); font-weight: 600;
+}
+
+/* ── BUTTONS ── */
+.button {
+  padding: 13px 24px; background: var(--grad); color: #0d1521; border: none;
+  border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px;
+  font-family: inherit; letter-spacing: 0.06em; transition: opacity 0.2s;
+}
+.button:hover { opacity: 0.85; }
+.button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── CARDS ── */
+.card {
+  padding: 16px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-card); margin-bottom: 12px;
+}
+
+.variation-card {
+  padding: 18px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg-card); margin-bottom: 16px; transition: border-color 0.2s;
+}
+.variation-card:hover { border-color: var(--border-mid); }
+
+.variation-title {
+  font-weight: 600; font-size: 12px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+}
+
+.variation-content {
+  white-space: pre-wrap; font-size: 14px; color: var(--primary);
+  margin-bottom: 14px; line-height: 1.7;
+}
+
+/* ── STARS ── */
+.rating { display: flex; gap: 4px; margin-top: 8px; }
+.star { font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.15); transition: color 0.15s; }
+.star:hover { color: var(--accent-mint); }
+.star.active { color: var(--accent-mint); }
+
+/* ── SECTIONS ── */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── DASHBOARD ── */
+.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { padding: 20px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+.stat-number {
+  font-family: 'DM Serif Display', serif; font-size: 36px; font-weight: 400;
+  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.stat-label { font-size: 12px; color: var(--secondary); margin-top: 6px; letter-spacing: 0.04em; }
+
+.best-badge { margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--accent-mint); text-transform: uppercase; }
+.generated-title { font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 400; color: var(--primary); margin-bottom: 16px; }
+
+/* ── SAVING INDICATOR ── */
+.saving-indicator {
+  position: fixed; bottom: 20px; right: 20px;
+  padding: 8px 16px; background: var(--bg-dark); border: 1px solid var(--border);
+  border-radius: 999px; font-size: 12px; color: var(--secondary);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+}
+.saving-indicator.visible { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen">
+  <div style="font-family:'DM Serif Display',serif; font-size:24px; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Flux Strategy</div>
+  <div class="loading-text">Loading...</div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-text">Flux Strategy</div>
+      <div class="auth-logo-sub">Content Engine</div>
+    </div>
+
+    <h1 class="auth-title">Welcome back.</h1>
+    <p class="auth-subtitle">Sign in to your account to continue generating content.</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">Create Account</button>
+    </div>
+
+    <div id="authError" class="auth-error"></div>
+    <div id="authSuccess" class="auth-success"></div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input type="password" id="loginPassword" placeholder="Your password" onkeydown="if(event.key==='Enter')handleLogin()">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()" id="loginBtn">Sign In</button>
+      <div class="auth-divider">or</div>
+      <button class="btn-google" onclick="handleGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="signupForm" style="display:none;">
+      <div class="form-field">
+        <label class="form-label">Full Name</label>
+        <input type="text" id="signupName" placeholder="Fiona Tsui">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Password</label>
+        <input type="password" id="signupPassword" placeholder="Min. 6 characters" onkeydown="if(event.key==='Enter')handleSignup()">
+      </div>
+      <button class="btn-primary" onclick="handleSignup()" id="signupBtn">Create Account</button>
+      <div class="auth-divider">or</div>
+      <button class="btn-google" onclick="handleGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="appScreen">
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-text">Flux Strategy</div>
+      <div class="logo-sub">Content Engine</div>
+    </div>
+    <div class="nav">
+      <button class="nav-item active" onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="nav-item" onclick="switchTab('clients')">Client Management</button>
+      <button class="nav-item" onclick="switchTab('discover')">Topics</button>
+      <button class="nav-item" onclick="switchTab('generate')">Generate</button>
+      <button class="nav-item" onclick="switchTab('history')">History</button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-email" id="userEmail">Loading...</div>
+      </div>
+      <div class="sidebar-btns">
+        <button class="sidebar-btn" onclick="exportData()">Backup</button>
+        <button class="sidebar-btn" onclick="importData()">Import</button>
+        <button class="sidebar-btn logout" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <h1 class="h1" id="pageTitle">Dashboard</h1>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLanguage('tc',event)">繁</button>
+        <button class="lang-btn" onclick="setLanguage('sc',event)">简</button>
+        <button class="lang-btn" onclick="setLanguage('en',event)">EN</button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="dashboard">
+      <div class="dashboard-grid">
+        <div class="stat-card">
+          <div class="stat-number" id="clientCount">0</div>
+          <div class="stat-label" id="clientsLabel">Clients</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="contentCount">0</div>
+          <div class="stat-label" id="contentLabel">Content Items</div>
+        </div>
+      </div>
+      <div style="padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--secondary); line-height: 1.7;">
+        <div style="color: var(--accent-mint); font-weight: 600; margin-bottom: 8px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">Getting Started</div>
+        1. Go to <strong style="color:var(--primary)">Client Management</strong> → Add your brand profile<br>
+        2. Go to <strong style="color:var(--primary)">Topics</strong> → Get 8 content ideas<br>
+        3. Go to <strong style="color:var(--primary)">Generate</strong> → Create platform-ready content
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="section" id="clients">
+      <div class="form-group">
+        <label class="label">Client Name *</label>
+        <input type="text" id="clientName" placeholder="Enter client name...">
+      </div>
+      <div class="form-group">
+        <label class="label">Industry</label>
+        <select id="clientIndustry">
+          <option value="">Select industry...</option>
+          <option value="beauty">Beauty & Personal Care (美容護膚)</option>
+          <option value="fashion">Fashion & Apparel (時尚服裝)</option>
+          <option value="food">Food & Beverage (食品飲料)</option>
+          <option value="technology">Technology (科技)</option>
+          <option value="finance">Finance & Banking (金融)</option>
+          <option value="health">Health & Wellness (健康)</option>
+          <option value="realestate">Real Estate (房地產)</option>
+          <option value="travel">Travel & Tourism (旅遊)</option>
+          <option value="education">Education (教育)</option>
+          <option value="entertainment">Entertainment (娛樂)</option>
+          <option value="ecommerce">E-commerce (電商)</option>
+          <option value="luxury">Luxury Goods (奢侈品)</option>
+          <option value="fitness">Fitness & Sports (運動健身)</option>
+          <option value="home">Home & Living (家居生活)</option>
+          <option value="nonprofit">Nonprofit (非牟利)</option>
+          <option value="other">Other (其他)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label">Brand Tone *</label>
+        <select id="clientTone">
+          <option value="professional">Professional 專業</option>
+          <option value="casual">Casual 輕鬆</option>
+          <option value="luxury">Luxury 奢華</option>
+          <option value="energetic">Energetic 活力</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label">Brand Story</label>
+        <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." style="min-height:80px;resize:vertical;"></textarea>
+      </div>
+
+      <!-- AUDIENCE TAG CHIPS -->
+      <div class="form-group">
+        <label class="label">Target Audience</label>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="gender_label">Gender</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="gender" data-val="女性為主" data-langkey="chip_female" onclick="toggleChip(this)">女性為主</button>
+            <button class="tag-chip" data-group="gender" data-val="男性為主" data-langkey="chip_male" onclick="toggleChip(this)">男性為主</button>
+            <button class="tag-chip" data-group="gender" data-val="性別均衡" data-langkey="chip_balanced" onclick="toggleChip(this)">性別均衡</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="age_label">Age Group</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="age" data-val="18-24歲" data-langkey="chip_18" onclick="toggleChip(this)">18-24</button>
+            <button class="tag-chip" data-group="age" data-val="25-34歲" data-langkey="chip_25" onclick="toggleChip(this)">25-34</button>
+            <button class="tag-chip" data-group="age" data-val="35-44歲" data-langkey="chip_35" onclick="toggleChip(this)">35-44</button>
+            <button class="tag-chip" data-group="age" data-val="45-54歲" data-langkey="chip_45" onclick="toggleChip(this)">45-54</button>
+            <button class="tag-chip" data-group="age" data-val="55歲以上" data-langkey="chip_55" onclick="toggleChip(this)">55+</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="lifestage_label">Life Stage</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="lifestage" data-val="學生" data-langkey="chip_student" onclick="toggleChip(this)">學生</button>
+            <button class="tag-chip" data-group="lifestage" data-val="初入職場" data-langkey="chip_newjob" onclick="toggleChip(this)">初入職場</button>
+            <button class="tag-chip" data-group="lifestage" data-val="專業人士" data-langkey="chip_pro" onclick="toggleChip(this)">專業人士</button>
+            <button class="tag-chip" data-group="lifestage" data-val="新婚" data-langkey="chip_married" onclick="toggleChip(this)">新婚</button>
+            <button class="tag-chip" data-group="lifestage" data-val="為人父母" data-langkey="chip_parent" onclick="toggleChip(this)">為人父母</button>
+            <button class="tag-chip" data-group="lifestage" data-val="退休準備" data-langkey="chip_retire" onclick="toggleChip(this)">退休準備</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="income_label">Income Level</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="income" data-val="大眾消費" data-langkey="chip_mass" onclick="toggleChip(this)">大眾消費</button>
+            <button class="tag-chip" data-group="income" data-val="中產" data-langkey="chip_midclass" onclick="toggleChip(this)">中產</button>
+            <button class="tag-chip" data-group="income" data-val="高收入" data-langkey="chip_high" onclick="toggleChip(this)">高收入</button>
+            <button class="tag-chip" data-group="income" data-val="超高淨值" data-langkey="chip_uhnw" onclick="toggleChip(this)">超高淨值</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="interests_label">Interests</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="interests" data-val="美容護膚" data-langkey="chip_beauty" onclick="toggleChip(this)">美容護膚</button>
+            <button class="tag-chip" data-group="interests" data-val="健康養生" data-langkey="chip_health" onclick="toggleChip(this)">健康養生</button>
+            <button class="tag-chip" data-group="interests" data-val="投資理財" data-langkey="chip_finance" onclick="toggleChip(this)">投資理財</button>
+            <button class="tag-chip" data-group="interests" data-val="旅遊" data-langkey="chip_travel" onclick="toggleChip(this)">旅遊</button>
+            <button class="tag-chip" data-group="interests" data-val="親子" data-langkey="chip_family" onclick="toggleChip(this)">親子</button>
+            <button class="tag-chip" data-group="interests" data-val="時尚" data-langkey="chip_fashion" onclick="toggleChip(this)">時尚</button>
+            <button class="tag-chip" data-group="interests" data-val="飲食" data-langkey="chip_food" onclick="toggleChip(this)">飲食</button>
+            <button class="tag-chip" data-group="interests" data-val="運動健身" data-langkey="chip_fitness" onclick="toggleChip(this)">運動健身</button>
+            <button class="tag-chip" data-group="interests" data-val="科技數碼" data-langkey="chip_tech" onclick="toggleChip(this)">科技數碼</button>
+            <button class="tag-chip" data-group="interests" data-val="家居生活" data-langkey="chip_home" onclick="toggleChip(this)">家居生活</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="decision_label">Decision Style</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="decision" data-val="價格敏感" data-langkey="chip_price" onclick="toggleChip(this)">價格敏感</button>
+            <button class="tag-chip" data-group="decision" data-val="品質導向" data-langkey="chip_quality" onclick="toggleChip(this)">品質導向</button>
+            <button class="tag-chip" data-group="decision" data-val="品牌忠誠" data-langkey="chip_brand_loyal" onclick="toggleChip(this)">品牌忠誠</button>
+            <button class="tag-chip" data-group="decision" data-val="口碑驅動" data-langkey="chip_wom" onclick="toggleChip(this)">口碑驅動</button>
+            <button class="tag-chip" data-group="decision" data-val="衝動消費" data-langkey="chip_impulse" onclick="toggleChip(this)">衝動消費</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="painpoints_label">Pain Points</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="painpoints" data-val="時間不足" data-langkey="chip_time" onclick="toggleChip(this)">時間不足</button>
+            <button class="tag-chip" data-group="painpoints" data-val="預算有限" data-langkey="chip_budget_pain" onclick="toggleChip(this)">預算有限</button>
+            <button class="tag-chip" data-group="painpoints" data-val="資訊過載" data-langkey="chip_info" onclick="toggleChip(this)">資訊過載</button>
+            <button class="tag-chip" data-group="painpoints" data-val="唔信任品牌" data-langkey="chip_trust" onclick="toggleChip(this)">唔信任品牌</button>
+            <button class="tag-chip" data-group="painpoints" data-val="選擇困難" data-langkey="chip_choice" onclick="toggleChip(this)">選擇困難</button>
+            <button class="tag-chip" data-group="painpoints" data-val="缺乏動力" data-langkey="chip_motivation" onclick="toggleChip(this)">缺乏動力</button>
+          </div>
+        </div>
+        <div class="tag-section">
+          <span class="tag-section-label" data-sectionkey="behaviour_label">Platform Behaviour</span>
+          <div class="tag-chips">
+            <button class="tag-chip" data-group="behaviour" data-val="主動搜尋型" data-langkey="chip_active" onclick="toggleChip(this)">主動搜尋型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="被動滾動型" data-langkey="chip_passive" onclick="toggleChip(this)">被動滾動型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="社群互動型" data-langkey="chip_social_b" onclick="toggleChip(this)">社群互動型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="只睇唔留言" data-langkey="chip_lurker" onclick="toggleChip(this)">只睇唔留言</button>
+          </div>
+        </div>
+        <div class="audience-summary" id="audienceSummary"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="label">Competitors</label>
+        <textarea id="clientCompetitors" placeholder="Main competitors..." style="min-height:60px;resize:vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="label">Forbidden Words</label>
+        <textarea id="clientForbiddenWords" placeholder="Words to avoid..." style="min-height:60px;resize:vertical;"></textarea>
+      </div>
+      <button class="button" id="saveClientBtn" onclick="saveClient()">Add Client</button>
+      <div id="clientSaveStatus" style="margin-top:10px; font-size:12px; color:var(--accent-mint); display:none;"></div>
+
+      <h2 style="color:var(--accent-mint); margin-top:28px; font-size:18px; margin-bottom:16px;" id="yourClientsHeader">Your Clients</h2>
+      <div id="clientsList"></div>
+    </div>
+
+    <!-- GENERATE -->
+    <div class="section" id="generate">
+      <div class="form-group">
+        <label class="label">Select Client *</label>
+        <select id="selectClient" onchange="selectCurrentClient()">
+          <option value="">Choose client...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label">Topic / Idea *</label>
+        <textarea id="topic" placeholder="e.g., Spring Collection" maxlength="200" oninput="updateTopicCount()" style="min-height:80px;resize:vertical;"></textarea>
+        <div style="text-align:right; font-size:11px; color:var(--muted); margin-top:4px;"><span id="topicCount">0</span> / 200</div>
+      </div>
+      <div class="form-group">
+        <label class="label">Select Platforms *</label>
+        <div class="platform-grid">
+          <button class="platform-btn" onclick="togglePlatform('facebook',event)">Facebook</button>
+          <button class="platform-btn" onclick="togglePlatform('instagram',event)">Instagram</button>
+          <button class="platform-btn" onclick="togglePlatform('threads',event)">Threads</button>
+          <button class="platform-btn" onclick="togglePlatform('linkedin',event)">LinkedIn</button>
+          <button class="platform-btn" onclick="togglePlatform('xiaohongshu',event)">XHS (RED)</button>
+          <button class="platform-btn" onclick="togglePlatform('wechat',event)">WeChat</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="label">Content Language</label>
+        <select id="contentLanguage">
+          <option value="tc">Traditional Chinese (繁體中文)</option>
+          <option value="sc">Simplified Chinese (簡體中文)</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <button class="button" onclick="generateContent()" id="generateBtn">Generate</button>
+      <div id="generatedContent" style="margin-top:24px;"></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="section" id="history">
+      <div id="historyList"></div>
+    </div>
+
+    <!-- TOPICS/DISCOVER -->
+    <div class="section" id="discover">
+      <div class="form-group">
+        <label class="label">Select Client *</label>
+        <select id="discoverSelectClient">
+          <option value="">Choose client...</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label">Content Direction (Optional)</label>
+        <input type="text" id="discoverContentDirection" placeholder="e.g., Health Insurance, Retirement Life...">
+      </div>
+      <div class="form-group">
+        <label class="label">Select Platform *</label>
+        <select id="discoverPlatform">
+          <option value="">Choose platform...</option>
+          <option value="facebook">Facebook</option>
+          <option value="instagram">Instagram</option>
+          <option value="threads">Threads</option>
+          <option value="linkedin">LinkedIn</option>
+          <option value="xiaohongshu">Xiaohongshu (RED)</option>
+          <option value="wechat">WeChat</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="label">Content Language *</label>
+        <select id="discoverContentLanguage">
+          <option value="tc">Traditional Chinese (繁體中文)</option>
+          <option value="sc">Simplified Chinese (簡體中文)</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <button class="button" onclick="generateTopicSuggestions()" id="topicBtn">Generate Topic Suggestions</button>
+      <div id="topicSuggestions" style="margin-top:24px;"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="saving-indicator" id="savingIndicator">Saving...</div>
+
+<script>
+// ═══════════════════════════════════════════
+// SUPABASE INIT
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://rmvfihgclnzbxzuxnmzb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_j2jVI-QRxBQlLaBpaZEq3g_376C6KIP';
+const BACKEND = 'https://flux-content-engine.onrender.com';
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentUser = null;
+let clients = [];
+let currentClient = null;
+let selectedPlatforms = [];
+let generatedVariations = [];
+let currentLang = 'tc';
+let editingClientId = null;
+
+// ═══════════════════════════════════════════
+// LANGUAGES
+// ═══════════════════════════════════════════
+const LANGS = {
+  tc: {
+    dashboard:'儀表板', clients:'客戶管理', discover:'主題探索', generate:'生成內容', history:'歷史記錄',
+    addClient:'新增客戶', updateClient:'更新客戶', selectClient:'選擇客戶', chooseClient:'選擇客戶…',
+    generate_btn:'生成', generateTopics:'生成主題建議',
+    yourClients:'你的客戶', generated:'生成的內容',
+    clients_label:'客戶數目', content_label:'內容數目',
+    gender_label:'性別', age_label:'年齡層', lifestage_label:'人生階段',
+    income_label:'收入水平', interests_label:'興趣', decision_label:'消費決策',
+    painpoints_label:'痛點', behaviour_label:'平台行為',
+    chip_female:'女性為主', chip_male:'男性為主', chip_balanced:'性別均衡',
+    chip_18:'18-24', chip_25:'25-34', chip_35:'35-44', chip_45:'45-54', chip_55:'55+',
+    chip_student:'學生', chip_newjob:'初入職場', chip_pro:'專業人士',
+    chip_married:'新婚', chip_parent:'為人父母', chip_retire:'退休準備',
+    chip_mass:'大眾消費', chip_midclass:'中產', chip_high:'高收入', chip_uhnw:'超高淨值',
+    chip_beauty:'美容護膚', chip_health:'健康養生', chip_finance:'投資理財',
+    chip_travel:'旅遊', chip_family:'親子', chip_fashion:'時尚',
+    chip_food:'飲食', chip_fitness:'運動健身', chip_tech:'科技數碼', chip_home:'家居生活',
+    chip_price:'價格敏感', chip_quality:'品質導向', chip_brand_loyal:'品牌忠誠',
+    chip_wom:'口碑驅動', chip_impulse:'衝動消費',
+    chip_time:'時間不足', chip_budget_pain:'預算有限', chip_info:'資訊過載',
+    chip_trust:'唔信任品牌', chip_choice:'選擇困難', chip_motivation:'缺乏動力',
+    chip_active:'主動搜尋型', chip_passive:'被動滾動型', chip_social_b:'社群互動型', chip_lurker:'只睇唔留言'
+  },
+  sc: {
+    dashboard:'仪表板', clients:'客户管理', discover:'主题探索', generate:'生成内容', history:'历史记录',
+    addClient:'新增客户', updateClient:'更新客户', selectClient:'选择客户', chooseClient:'选择客户…',
+    generate_btn:'生成', generateTopics:'生成主题建议',
+    yourClients:'你的客户', generated:'生成的内容',
+    clients_label:'客户数目', content_label:'内容数目',
+    gender_label:'性别', age_label:'年龄层', lifestage_label:'人生阶段',
+    income_label:'收入水平', interests_label:'兴趣', decision_label:'消费决策',
+    painpoints_label:'痛点', behaviour_label:'平台行为',
+    chip_female:'女性为主', chip_male:'男性为主', chip_balanced:'性别均衡',
+    chip_18:'18-24', chip_25:'25-34', chip_35:'35-44', chip_45:'45-54', chip_55:'55+',
+    chip_student:'学生', chip_newjob:'初入职场', chip_pro:'专业人士',
+    chip_married:'新婚', chip_parent:'为人父母', chip_retire:'退休准备',
+    chip_mass:'大众消费', chip_midclass:'中产', chip_high:'高收入', chip_uhnw:'超高净值',
+    chip_beauty:'美容护肤', chip_health:'健康养生', chip_finance:'投资理财',
+    chip_travel:'旅游', chip_family:'亲子', chip_fashion:'时尚',
+    chip_food:'饮食', chip_fitness:'运动健身', chip_tech:'科技数码', chip_home:'家居生活',
+    chip_price:'价格敏感', chip_quality:'品质导向', chip_brand_loyal:'品牌忠诚',
+    chip_wom:'口碑驱动', chip_impulse:'冲动消费',
+    chip_time:'时间不足', chip_budget_pain:'预算有限', chip_info:'信息过载',
+    chip_trust:'不信任品牌', chip_choice:'选择困难', chip_motivation:'缺乏动力',
+    chip_active:'主动搜索型', chip_passive:'被动浏览型', chip_social_b:'社群互动型', chip_lurker:'只看不评论'
+  },
+  en: {
+    dashboard:'Dashboard', clients:'Client Management', discover:'Topics', generate:'Generate', history:'History',
+    addClient:'Add Client', updateClient:'Update Client', selectClient:'Select Client', chooseClient:'Choose client…',
+    generate_btn:'Generate', generateTopics:'Generate Topic Suggestions',
+    yourClients:'Your Clients', generated:'Generated Content',
+    clients_label:'Clients', content_label:'Content Items',
+    gender_label:'Gender', age_label:'Age Group', lifestage_label:'Life Stage',
+    income_label:'Income Level', interests_label:'Interests', decision_label:'Decision Style',
+    painpoints_label:'Pain Points', behaviour_label:'Platform Behaviour',
+    chip_female:'Female-led', chip_male:'Male-led', chip_balanced:'Gender Balanced',
+    chip_18:'18-24', chip_25:'25-34', chip_35:'35-44', chip_45:'45-54', chip_55:'55+',
+    chip_student:'Student', chip_newjob:'Early Career', chip_pro:'Professional',
+    chip_married:'Newly Married', chip_parent:'Parent', chip_retire:'Pre-retirement',
+    chip_mass:'Mass Market', chip_midclass:'Middle Class', chip_high:'High Income', chip_uhnw:'Ultra High Net Worth',
+    chip_beauty:'Beauty & Skincare', chip_health:'Health & Wellness', chip_finance:'Finance & Investment',
+    chip_travel:'Travel', chip_family:'Family & Kids', chip_fashion:'Fashion',
+    chip_food:'Food & Dining', chip_fitness:'Fitness', chip_tech:'Tech & Digital', chip_home:'Home & Living',
+    chip_price:'Price Sensitive', chip_quality:'Quality-driven', chip_brand_loyal:'Brand Loyal',
+    chip_wom:'Word of Mouth', chip_impulse:'Impulse Buyer',
+    chip_time:'Time-poor', chip_budget_pain:'Budget Conscious', chip_info:'Info Overload',
+    chip_trust:'Low Brand Trust', chip_choice:'Choice Paralysis', chip_motivation:'Lacks Motivation',
+    chip_active:'Active Searcher', chip_passive:'Passive Scroller', chip_social_b:'Community Engager', chip_lurker:'Lurker'
+  }
+};
+
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
+function showScreen(screen) {
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'none';
+  if (screen === 'loading') document.getElementById('loadingScreen').style.display = 'flex';
+  else if (screen === 'auth') document.getElementById('authScreen').style.display = 'flex';
+  else if (screen === 'app') document.getElementById('appScreen').style.display = 'block';
+}
+
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+  clearAuthMessages();
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.classList.add('visible');
+  document.getElementById('authSuccess').classList.remove('visible');
+}
+
+function showAuthSuccess(msg) {
+  const el = document.getElementById('authSuccess');
+  el.textContent = msg;
+  el.classList.add('visible');
+  document.getElementById('authError').classList.remove('visible');
+}
+
+function clearAuthMessages() {
+  document.getElementById('authError').classList.remove('visible');
+  document.getElementById('authSuccess').classList.remove('visible');
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showAuthError('Please enter email and password.'); return; }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    showAuthError(error.message);
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+}
+
+async function handleSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  if (!email || !password) { showAuthError('Please fill in all fields.'); return; }
+  if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
+
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.textContent = 'Creating account...';
+
+  const { error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { full_name: name } }
+  });
+
+  if (error) {
+    showAuthError(error.message);
+    btn.disabled = false; btn.textContent = 'Create Account';
+  } else {
+    showAuthSuccess('Account created! Please check your email to confirm, then sign in.');
+    btn.disabled = false; btn.textContent = 'Create Account';
+  }
+}
+
+async function handleGoogleLogin() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/flux-content-engine-v2.html' }
+  });
+  if (error) showAuthError(error.message);
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+  clients = []; currentClient = null; generatedVariations = [];
+  showScreen('auth');
+}
+
+// ═══════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════
+async function initApp(user) {
+  currentUser = user;
+
+  // Set user info in sidebar
+  const email = user.email || '';
+  const initials = email.charAt(0).toUpperCase();
+  document.getElementById('userAvatar').textContent = initials;
+  document.getElementById('userEmail').textContent = email;
+
+  showScreen('app');
+  await loadClients();
+  updateStats();
+  updateAllUI();
+  startKeepAlive();
+}
+
+// ═══════════════════════════════════════════
+// SUPABASE DATA OPERATIONS
+// ═══════════════════════════════════════════
+async function loadClients() {
+  const { data, error } = await sb
+    .from('clients')
+    .select('*')
+    .eq('is_active', true)
+    .order('created_at', { ascending: true });
+
+  if (error) { console.error('Load clients error:', error); return; }
+  clients = (data || []).map(c => ({
+    id: c.id,
+    name: c.name,
+    industry: c.industry,
+    tone: c.tone,
+    brandStory: c.brand_story,
+    targetAudience: c.target_audience,
+    targetAudienceTags: c.target_audience_tags,
+    competitors: c.competitors,
+    forbiddenWords: c.forbidden_words
+  }));
+
+  updateClientsList();
+  updateClientSelect();
+  updateStats();
+}
+
+async function saveClient() {
+  const name = document.getElementById('clientName').value.trim();
+  if (!name) { alert('Please enter a client name.'); return; }
+
+  const industry = document.getElementById('clientIndustry').value;
+  const tone = document.getElementById('clientTone').value;
+  const brandStory = document.getElementById('clientBrandStory').value;
+  const targetAudienceTags = getAudienceTags();
+  const targetAudience = getAudienceString();
+  const competitors = document.getElementById('clientCompetitors').value;
+  const forbiddenWords = document.getElementById('clientForbiddenWords').value;
+
+  const btn = document.getElementById('saveClientBtn');
+  btn.disabled = true;
+  btn.textContent = editingClientId ? 'Updating...' : 'Saving...';
+
+  const record = {
+    user_id: currentUser.id,
+    name, industry, tone,
+    brand_story: brandStory,
+    target_audience: targetAudience,
+    target_audience_tags: targetAudienceTags,
+    competitors,
+    forbidden_words: forbiddenWords,
+    is_active: true
+  };
+
+  let error;
+  if (editingClientId) {
+    const res = await sb.from('clients').update(record).eq('id', editingClientId).eq('user_id', currentUser.id);
+    error = res.error;
+  } else {
+    const res = await sb.from('clients').insert(record);
+    error = res.error;
+  }
+
+  btn.disabled = false;
+  btn.textContent = editingClientId ? LANGS[currentLang].updateClient : LANGS[currentLang].addClient;
+
+  if (error) { alert('Error saving client: ' + error.message); return; }
+
+  // Reset form
+  document.getElementById('clientName').value = '';
+  document.getElementById('clientIndustry').value = '';
+  document.getElementById('clientTone').value = 'professional';
+  document.getElementById('clientBrandStory').value = '';
+  loadAudienceTags(null);
+  document.getElementById('clientCompetitors').value = '';
+  document.getElementById('clientForbiddenWords').value = '';
+  editingClientId = null;
+  btn.textContent = LANGS[currentLang].addClient;
+
+  await loadClients();
+  showSaving('Saved ✓');
+}
+
+async function saveContent(entry) {
+  if (!currentUser) return;
+  await sb.from('content').insert({
+    user_id: currentUser.id,
+    client_id: entry.clientId,
+    topic: entry.topic,
+    platforms: entry.platforms,
+    content_language: entry.contentLanguage,
+    variations: entry.variations
+  });
+  await sb.from('usage_logs').insert({
+    user_id: currentUser.id,
+    client_id: entry.clientId,
+    action: 'generate'
+  });
+}
+
+async function loadHistory() {
+  const { data, error } = await sb
+    .from('content')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) { console.error('Load history error:', error); return []; }
+  return data || [];
+}
+
+async function updateContentVariations(contentId, variations) {
+  await sb.from('content').update({ variations }).eq('id', contentId).eq('user_id', currentUser.id);
+}
+
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function showSaving(msg) {
+  const el = document.getElementById('savingIndicator');
+  el.textContent = msg || 'Saving...';
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2000);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.target.classList.add('active');
+  updatePageTitle();
+  if (tab === 'history') renderHistory();
+}
+
+function updatePageTitle() {
+  const t = LANGS[currentLang];
+  const tabMap = { dashboard: t.dashboard, clients: t.clients, discover: t.discover, generate: t.generate, history: t.history };
+  const activeTab = document.querySelector('.section.active')?.id || 'dashboard';
+  document.getElementById('pageTitle').textContent = tabMap[activeTab] || 'Dashboard';
+}
+
+function setLanguage(lang, e) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  if (e && e.target) e.target.classList.add('active');
+  updateAllUI();
+}
+
+function updateAllUI() {
+  const t = LANGS[currentLang];
+  const navKeys = ['dashboard','clients','discover','generate','history'];
+  document.querySelectorAll('.nav-item').forEach((item, i) => { if (t[navKeys[i]]) item.textContent = t[navKeys[i]]; });
+
+  const genBtn = document.getElementById('generateBtn');
+  if (genBtn) genBtn.textContent = t.generate_btn;
+  const topicBtn = document.getElementById('topicBtn');
+  if (topicBtn) topicBtn.textContent = t.generateTopics;
+  const saveBtn = document.getElementById('saveClientBtn');
+  if (saveBtn) saveBtn.textContent = editingClientId ? t.updateClient : t.addClient;
+  const header = document.getElementById('yourClientsHeader');
+  if (header) header.textContent = t.yourClients;
+  document.querySelectorAll('.stat-label')[0] && (document.getElementById('clientsLabel').textContent = t.clients_label);
+  document.querySelectorAll('.stat-label')[1] && (document.getElementById('contentLabel').textContent = t.content_label);
+
+  document.querySelectorAll('.tag-chip[data-langkey]').forEach(chip => {
+    const key = chip.getAttribute('data-langkey');
+    if (t[key]) chip.textContent = t[key];
+  });
+  document.querySelectorAll('[data-sectionkey]').forEach(el => {
+    const key = el.getAttribute('data-sectionkey');
+    if (t[key]) el.textContent = t[key];
+  });
+
+  updatePageTitle();
+}
+
+function updateStats() {
+  document.getElementById('clientCount').textContent = clients.length;
+}
+
+function updateClientsList() {
+  const list = document.getElementById('clientsList');
+  if (!clients.length) {
+    list.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:16px 0;">No clients yet. Add your first client above.</div>';
+    return;
+  }
+  list.innerHTML = clients.map(c => `
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+      <div style="cursor:pointer;flex:1;" onclick="selectClientById('${c.id}')">
+        <div style="font-weight:600;color:var(--accent-mint);">${c.name}</div>
+        <div style="font-size:12px;color:var(--secondary);margin-top:4px;">${c.tone}${c.industry ? ' · ' + c.industry : ''}</div>
+        ${c.brandStory ? '<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 Has story</div>' : ''}
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="editClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.color='var(--accent-mint)'" onmouseout="this.style.color='var(--secondary)'">Edit</button>
+        <button onclick="deleteClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:rgba(255,107,107,0.6);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function updateClientSelect() {
+  const opts = '<option value="">Choose client...</option>' + clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('selectClient').innerHTML = opts;
+  document.getElementById('discoverSelectClient').innerHTML = opts;
+}
+
+function selectClientById(id) {
+  currentClient = clients.find(c => c.id === id) || null;
+  document.getElementById('selectClient').value = id || '';
+}
+
+function selectCurrentClient() {
+  const id = document.getElementById('selectClient').value;
+  currentClient = clients.find(c => c.id === id) || null;
+}
+
+function editClient(id) {
+  const c = clients.find(cl => cl.id === id);
+  if (!c) return;
+  document.getElementById('clientName').value = c.name;
+  document.getElementById('clientIndustry').value = c.industry || '';
+  document.getElementById('clientTone').value = c.tone;
+  document.getElementById('clientBrandStory').value = c.brandStory || '';
+  loadAudienceTags(c.targetAudienceTags || null);
+  document.getElementById('clientCompetitors').value = c.competitors || '';
+  document.getElementById('clientForbiddenWords').value = c.forbiddenWords || '';
+  editingClientId = id;
+  document.getElementById('saveClientBtn').textContent = LANGS[currentLang].updateClient;
+  document.getElementById('clientName').focus();
+  switchTab('clients');
+}
+
+async function deleteClient(id) {
+  if (!confirm('Delete this client? This cannot be undone.')) return;
+  await sb.from('clients').update({ is_active: false }).eq('id', id).eq('user_id', currentUser.id);
+  await loadClients();
+  showSaving('Deleted');
+}
+
+// ═══════════════════════════════════════════
+// TAG CHIPS
+// ═══════════════════════════════════════════
+const AUDIENCE_GROUPS = ['gender','age','lifestage','income','interests','decision','painpoints','behaviour'];
+
+function toggleChip(el) {
+  const group = el.getAttribute('data-group');
+  const isSingle = ['gender','income'].includes(group);
+  if (isSingle) document.querySelectorAll(`.tag-chip[data-group="${group}"]`).forEach(c => c.classList.remove('selected'));
+  el.classList.toggle('selected');
+  updateAudienceSummary();
+}
+
+function getAudienceTags() {
+  const tags = {};
+  AUDIENCE_GROUPS.forEach(group => {
+    const selected = [...document.querySelectorAll(`.tag-chip[data-group="${group}"].selected`)].map(c => c.getAttribute('data-val'));
+    if (selected.length > 0) tags[group] = selected;
+  });
+  return tags;
+}
+
+function getAudienceString() {
+  const tags = getAudienceTags();
+  const parts = [];
+  if (tags.gender)     parts.push('Gender: ' + tags.gender.join(', '));
+  if (tags.age)        parts.push('Age: ' + tags.age.join(', '));
+  if (tags.lifestage)  parts.push('Life Stage: ' + tags.lifestage.join(', '));
+  if (tags.income)     parts.push('Income: ' + tags.income.join(', '));
+  if (tags.interests)  parts.push('Interests: ' + tags.interests.join(', '));
+  if (tags.decision)   parts.push('Decision Style: ' + tags.decision.join(', '));
+  if (tags.painpoints) parts.push('Pain Points: ' + tags.painpoints.join(', '));
+  if (tags.behaviour)  parts.push('Platform Behaviour: ' + tags.behaviour.join(', '));
+  return parts.join(' | ');
+}
+
+function updateAudienceSummary() {
+  const el = document.getElementById('audienceSummary');
+  const str = getAudienceString();
+  if (str) { el.textContent = '✓ ' + str; el.classList.add('visible'); }
+  else el.classList.remove('visible');
+}
+
+function loadAudienceTags(audienceObj) {
+  document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('selected'));
+  if (!audienceObj) { updateAudienceSummary(); return; }
+  Object.entries(audienceObj).forEach(([group, vals]) => {
+    vals.forEach(val => {
+      const chip = document.querySelector(`.tag-chip[data-group="${group}"][data-val="${val}"]`);
+      if (chip) chip.classList.add('selected');
+    });
+  });
+  updateAudienceSummary();
+}
+
+// ═══════════════════════════════════════════
+// TOPIC COUNT
+// ═══════════════════════════════════════════
+function updateTopicCount() {
+  const ta = document.getElementById('topic');
+  const count = document.getElementById('topicCount');
+  if (ta && count) count.textContent = ta.value.length;
+}
+
+// ═══════════════════════════════════════════
+// PLATFORM TOGGLE
+// ═══════════════════════════════════════════
+function togglePlatform(id, e) {
+  const btn = e ? e.target : document.querySelector(`.platform-btn[onclick*="${id}"]`);
+  if (selectedPlatforms.includes(id)) {
+    selectedPlatforms = selectedPlatforms.filter(p => p !== id);
+    btn.classList.remove('active');
+  } else {
+    selectedPlatforms.push(id);
+    btn.classList.add('active');
+  }
+}
+
+// ═══════════════════════════════════════════
+// GENERATE CONTENT
+// ═══════════════════════════════════════════
+function generateContent() {
+  if (!currentClient || selectedPlatforms.length === 0 || !document.getElementById('topic').value.trim()) {
+    alert('Please select a client, choose at least one platform, and enter a topic.');
+    return;
+  }
+
+  const topic = document.getElementById('topic').value.trim();
+  const contentLang = document.getElementById('contentLanguage').value;
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  fetch(BACKEND + '/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      topic, clientName: currentClient.name, industry: currentClient.industry,
+      tone: currentClient.tone, brandStory: currentClient.brandStory,
+      targetAudience: currentClient.targetAudience, forbiddenWords: currentClient.forbiddenWords,
+      platforms: selectedPlatforms, language: contentLang
+    })
+  })
+  .then(r => r.json())
+  .then(async data => {
+    btn.disabled = false; btn.textContent = LANGS[currentLang].generate_btn;
+    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
+
+    generatedVariations = parseVariations(data.text);
+
+    const entry = {
+      clientId: currentClient.id, topic, variations: generatedVariations,
+      platforms: selectedPlatforms, contentLanguage: contentLang,
+      createdAt: new Date().toISOString()
+    };
+
+    await saveContent(entry);
+    renderVariations();
+
+    document.getElementById('topic').value = '';
+    document.getElementById('topicCount').textContent = '0';
+    selectedPlatforms = [];
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+
+    const { count } = await sb.from('content').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+    document.getElementById('contentCount').textContent = count || 0;
+  })
+  .catch(err => {
+    btn.disabled = false; btn.textContent = LANGS[currentLang].generate_btn;
+    alert('Network error: ' + err.message);
+  });
+}
+
+function parseVariations(content) {
+  const variations = [];
+  const parts = content.split(/\[Variation \d+\]/i);
+  for (let i = 1; i < parts.length; i++) {
+    const text = parts[i].trim();
+    if (text) variations.push({ id: 'var_' + Date.now() + '_' + i, number: i, content: text, rating: 0, isBest: false });
+  }
+  return variations.length > 0 ? variations : [{ id: 'var_' + Date.now() + '_1', number: 1, content, rating: 0, isBest: false }];
+}
+
+function renderVariations() {
+  const div = document.getElementById('generatedContent');
+  if (!generatedVariations || !generatedVariations.length) { div.innerHTML = ''; return; }
+
+  let html = `<div class="generated-title">${LANGS[currentLang].generated} (${generatedVariations.length})</div>`;
+  generatedVariations.forEach(v => {
+    html += `<div class="variation-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div class="variation-title" style="margin-bottom:0;">Variation ${v.number}</div>
+        <button onclick="copyVariation('${v.id}',this)" style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Copy</button>
+      </div>
+      <div class="variation-content">${v.content}</div>
+      <div class="rating">`;
+    for (let i = 1; i <= 5; i++) {
+      html += `<span class="star${i <= v.rating ? ' active' : ''}" onclick="rateVariation('${v.id}',${i})">${i <= v.rating ? '★' : '☆'}</span>`;
+    }
+    html += `</div>${v.isBest ? '<div class="best-badge">✓ Best</div>' : ''}</div>`;
+  });
+  div.innerHTML = html;
+}
+
+function copyVariation(varId, btn) {
+  const v = generatedVariations.find(v => v.id === varId);
+  if (!v) return;
+  navigator.clipboard.writeText(v.content).then(() => {
+    btn.textContent = 'Copied ✓';
+    btn.style.color = '#cdffd8';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = 'rgba(255,255,255,0.6)'; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = v.content; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+function rateVariation(varId, rating) {
+  const v = generatedVariations.find(v => v.id === varId);
+  if (v) { v.rating = rating; v.isBest = rating >= 4; renderVariations(); }
+}
+
+// ═══════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════
+async function renderHistory() {
+  const div = document.getElementById('historyList');
+  div.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:16px 0;">Loading history...</div>';
+
+  const history = await loadHistory();
+  if (!history.length) {
+    div.innerHTML = '<div style="color:var(--secondary);text-align:center;padding:48px 0;font-size:14px;">No content generated yet.</div>';
+    return;
+  }
+
+  let html = '';
+  history.forEach(entry => {
+    const client = clients.find(c => c.id === entry.client_id);
+    const clientName = client ? client.name : 'Unknown Client';
+    const date = new Date(entry.created_at).toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const platforms = (entry.platforms || []).join(', ').toUpperCase();
+    const vars = entry.variations || [];
+    const bestVar = vars.find(v => v.isBest) || vars[0];
+    const preview = bestVar ? bestVar.content.substring(0, 120) + '...' : '';
+
+    html += `<div class="card" style="margin-bottom:16px;cursor:pointer;" onclick="loadHistoryEntry('${entry.id}','${JSON.stringify(entry.variations).replace(/'/g,"\\'")}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div>
+          <div style="font-weight:600;color:var(--accent-mint);margin-bottom:4px;">${entry.topic}</div>
+          <div style="font-size:11px;color:var(--muted);">${clientName} · ${platforms} · ${date}</div>
+        </div>
+        ${bestVar && bestVar.isBest ? '<div style="font-size:10px;color:var(--accent-mint);font-weight:600;letter-spacing:0.08em;">★ BEST</div>' : ''}
+      </div>
+      ${preview ? `<div style="font-size:12px;color:var(--secondary);line-height:1.5;">${preview}</div>` : ''}
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;">${vars.length} variations</div>
+    </div>`;
+  });
+  div.innerHTML = html;
+}
+
+function loadHistoryEntry(entryId, variationsJson) {
+  try {
+    generatedVariations = JSON.parse(variationsJson.replace(/\\'/g,"'"));
+  } catch(e) { return; }
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('generate').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[3].classList.add('active');
+  updatePageTitle();
+  renderVariations();
+}
+
+// ═══════════════════════════════════════════
+// TOPIC SUGGESTIONS
+// ═══════════════════════════════════════════
+function generateTopicSuggestions() {
+  const clientId = document.getElementById('discoverSelectClient').value;
+  const platform = document.getElementById('discoverPlatform').value;
+  const contentDirection = document.getElementById('discoverContentDirection').value;
+  const contentLang = document.getElementById('discoverContentLanguage').value;
+
+  if (!clientId || !platform) { alert('Please select client and platform.'); return; }
+  const client = clients.find(c => c.id === clientId);
+  if (!client) return;
+
+  const btn = document.getElementById('topicBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+
+  fetch(BACKEND + '/api/topics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clientName: client.name, industry: client.industry, tone: client.tone,
+      brandStory: client.brandStory, targetAudience: client.targetAudience,
+      platform, language: contentLang, contentDirection
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.disabled = false; btn.textContent = LANGS[currentLang].generateTopics;
+    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
+    const suggestions = parseTopicSuggestions(data.text);
+    displayTopicSuggestions(suggestions);
+  })
+  .catch(err => {
+    btn.disabled = false; btn.textContent = LANGS[currentLang].generateTopics;
+    alert('Network error: ' + err.message);
+  });
+}
+
+function parseTopicSuggestions(text) {
+  const suggestions = [];
+  let topicBlocks = text.split(/\s*\[Topic \d+\]/i).filter(b => b.trim());
+  if (topicBlocks.length < 4) topicBlocks = text.split(/(?:^|\n)(?:\*{0,2})(?:\d+)[.)\]]\s*/m).filter(b => b.trim());
+  if (topicBlocks.length < 4) topicBlocks = text.split(/\n#{1,3}\s+|\n\*{2}Topic/i).filter(b => b.trim());
+
+  topicBlocks.forEach((block, index) => {
+    const lines = block.trim().split('\n').filter(l => l.trim());
+    if (!lines.length) return;
+    let angle = '', title = '', descLines = [];
+    lines.forEach((line, i) => {
+      const clean = line.replace(/^\*+|\*+$/g, '').trim();
+      if (/^angle[:\s]/i.test(clean)) angle = clean.replace(/^angle[:\s]*/i, '').trim();
+      else if (/^title[:\s]/i.test(clean)) title = clean.replace(/^title[:\s]*/i, '').trim();
+      else if (/^desc/i.test(clean)) descLines.push(clean.replace(/^desc[a-z]*[:\s]*/i, '').trim());
+      else if (i === 0 && !title) title = clean;
+      else if (title && i > 0) descLines.push(clean);
+    });
+    if (!title && lines.length) title = lines[0].replace(/^\*+|\*+$/g, '').trim();
+    title = title.replace(/^\d+[.)\]]\s*/, '').replace(/^\*+|\*+$/g, '').trim();
+    if (title && title.length > 2) suggestions.push({ id: 'topic_' + Date.now() + '_' + index, angle: angle || 'General', title, description: descLines.join(' ').trim() });
+  });
+
+  const seen = new Set();
+  return suggestions.filter(s => { if (seen.has(s.title)) return false; seen.add(s.title); return true; }).slice(0, 8);
+}
+
+function displayTopicSuggestions(suggestions) {
+  const div = document.getElementById('topicSuggestions');
+  if (!suggestions.length) { div.innerHTML = '<p style="color:var(--secondary);">No suggestions generated. Please try again.</p>'; return; }
+
+  let html = '';
+  suggestions.forEach(sug => {
+    html += `<div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="color:var(--accent-mint);font-weight:600;margin-bottom:4px;">${sug.title}</div>
+          <div style="color:var(--secondary);font-size:12px;margin-bottom:8px;">📍 ${sug.angle}</div>
+          <div style="color:var(--secondary);font-size:13px;line-height:1.5;">${sug.description}</div>
+        </div>
+        <button onclick="useTopic('${sug.title.replace(/'/g,"\\'")}') " style="margin-left:12px;padding:8px 14px;background:var(--grad);color:#0d1521;border:none;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;font-family:inherit;">${LANGS[currentLang].generate_btn || 'Use'}</button>
+      </div>
+    </div>`;
+  });
+  div.innerHTML = html;
+}
+
+function useTopic(title) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('generate').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[3].classList.add('active');
+  updatePageTitle();
+  document.getElementById('topic').value = title;
+  updateTopicCount();
+}
+
+// ═══════════════════════════════════════════
+// BACKUP / IMPORT
+// ═══════════════════════════════════════════
+async function exportData() {
+  const history = await loadHistory();
+  const data = { clients, history, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'flux-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+async function importData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = async function(e) {
+    const reader = new FileReader();
+    reader.onload = async function(evt) {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (data.clients && data.clients.length) {
+          for (const c of data.clients) {
+            await sb.from('clients').insert({
+              user_id: currentUser.id, name: c.name, industry: c.industry, tone: c.tone,
+              brand_story: c.brandStory, target_audience: c.targetAudience,
+              target_audience_tags: c.targetAudienceTags || {}, competitors: c.competitors,
+              forbidden_words: c.forbiddenWords, is_active: true
+            });
+          }
+          await loadClients();
+          alert('Import complete! ' + data.clients.length + ' clients imported.');
+        }
+      } catch(err) { alert('Invalid backup file.'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  input.click();
+}
+
+// ═══════════════════════════════════════════
+// KEEP ALIVE
+// ═══════════════════════════════════════════
+function startKeepAlive() {
+  fetch(BACKEND + '/ping').catch(() => {});
+  setInterval(() => fetch(BACKEND + '/ping').catch(() => {}), 10 * 60 * 1000);
+}
+
+// ═══════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════
+showScreen('loading');
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session && session.user) {
+    await initApp(session.user);
+  } else {
+    showScreen('auth');
+  }
+});
+
+// Handle OAuth redirect
+sb.auth.getSession().then(({ data: { session } }) => {
+  if (!session) showScreen('auth');
+});
+</script>
+</body>
+</html>
