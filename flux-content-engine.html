@@ -449,10 +449,10 @@ select option { background: var(--bg-dark); color: var(--primary); }
       <div class="form-group">
         <label class="label" data-key="brandTone" data-required="true">Brand Tone *</label>
         <select id="clientTone">
-          <option value="professional">Professional</option>
-          <option value="casual">Casual</option>
-          <option value="luxury">Luxury</option>
-          <option value="energetic">Energetic</option>
+          <option value="professional" data-langkey="tone_professional">Professional</option>
+          <option value="casual" data-langkey="tone_casual">Casual</option>
+          <option value="luxury" data-langkey="tone_luxury">Luxury</option>
+          <option value="energetic" data-langkey="tone_energetic">Energetic</option>
         </select>
       </div>
       <div class="form-group">
@@ -463,93 +463,93 @@ select option { background: var(--bg-dark); color: var(--primary); }
         <label class="label" data-key="targetAudience">Target Audience</label>
 
         <div class="tag-section">
-          <span class="tag-section-label">Gender</span>
+          <span class="tag-section-label" data-sectionkey="gender_label">Gender</span>
           <div class="tag-chips" id="chips-gender">
-            <button class="tag-chip" data-group="gender" data-val="女性為主" onclick="toggleChip(this)">女性為主</button>
-            <button class="tag-chip" data-group="gender" data-val="男性為主" onclick="toggleChip(this)">男性為主</button>
-            <button class="tag-chip" data-group="gender" data-val="性別均衡" onclick="toggleChip(this)">性別均衡</button>
+            <button class="tag-chip" data-group="gender" data-val="女性為主" data-langkey="chip_female" onclick="toggleChip(this)">女性為主</button>
+            <button class="tag-chip" data-group="gender" data-val="男性為主" data-langkey="chip_male" onclick="toggleChip(this)">男性為主</button>
+            <button class="tag-chip" data-group="gender" data-val="性別均衡" data-langkey="chip_balanced" onclick="toggleChip(this)">性別均衡</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Age Group</span>
+          <span class="tag-section-label" data-sectionkey="age_label">Age Group</span>
           <div class="tag-chips" id="chips-age">
-            <button class="tag-chip" data-group="age" data-val="18-24歲" onclick="toggleChip(this)">18-24</button>
-            <button class="tag-chip" data-group="age" data-val="25-34歲" onclick="toggleChip(this)">25-34</button>
-            <button class="tag-chip" data-group="age" data-val="35-44歲" onclick="toggleChip(this)">35-44</button>
-            <button class="tag-chip" data-group="age" data-val="45-54歲" onclick="toggleChip(this)">45-54</button>
-            <button class="tag-chip" data-group="age" data-val="55歲以上" onclick="toggleChip(this)">55+</button>
+            <button class="tag-chip" data-group="age" data-val="18-24歲" data-langkey="chip_18" onclick="toggleChip(this)">18-24</button>
+            <button class="tag-chip" data-group="age" data-val="25-34歲" data-langkey="chip_25" onclick="toggleChip(this)">25-34</button>
+            <button class="tag-chip" data-group="age" data-val="35-44歲" data-langkey="chip_35" onclick="toggleChip(this)">35-44</button>
+            <button class="tag-chip" data-group="age" data-val="45-54歲" data-langkey="chip_45" onclick="toggleChip(this)">45-54</button>
+            <button class="tag-chip" data-group="age" data-val="55歲以上" data-langkey="chip_55" onclick="toggleChip(this)">55+</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Life Stage</span>
+          <span class="tag-section-label" data-sectionkey="lifestage_label">Life Stage</span>
           <div class="tag-chips" id="chips-lifestage">
-            <button class="tag-chip" data-group="lifestage" data-val="學生" onclick="toggleChip(this)">學生</button>
-            <button class="tag-chip" data-group="lifestage" data-val="初入職場" onclick="toggleChip(this)">初入職場</button>
-            <button class="tag-chip" data-group="lifestage" data-val="專業人士" onclick="toggleChip(this)">專業人士</button>
-            <button class="tag-chip" data-group="lifestage" data-val="新婚" onclick="toggleChip(this)">新婚</button>
-            <button class="tag-chip" data-group="lifestage" data-val="為人父母" onclick="toggleChip(this)">為人父母</button>
-            <button class="tag-chip" data-group="lifestage" data-val="退休準備" onclick="toggleChip(this)">退休準備</button>
+            <button class="tag-chip" data-group="lifestage" data-val="學生" data-langkey="chip_student" onclick="toggleChip(this)">學生</button>
+            <button class="tag-chip" data-group="lifestage" data-val="初入職場" data-langkey="chip_newjob" onclick="toggleChip(this)">初入職場</button>
+            <button class="tag-chip" data-group="lifestage" data-val="專業人士" data-langkey="chip_pro" onclick="toggleChip(this)">專業人士</button>
+            <button class="tag-chip" data-group="lifestage" data-val="新婚" data-langkey="chip_married" onclick="toggleChip(this)">新婚</button>
+            <button class="tag-chip" data-group="lifestage" data-val="為人父母" data-langkey="chip_parent" onclick="toggleChip(this)">為人父母</button>
+            <button class="tag-chip" data-group="lifestage" data-val="退休準備" data-langkey="chip_retire" onclick="toggleChip(this)">退休準備</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Income Level</span>
+          <span class="tag-section-label" data-sectionkey="income_label">Income Level</span>
           <div class="tag-chips" id="chips-income">
-            <button class="tag-chip" data-group="income" data-val="大眾消費" onclick="toggleChip(this)">大眾消費</button>
-            <button class="tag-chip" data-group="income" data-val="中產" onclick="toggleChip(this)">中產</button>
-            <button class="tag-chip" data-group="income" data-val="高收入" onclick="toggleChip(this)">高收入</button>
-            <button class="tag-chip" data-group="income" data-val="超高淨值" onclick="toggleChip(this)">超高淨值</button>
+            <button class="tag-chip" data-group="income" data-val="大眾消費" data-langkey="chip_mass" onclick="toggleChip(this)">大眾消費</button>
+            <button class="tag-chip" data-group="income" data-val="中產" data-langkey="chip_midclass" onclick="toggleChip(this)">中產</button>
+            <button class="tag-chip" data-group="income" data-val="高收入" data-langkey="chip_high" onclick="toggleChip(this)">高收入</button>
+            <button class="tag-chip" data-group="income" data-val="超高淨值" data-langkey="chip_uhnw" onclick="toggleChip(this)">超高淨值</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Interests</span>
+          <span class="tag-section-label" data-sectionkey="interests_label">Interests</span>
           <div class="tag-chips" id="chips-interests">
-            <button class="tag-chip" data-group="interests" data-val="美容護膚" onclick="toggleChip(this)">美容護膚</button>
-            <button class="tag-chip" data-group="interests" data-val="健康養生" onclick="toggleChip(this)">健康養生</button>
-            <button class="tag-chip" data-group="interests" data-val="投資理財" onclick="toggleChip(this)">投資理財</button>
-            <button class="tag-chip" data-group="interests" data-val="旅遊" onclick="toggleChip(this)">旅遊</button>
-            <button class="tag-chip" data-group="interests" data-val="親子" onclick="toggleChip(this)">親子</button>
-            <button class="tag-chip" data-group="interests" data-val="時尚" onclick="toggleChip(this)">時尚</button>
-            <button class="tag-chip" data-group="interests" data-val="飲食" onclick="toggleChip(this)">飲食</button>
-            <button class="tag-chip" data-group="interests" data-val="運動健身" onclick="toggleChip(this)">運動健身</button>
-            <button class="tag-chip" data-group="interests" data-val="科技數碼" onclick="toggleChip(this)">科技數碼</button>
-            <button class="tag-chip" data-group="interests" data-val="家居生活" onclick="toggleChip(this)">家居生活</button>
+            <button class="tag-chip" data-group="interests" data-val="美容護膚" data-langkey="chip_beauty" onclick="toggleChip(this)">美容護膚</button>
+            <button class="tag-chip" data-group="interests" data-val="健康養生" data-langkey="chip_health" onclick="toggleChip(this)">健康養生</button>
+            <button class="tag-chip" data-group="interests" data-val="投資理財" data-langkey="chip_finance" onclick="toggleChip(this)">投資理財</button>
+            <button class="tag-chip" data-group="interests" data-val="旅遊" data-langkey="chip_travel" onclick="toggleChip(this)">旅遊</button>
+            <button class="tag-chip" data-group="interests" data-val="親子" data-langkey="chip_family" onclick="toggleChip(this)">親子</button>
+            <button class="tag-chip" data-group="interests" data-val="時尚" data-langkey="chip_fashion" onclick="toggleChip(this)">時尚</button>
+            <button class="tag-chip" data-group="interests" data-val="飲食" data-langkey="chip_food" onclick="toggleChip(this)">飲食</button>
+            <button class="tag-chip" data-group="interests" data-val="運動健身" data-langkey="chip_fitness" onclick="toggleChip(this)">運動健身</button>
+            <button class="tag-chip" data-group="interests" data-val="科技數碼" data-langkey="chip_tech" onclick="toggleChip(this)">科技數碼</button>
+            <button class="tag-chip" data-group="interests" data-val="家居生活" data-langkey="chip_home" onclick="toggleChip(this)">家居生活</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Decision Style</span>
+          <span class="tag-section-label" data-sectionkey="decision_label">Decision Style</span>
           <div class="tag-chips" id="chips-decision">
-            <button class="tag-chip" data-group="decision" data-val="價格敏感" onclick="toggleChip(this)">價格敏感</button>
-            <button class="tag-chip" data-group="decision" data-val="品質導向" onclick="toggleChip(this)">品質導向</button>
-            <button class="tag-chip" data-group="decision" data-val="品牌忠誠" onclick="toggleChip(this)">品牌忠誠</button>
-            <button class="tag-chip" data-group="decision" data-val="口碑驅動" onclick="toggleChip(this)">口碑驅動</button>
-            <button class="tag-chip" data-group="decision" data-val="衝動消費" onclick="toggleChip(this)">衝動消費</button>
+            <button class="tag-chip" data-group="decision" data-val="價格敏感" data-langkey="chip_price" onclick="toggleChip(this)">價格敏感</button>
+            <button class="tag-chip" data-group="decision" data-val="品質導向" data-langkey="chip_quality" onclick="toggleChip(this)">品質導向</button>
+            <button class="tag-chip" data-group="decision" data-val="品牌忠誠" data-langkey="chip_brand" onclick="toggleChip(this)">品牌忠誠</button>
+            <button class="tag-chip" data-group="decision" data-val="口碑驅動" data-langkey="chip_wom" onclick="toggleChip(this)">口碑驅動</button>
+            <button class="tag-chip" data-group="decision" data-val="衝動消費" data-langkey="chip_impulse" onclick="toggleChip(this)">衝動消費</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Pain Points</span>
+          <span class="tag-section-label" data-sectionkey="painpoints_label">Pain Points</span>
           <div class="tag-chips" id="chips-painpoints">
-            <button class="tag-chip" data-group="painpoints" data-val="時間不足" onclick="toggleChip(this)">時間不足</button>
-            <button class="tag-chip" data-group="painpoints" data-val="預算有限" onclick="toggleChip(this)">預算有限</button>
-            <button class="tag-chip" data-group="painpoints" data-val="資訊過載" onclick="toggleChip(this)">資訊過載</button>
-            <button class="tag-chip" data-group="painpoints" data-val="唔信任品牌" onclick="toggleChip(this)">唔信任品牌</button>
-            <button class="tag-chip" data-group="painpoints" data-val="選擇困難" onclick="toggleChip(this)">選擇困難</button>
-            <button class="tag-chip" data-group="painpoints" data-val="缺乏動力" onclick="toggleChip(this)">缺乏動力</button>
+            <button class="tag-chip" data-group="painpoints" data-val="時間不足" data-langkey="chip_time" onclick="toggleChip(this)">時間不足</button>
+            <button class="tag-chip" data-group="painpoints" data-val="預算有限" data-langkey="chip_budget" onclick="toggleChip(this)">預算有限</button>
+            <button class="tag-chip" data-group="painpoints" data-val="資訊過載" data-langkey="chip_info" onclick="toggleChip(this)">資訊過載</button>
+            <button class="tag-chip" data-group="painpoints" data-val="唔信任品牌" data-langkey="chip_trust" onclick="toggleChip(this)">唔信任品牌</button>
+            <button class="tag-chip" data-group="painpoints" data-val="選擇困難" data-langkey="chip_choice" onclick="toggleChip(this)">選擇困難</button>
+            <button class="tag-chip" data-group="painpoints" data-val="缺乏動力" data-langkey="chip_motivation" onclick="toggleChip(this)">缺乏動力</button>
           </div>
         </div>
 
         <div class="tag-section">
-          <span class="tag-section-label">Platform Behaviour</span>
+          <span class="tag-section-label" data-sectionkey="behaviour_label">Platform Behaviour</span>
           <div class="tag-chips" id="chips-behaviour">
-            <button class="tag-chip" data-group="behaviour" data-val="主動搜尋型" onclick="toggleChip(this)">主動搜尋型</button>
-            <button class="tag-chip" data-group="behaviour" data-val="被動滾動型" onclick="toggleChip(this)">被動滾動型</button>
-            <button class="tag-chip" data-group="behaviour" data-val="社群互動型" onclick="toggleChip(this)">社群互動型</button>
-            <button class="tag-chip" data-group="behaviour" data-val="只睇唔留言" onclick="toggleChip(this)">只睇唔留言</button>
+            <button class="tag-chip" data-group="behaviour" data-val="主動搜尋型" data-langkey="chip_active" onclick="toggleChip(this)">主動搜尋型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="被動滾動型" data-langkey="chip_passive" onclick="toggleChip(this)">被動滾動型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="社群互動型" data-langkey="chip_social" onclick="toggleChip(this)">社群互動型</button>
+            <button class="tag-chip" data-group="behaviour" data-val="只睇唔留言" data-langkey="chip_lurker" onclick="toggleChip(this)">只睇唔留言</button>
           </div>
         </div>
 
@@ -659,7 +659,25 @@ const LANGS = {
     contentDirection: '內容方向（選填）', contentDirectionPlaceholder: '例如：健康保險、退休生活…',
     selectPlatform: '選擇平台', generateTopics: '生成主題建議',
     clients_label: '客戶數目', content_label: '內容數目',
-    editClient: '編輯', useTopicBtn: '使用主題'
+    editClient: '編輯', useTopicBtn: '使用主題',
+    tone_professional: '專業', tone_casual: '輕鬆', tone_luxury: '奢華', tone_energetic: '活力',
+    gender_label: '性別', age_label: '年齡層', lifestage_label: '人生階段',
+    income_label: '收入水平', interests_label: '興趣', decision_label: '消費決策',
+    painpoints_label: '痛點', behaviour_label: '平台行為',
+    chip_female: '女性為主', chip_male: '男性為主', chip_balanced: '性別均衡',
+    chip_18: '18-24', chip_25: '25-34', chip_35: '35-44', chip_45: '45-54', chip_55: '55+',
+    chip_student: '學生', chip_newjob: '初入職場', chip_pro: '專業人士',
+    chip_married: '新婚', chip_parent: '為人父母', chip_retire: '退休準備',
+    chip_mass: '大眾消費', chip_midclass: '中產', chip_high: '高收入', chip_uhnw: '超高淨值',
+    chip_beauty: '美容護膚', chip_health: '健康養生', chip_finance: '投資理財',
+    chip_travel: '旅遊', chip_family: '親子', chip_fashion: '時尚',
+    chip_food: '飲食', chip_fitness: '運動健身', chip_tech: '科技數碼', chip_home: '家居生活',
+    chip_price: '價格敏感', chip_quality: '品質導向', chip_brand: '品牌忠誠',
+    chip_wom: '口碑驅動', chip_impulse: '衝動消費',
+    chip_time: '時間不足', chip_budget: '預算有限', chip_info: '資訊過載',
+    chip_trust: '唔信任品牌', chip_choice: '選擇困難', chip_motivation: '缺乏動力',
+    chip_active: '主動搜尋型', chip_passive: '被動滾動型',
+    chip_social: '社群互動型', chip_lurker: '只睇唔留言'
   },
   sc: {
     dashboard: '仪表板', clients: '客户管理', discover: '主题探索', generate: '生成内容', history: '历史记录',
@@ -675,7 +693,25 @@ const LANGS = {
     contentDirection: '内容方向（选填）', contentDirectionPlaceholder: '例如：健康保险、退休生活…',
     selectPlatform: '选择平台', generateTopics: '生成主题建议',
     clients_label: '客户数目', content_label: '内容数目',
-    editClient: '编辑', useTopicBtn: '使用主题'
+    editClient: '编辑', useTopicBtn: '使用主题',
+    tone_professional: '专业', tone_casual: '轻松', tone_luxury: '奢华', tone_energetic: '活力',
+    gender_label: '性别', age_label: '年龄层', lifestage_label: '人生阶段',
+    income_label: '收入水平', interests_label: '兴趣', decision_label: '消费决策',
+    painpoints_label: '痛点', behaviour_label: '平台行为',
+    chip_female: '女性为主', chip_male: '男性为主', chip_balanced: '性别均衡',
+    chip_18: '18-24', chip_25: '25-34', chip_35: '35-44', chip_45: '45-54', chip_55: '55+',
+    chip_student: '学生', chip_newjob: '初入职场', chip_pro: '专业人士',
+    chip_married: '新婚', chip_parent: '为人父母', chip_retire: '退休准备',
+    chip_mass: '大众消费', chip_midclass: '中产', chip_high: '高收入', chip_uhnw: '超高净值',
+    chip_beauty: '美容护肤', chip_health: '健康养生', chip_finance: '投资理财',
+    chip_travel: '旅游', chip_family: '亲子', chip_fashion: '时尚',
+    chip_food: '饮食', chip_fitness: '运动健身', chip_tech: '科技数码', chip_home: '家居生活',
+    chip_price: '价格敏感', chip_quality: '品质导向', chip_brand: '品牌忠诚',
+    chip_wom: '口碑驱动', chip_impulse: '冲动消费',
+    chip_time: '时间不足', chip_budget: '预算有限', chip_info: '信息过载',
+    chip_trust: '不信任品牌', chip_choice: '选择困难', chip_motivation: '缺乏动力',
+    chip_active: '主动搜索型', chip_passive: '被动浏览型',
+    chip_social: '社群互动型', chip_lurker: '只看不评论'
   },
   en: {
     dashboard: 'Dashboard', clients: 'Client Management', discover: 'Topics', generate: 'Generate', history: 'History',
@@ -691,7 +727,25 @@ const LANGS = {
     contentDirection: 'Content Direction (Optional)', contentDirectionPlaceholder: 'e.g., Health Insurance, Retirement Life…',
     selectPlatform: 'Select Platform', generateTopics: 'Generate Topic Suggestions',
     clients_label: 'Clients', content_label: 'Content Items',
-    editClient: 'Edit', useTopicBtn: 'Use Topic'
+    editClient: 'Edit', useTopicBtn: 'Use Topic',
+    tone_professional: 'Professional', tone_casual: 'Casual', tone_luxury: 'Luxury', tone_energetic: 'Energetic',
+    gender_label: 'Gender', age_label: 'Age Group', lifestage_label: 'Life Stage',
+    income_label: 'Income Level', interests_label: 'Interests', decision_label: 'Decision Style',
+    painpoints_label: 'Pain Points', behaviour_label: 'Platform Behaviour',
+    chip_female: 'Female-led', chip_male: 'Male-led', chip_balanced: 'Gender Balanced',
+    chip_18: '18-24', chip_25: '25-34', chip_35: '35-44', chip_45: '45-54', chip_55: '55+',
+    chip_student: 'Student', chip_newjob: 'Early Career', chip_pro: 'Professional',
+    chip_married: 'Newly Married', chip_parent: 'Parent', chip_retire: 'Pre-retirement',
+    chip_mass: 'Mass Market', chip_midclass: 'Middle Class', chip_high: 'High Income', chip_uhnw: 'Ultra High Net Worth',
+    chip_beauty: 'Beauty & Skincare', chip_health: 'Health & Wellness', chip_finance: 'Finance & Investment',
+    chip_travel: 'Travel', chip_family: 'Family & Kids', chip_fashion: 'Fashion',
+    chip_food: 'Food & Dining', chip_fitness: 'Fitness & Sports', chip_tech: 'Tech & Digital', chip_home: 'Home & Living',
+    chip_price: 'Price Sensitive', chip_quality: 'Quality-driven', chip_brand: 'Brand Loyal',
+    chip_wom: 'Word of Mouth', chip_impulse: 'Impulse Buyer',
+    chip_time: 'Time-poor', chip_budget: 'Budget Conscious', chip_info: 'Info Overload',
+    chip_trust: 'Low Brand Trust', chip_choice: 'Choice Paralysis', chip_motivation: 'Lacks Motivation',
+    chip_active: 'Active Searcher', chip_passive: 'Passive Scroller',
+    chip_social: 'Community Engager', chip_lurker: 'Lurker (reads only)'
   }
 };
 
@@ -771,6 +825,24 @@ function updateAllUI() {
   // Your Clients header
   const header = document.querySelector('#clients h2');
   if (header) header.textContent = t.yourClients;
+
+  // Tag chip labels
+  document.querySelectorAll('.tag-chip[data-langkey]').forEach(chip => {
+    const key = chip.getAttribute('data-langkey');
+    if (t[key]) chip.textContent = t[key];
+  });
+
+  // Tag section labels
+  document.querySelectorAll('[data-sectionkey]').forEach(el => {
+    const key = el.getAttribute('data-sectionkey');
+    if (t[key]) el.textContent = t[key];
+  });
+
+  // Tone select options
+  document.querySelectorAll('option[data-langkey]').forEach(opt => {
+    const key = opt.getAttribute('data-langkey');
+    if (t[key]) opt.textContent = t[key];
+  });
 }
 
 function switchTab(tab) {

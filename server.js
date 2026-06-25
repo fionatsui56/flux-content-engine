@@ -16,11 +16,9 @@ app.get('/', (req, res) => res.json({ service: 'Flux Strategy Content Engine', s
 async function callGemini(prompt, maxTokens) {
   const key = process.env.GEMINI_API_KEY;
   const models = [
-    'v1beta/models/gemini-2.5-flash-preview-04-17',
-    'v1beta/models/gemini-2.0-flash-lite',
-    'v1beta/models/gemini-flash-latest',
-    'v1beta/models/gemini-1.5-flash',
-    'v1/models/gemini-1.5-flash',
+    'v1beta/models/gemini-2.5-flash',
+    'v1beta/models/gemini-3.5-flash',
+    'v1beta/models/gemini-2.5-flash-lite',
   ];
   for (const model of models) {
     try {
