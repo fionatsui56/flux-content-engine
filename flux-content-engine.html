@@ -1075,36 +1075,6 @@ function generateTopicSuggestions() {
   btn.disabled = true;
   btn.textContent = 'Generating...';
   
-  const audienceStr = client.targetAudience || '';
-  const prompt = 'Generate EXACTLY 8 social media content topic suggestions for ' + client.name + '\n' +
-    'Industry: ' + (client.industry || 'General') + '\n' +
-    'Brand tone: ' + client.tone + '\n' +
-    (client.brandStory ? 'Brand story: ' + client.brandStory + '\n' : '') +
-    (audienceStr ? 'Target audience: ' + audienceStr + '\n' : '') +
-    (client.competitors ? 'Competitors: ' + client.competitors + '\n' : '') +
-    'Platform: ' + platform + '\n' +
-    'Content Language: ' + languageMap[contentLang] + '\n' +
-    (contentDirection ? 'Content Direction: ' + contentDirection + '\n' : '') +
-    '\nYou MUST generate EXACTLY 8 topics. Use one angle from each category below, mixing to reach 8:\n' +
-    '1. Sales/Promotion\n' +
-    '2. Education/Tips\n' +
-    '3. Entertainment/Fun\n' +
-    '4. Engagement/Interaction\n' +
-    '5. Seasonal/Trending\n' +
-    '6. Daily Life/Relatable\n' +
-    '7. Habits/Routines\n\n' +
-    'CRITICAL: Use THIS EXACT FORMAT for all 8 topics, no exceptions:\n\n' +
-    '[Topic 1]\n' +
-    'Angle: Sales/Promotion\n' +
-    'Title: Example Title\n' +
-    'Description: 2-3 sentences explaining why this works for this client on this platform.\n\n' +
-    '[Topic 2]\n' +
-    'Angle: Education/Tips\n' +
-    'Title: Example Title\n' +
-    'Description: 2-3 sentences.\n\n' +
-    '...continue for [Topic 3] through [Topic 8]\n\n' +
-    'Do not use any other format. Do not add extra sections. Output all 8 topics.';
-  
   fetch('https://flux-content-engine.onrender.com/api/topics', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1128,7 +1098,9 @@ function generateTopicSuggestions() {
       return;
     }
 
+    console.log('Raw topic response:', data.text.substring(0, 500));
     const suggestions = parseTopicSuggestions(data.text);
+    console.log('Parsed', suggestions.length, 'topics');
     displayTopicSuggestions(suggestions);
     
     btn.disabled = false;
