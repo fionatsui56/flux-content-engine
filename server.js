@@ -28,7 +28,7 @@ async function sbFetch(path, method, body) {
 
 // ── KEEP ALIVE ──
 app.get('/ping', (req, res) => res.json({ status: 'alive', time: new Date().toISOString() }));
-app.get('/', (req, res) => res.json({ service: 'Flux Strategy Content Engine', status: 'running' }));
+app.get('/', (req, res) => res.json({ service: 'Flux Strategy Content Engine', version: '2.1', status: 'running' }));
 
 // ════════════════════════════════════════════════════
 // CLIENTS CRUD
@@ -46,13 +46,18 @@ app.get('/api/clients', async (req, res) => {
 
 // POST /api/clients
 app.post('/api/clients', async (req, res) => {
-  const { user_id, name, industry, tone, brand_story, target_audience, target_audience_tags, competitors, forbidden_words } = req.body;
+  const { user_id, name, industry, tone, brand_story, target_audience, target_audience_tags,
+          competitors, forbidden_words, selected_pillars, must_mention_items } = req.body;
   if (!user_id || !name) return res.status(400).json({ success: false, error: 'user_id and name required' });
 
   const result = await sbFetch('/clients', 'POST', {
     user_id, name, industry, tone: tone || 'professional',
     brand_story, target_audience, target_audience_tags: target_audience_tags || {},
-    competitors, forbidden_words, is_active: true
+    competitors, forbidden_words,
+    selected_pillars: selected_pillars || [],
+    pillar_rotation_index: 0,
+    must_mention_items: must_mention_items || null,
+    is_active: true
   });
   if (!result.ok) return res.status(result.status).json({ success: false, error: result.data });
   res.json({ success: true, data: result.data });
@@ -61,13 +66,20 @@ app.post('/api/clients', async (req, res) => {
 // PUT /api/clients/:id
 app.put('/api/clients/:id', async (req, res) => {
   const { id } = req.params;
-  const { user_id, name, industry, tone, brand_story, target_audience, target_audience_tags, competitors, forbidden_words } = req.body;
+  const { user_id, name, industry, tone, brand_story, target_audience, target_audience_tags,
+          competitors, forbidden_words, selected_pillars, must_mention_items } = req.body;
   if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
 
-  const result = await sbFetch(`/clients?id=eq.${id}&user_id=eq.${user_id}`, 'PATCH', {
+  const updateData = {
     name, industry, tone, brand_story, target_audience,
-    target_audience_tags: target_audience_tags || {}, competitors, forbidden_words
-  });
+    target_audience_tags: target_audience_tags || {},
+    competitors, forbidden_words
+  };
+  // Only update pillar fields if explicitly provided
+  if (selected_pillars !== undefined) updateData.selected_pillars = selected_pillars;
+  if (must_mention_items !== undefined) updateData.must_mention_items = must_mention_items;
+
+  const result = await sbFetch(`/clients?id=eq.${id}&user_id=eq.${user_id}`, 'PATCH', updateData);
   if (!result.ok) return res.status(result.status).json({ success: false, error: result.data });
   res.json({ success: true });
 });
@@ -83,11 +95,35 @@ app.delete('/api/clients/:id', async (req, res) => {
   res.json({ success: true });
 });
 
+// ── NEW: Advance pillar rotation after generation ──
+// POST /api/clients/:id/advance-pillar
+app.post('/api/clients/:id/advance-pillar', async (req, res) => {
+  const { id } = req.params;
+  const { user_id, current_index, pillar_count } = req.body;
+  if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
+
+  const nextIndex = pillar_count > 0 ? (current_index + 1) % pillar_count : 0;
+
+  // Update lastUsed for current pillar + advance index
+  const clientResult = await sbFetch(`/clients?id=eq.${id}&user_id=eq.${user_id}&select=selected_pillars`, 'GET');
+  if (clientResult.ok && clientResult.data && clientResult.data[0]) {
+    const pillars = clientResult.data[0].selected_pillars || [];
+    if (pillars[current_index]) {
+      pillars[current_index].lastUsed = new Date().toISOString();
+    }
+    await sbFetch(`/clients?id=eq.${id}&user_id=eq.${user_id}`, 'PATCH', {
+      pillar_rotation_index: nextIndex,
+      selected_pillars: pillars
+    });
+  }
+
+  res.json({ success: true, next_index: nextIndex });
+});
+
 // ════════════════════════════════════════════════════
 // CONTENT CRUD
 // ════════════════════════════════════════════════════
 
-// GET /api/content?user_id=xxx
 app.get('/api/content', async (req, res) => {
   const { user_id } = req.query;
   if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
@@ -97,7 +133,6 @@ app.get('/api/content', async (req, res) => {
   res.json({ success: true, data: result.data });
 });
 
-// POST /api/content
 app.post('/api/content', async (req, res) => {
   const { user_id, client_id, topic, platforms, content_language, variations } = req.body;
   if (!user_id || !topic) return res.status(400).json({ success: false, error: 'user_id and topic required' });
@@ -106,15 +141,11 @@ app.post('/api/content', async (req, res) => {
     user_id, client_id, topic, platforms: platforms || [],
     content_language: content_language || 'tc', variations: variations || []
   });
-
-  // Log usage
   await sbFetch('/usage_logs', 'POST', { user_id, client_id, action: 'generate' });
-
   if (!result.ok) return res.status(result.status).json({ success: false, error: result.data });
   res.json({ success: true, data: result.data });
 });
 
-// GET /api/content/count?user_id=xxx
 app.get('/api/content/count', async (req, res) => {
   const { user_id } = req.query;
   if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
@@ -131,135 +162,178 @@ app.get('/api/content/count', async (req, res) => {
 });
 
 // ════════════════════════════════════════════════════
-// GEMINI AI
+// AI ENGINE — GEMINI + CLAUDE CASCADE
 // ════════════════════════════════════════════════════
 
 async function callGemini(prompt, maxTokens) {
   const key = process.env.GEMINI_API_KEY;
+  if (!key) throw new Error('No Gemini API key');
+
   const models = [
     'v1beta/models/gemini-2.5-flash',
-    'v1beta/models/gemini-3.5-flash',
     'v1beta/models/gemini-2.5-flash-lite',
+    'v1beta/models/gemini-2.0-flash',
   ];
+
+  let lastError = null;
   for (const model of models) {
     try {
+      console.log(`Trying Gemini model: ${model}`);
       const r = await fetch(`https://generativelanguage.googleapis.com/${model}:generateContent?key=${key}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: { maxOutputTokens: maxTokens, temperature: 0.8 }
         })
       });
       const d = await r.json();
-      if (d.error) { console.log('Gemini', model, 'failed:', d.error.message); continue; }
+      if (d.error) {
+        console.log(`Gemini ${model} failed: ${d.error.message}`);
+        lastError = d.error.message;
+        // Wait 1s before trying next model
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        continue;
+      }
       const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) continue;
-      console.log('Gemini OK:', model);
-      return { text, provider: 'gemini' };
-    } catch (e) { console.log('Gemini', model, 'error:', e.message); continue; }
+      if (!text) { lastError = 'Empty response'; continue; }
+      console.log(`Gemini OK: ${model}`);
+      return { text, provider: 'gemini', model };
+    } catch (e) {
+      console.log(`Gemini ${model} error: ${e.message}`);
+      lastError = e.message;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      continue;
+    }
   }
-  throw new Error('All Gemini models failed.');
+  throw new Error(`All Gemini models failed. Last error: ${lastError}`);
 }
 
-async function callAI(prompt, maxTokens) {
+async function callAI(prompt, maxTokens, retries = 2) {
   maxTokens = maxTokens || 3000;
+
+  // Try Claude first if available
   if (process.env.ANTHROPIC_API_KEY) {
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: maxTokens, messages: [{ role: 'user', content: prompt }] })
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: maxTokens,
+          messages: [{ role: 'user', content: prompt }]
+        })
       });
       const data = await response.json();
       if (!data.error) return { text: data.content[0].text, provider: 'claude' };
       console.error('Claude error:', data.error.message);
-    } catch (err) { console.error('Claude failed:', err.message); }
+    } catch (err) {
+      console.error('Claude failed:', err.message);
+    }
   }
-  if (process.env.GEMINI_API_KEY) return await callGemini(prompt, maxTokens);
-  throw new Error('No API key configured.');
+
+  // Gemini with retry
+  if (process.env.GEMINI_API_KEY) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        console.log(`Gemini attempt ${attempt}/${retries}`);
+        return await callGemini(prompt, maxTokens);
+      } catch (err) {
+        console.error(`Gemini attempt ${attempt} failed: ${err.message}`);
+        if (attempt < retries) {
+          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+        }
+      }
+    }
+  }
+
+  throw new Error('All AI providers failed. Please try again.');
 }
 
 // ════════════════════════════════════════════════════
-// E5: THREE-LAYER PROMPT BUILDER
+// B2: ENHANCED PROMPT BUILDER (4 LAYERS)
 // ════════════════════════════════════════════════════
 
 function buildLayer1(platforms, lang) {
   const platformRules = {
-    facebook: `FACEBOOK RULES:
-- Length: 100-200 words (300+ for long-form)
-- Style: Conversational storytelling, warm and relatable
-- Hook: MUST start with question, bold statement, or story opener
+    facebook: `FACEBOOK:
+- Length: 100-200 words (300+ OK for long-form)
+- Hook: MUST open with question, bold statement, or story
 - Hashtags: 2-3 only
-- CTA: Specific comment-driving question`,
+- Style: Conversational, story-driven, warm
+- CTA: Question that drives comments`,
 
-    instagram: `INSTAGRAM RULES:
-- Length: 50-100 words (caption cuts at 125 chars — hook MUST land before cutoff)
-- Style: Concise, visual-forward, emoji-rich
+    instagram: `INSTAGRAM:
+- Length: 50-100 words (hook MUST land in first 125 chars)
 - Hashtags: 8-10 at end
+- Style: Concise, visual-forward, emoji-rich
 - Line breaks between every sentence
-- CTA: Drive SAVES ("Save this for later")`,
+- CTA: Drive SAVES ("Save this")`,
 
-    threads: `THREADS RULES:
+    threads: `THREADS:
 - Length: Under 80 words
-- Style: Extremely casual, like talking to a friend
 - Hashtags: 0-3 max
-- Fragments are OK. Open-ended is better.
+- Style: Extremely casual, like texting a friend
+- Fragments OK. Open-ended is better than concluded.
 - NEVER corporate tone`,
 
-    linkedin: `LINKEDIN RULES:
+    linkedin: `LINKEDIN:
 - Length: 150-250 words
-- Hook in first 210 characters (before "see more")
-- Style: Personal voice, professional but human
+- Hook in first 210 chars (before "see more")
 - Hashtags: 3-5 precise ones
-- Structure: Hook → Expand → Key insight → Closing question`,
+- Style: Professional but personal, thought-leadership
+- Must end with a genuine question`,
 
-    xiaohongshu: `XIAOHONGSHU (RED) RULES:
+    xiaohongshu: `XIAOHONGSHU (RED):
 - Length: 150-250 words
-- Title MUST use 【】brackets e.g.【這個方法真的有效！】
-- Style: 種草 mindset — friend sharing a discovery
-- Hashtags: 8-15, Chinese/English mix
-- Emoji after every key point
-- MAINLAND CHINESE ONLY — NO HK expressions
+- Title: MUST use 【】brackets e.g.【這個方法有效！】
+- Hashtags: 8-15, Chinese/English mix, at end
+- Emoji: After every key point
+- Style: 種草 — friend sharing a discovery
+- MAINLAND SIMPLIFIED CHINESE ONLY (no HK vocab)
 - FORBIDDEN: 最/第一/唯一/保證/限時特惠`,
 
-    wechat: `WECHAT MOMENTS RULES:
+    wechat: `WECHAT MOMENTS:
 - Length: 80-150 words
-- Style: Warm and personal, like sharing with close friends
-- NO hashtags
-- First-person voice, genuine feel
-- MAINLAND CHINESE ONLY
-- CTA: Soft closing question e.g.「你呢？」
+- NO hashtags (not supported)
+- Style: Warm, personal, first-person
+- MAINLAND SIMPLIFIED CHINESE ONLY
+- End with soft question: 「你呢？」
 - FORBIDDEN: Promotional language, superlatives`
   };
 
   const langRules = {
-    tc: `LANGUAGE: Traditional Chinese (Hong Kong)
-- Professional/Educational: Formal written Chinese (書面語)
-- Casual/Energetic: Natural HK conversational style
-- Luxury: Elegant formal: 「臻選」「尊享」
-- NEVER use Taiwan expressions: 棒、讚`,
-    sc: `LANGUAGE: Simplified Chinese (Mainland)
-- Sound native to XiaoHongShu and WeChat
-- AVOID: HK expressions (冇、靠), Taiwan expressions (棒、讚)
+    tc: `LANGUAGE — Traditional Chinese (HK):
+- Professional: 書面語 (formal written)
+- Casual/Energetic: Natural HK Cantonese
+- NEVER Taiwan expressions: 棒、讚、超級`,
+    sc: `LANGUAGE — Simplified Chinese (Mainland):
+- Write as NATIVE mainland Chinese, not character conversion
+- Sound like 小紅書/WeChat native
+- AVOID: HK (冇、靠、得唔得) and Taiwan (棒、讚) expressions
 - Use: 很棒 not 好正 | 没问题 not 冇問題`,
-    en: `LANGUAGE: English (Hong Kong English)
+    en: `LANGUAGE — English (Hong Kong):
 - British spelling: colour, organisation, realise
 - AVOID American jargon: leverage, synergise, game-changer
-- AVOID AI clichés: "I'm thrilled to share", "In today's world"
-- Direct, clear, approachable`
+- AVOID AI clichés: "thrilled to share", "In today's world"
+- Direct, clear, approachable tone`
   };
 
   const antiAI = `
-ANTI-AI WRITING RULES (CRITICAL):
-- Write like a real human, NOT a corporate announcement
-- Vary sentence length
-- Include specific details, not vague descriptions
-- NO markdown: no **, no ##
-- FORBIDDEN phrases: "In conclusion", "Game-changer", "Unlock your potential", "Leverage", "Synergy"
-- Start with a story, question, specific moment, or bold opinion`;
+ANTI-AI WRITING (CRITICAL — supersedes all other rules):
+- Sound like a REAL HUMAN, not a corporate announcement
+- Use specific details and concrete moments (not vague descriptions)
+- Vary sentence length naturally
+- NO markdown formatting: no **, no ##
+- FORBIDDEN: "In conclusion", "Game-changer", "Unlock potential", "Leverage", "Synergy", "I'm thrilled"
+- Open with a story, question, specific moment, or bold opinion`;
 
-  const selectedPlatformRules = platforms.filter(p => platformRules[p]).map(p => platformRules[p]).join('\n\n');
-  return `=== LAYER 1: PLATFORM & LANGUAGE RULES ===\n${selectedPlatformRules}\n\n${langRules[lang] || langRules['tc']}\n${antiAI}`;
+  const selectedRules = platforms.filter(p => platformRules[p]).map(p => platformRules[p]).join('\n\n');
+  return `=== LAYER 1: PLATFORM & LANGUAGE RULES ===\n${selectedRules}\n\n${langRules[lang] || langRules['tc']}\n${antiAI}`;
 }
 
 function buildLayer2(client) {
@@ -269,43 +343,80 @@ function buildLayer2(client) {
     luxury: 'Luxury & premium — elegant, aspirational, refined',
     energetic: 'Energetic & bold — high energy, action-oriented'
   };
-  let layer = `=== LAYER 2: BRAND RULES ===\nClient: ${client.clientName}`;
+
+  let layer = `=== LAYER 2: BRAND PROFILE ===\nBrand: ${client.clientName}`;
   if (client.industry) layer += `\nIndustry: ${client.industry}`;
-  layer += `\nBrand Tone: ${toneDescriptions[client.tone] || client.tone}`;
-  if (client.brandStory) layer += `\nBrand Story: ${client.brandStory.substring(0, 200)}`;
-  if (client.targetAudience) layer += `\nTarget Audience: ${client.targetAudience.substring(0, 150)}`;
-  if (client.competitors) layer += `\nCompetitors: ${client.competitors}`;
-  if (client.forbiddenWords) layer += `\nFORBIDDEN WORDS: ${client.forbiddenWords}`;
+  layer += `\nTone: ${toneDescriptions[client.tone] || client.tone}`;
+
+  // Brand story: compressed to 150 chars max to prevent over-restriction
+  if (client.brandStory) {
+    const story = client.brandStory.length > 150
+      ? client.brandStory.substring(0, 147) + '...'
+      : client.brandStory;
+    layer += `\nBrand Essence: ${story}`;
+  }
+
+  // Audience: compressed to 120 chars max
+  if (client.targetAudience) {
+    const audience = client.targetAudience.length > 120
+      ? client.targetAudience.substring(0, 117) + '...'
+      : client.targetAudience;
+    layer += `\nAudience: ${audience}`;
+  }
+
+  if (client.forbiddenWords) layer += `\nFORBIDDEN WORDS (never use): ${client.forbiddenWords}`;
+  if (client.mustMentionItems) layer += `\nMUST MENTION (always include): ${client.mustMentionItems}`;
+
   return layer;
+}
+
+// B2: NEW — Pillar injection layer
+function buildPillarLayer(pillars, rotationIndex) {
+  if (!pillars || pillars.length === 0) return '';
+
+  const idx = rotationIndex % pillars.length;
+  const pillar = pillars[idx];
+  if (!pillar) return '';
+
+  return `=== CONTENT ANGLE (TODAY'S FOCUS) ===
+Pillar: ${pillar.name}
+Direction: ${pillar.description || 'Create content aligned with this angle'}
+
+RULE: Your content should reflect the "${pillar.name}" angle.
+This is strategic guidance — use it to shape the angle/perspective, not to restrict the topic.
+If you genuinely cannot align with this pillar, create the best content for the topic anyway.`;
 }
 
 function buildLayer3(platforms, topic, industry) {
   const triggers = [];
+
   const mainlandPlatforms = platforms.filter(p => p === 'xiaohongshu' || p === 'wechat');
   if (mainlandPlatforms.length > 0) {
-    triggers.push(`CHINA ADVERTISING LAW (${mainlandPlatforms.join(', ')}):
+    triggers.push(`CHINA AD LAW (${mainlandPlatforms.join(', ')}):
 FORBIDDEN: 最優、最好、最佳、最強、第一、唯一、100%、絕對、革命性
 FORBIDDEN exaggeration: 火爆全港、瘋搶、秒空
 Content must feel EDUCATIONAL or personal, not sales-driven`);
   }
+
   const financialIndustries = ['finance', 'insurance', 'banking', 'investment'];
   if (industry && financialIndustries.some(f => industry.toLowerCase().includes(f))) {
     triggers.push(`FINANCIAL COMPLIANCE:
 FORBIDDEN: 保本、保息、穩賺、無風險、保證收益
-If mentioning returns, MUST add: 「投資涉及風險，過去表現不代表未來」`);
+If mentioning returns: MUST add 「投資涉及風險，過去表現不代表未來」`);
   }
+
   const topicLower = topic.toLowerCase();
   const seasonalMap = {
-    'christmas': '🎄 Christmas — gift-giving, year-end gratitude, family warmth',
-    '聖誕': '🎄 聖誕節 — 禮物、年終感恩、家庭溫暖',
-    'new year': '🎊 New Year — fresh start, resolutions, reflection',
+    'christmas': '🎄 Christmas — gift-giving, year-end, family warmth',
+    '聖誕': '🎄 聖誕節 — 禮物、年終、家庭溫暖',
+    'new year': '🎊 New Year — fresh start, resolutions',
     '新年': '🧧 農曆新年 — 團圓、繁榮、新開始',
-    "valentine": "💕 Valentine's Day — love, appreciation, connection",
-    '情人節': '💕 情人節 — 愛、感恩、連結',
-    "mother": "💐 Mother's Day — appreciation, family bond",
-    '母親節': '💐 母親節 — 感恩、家庭情感',
-    '中秋': '🥮 中秋節 — 團圓、月餅、家庭傳統',
-    '端午': '🐉 端午節 — 粽子、傳統、家庭聚會',
+    'valentine': "💕 Valentine's — love, appreciation",
+    '情人節': '💕 情人節 — 愛、感恩',
+    'mother': "💐 Mother's Day — appreciation, family",
+    '母親節': '💐 母親節 — 感恩、家庭',
+    '中秋': '🥮 中秋 — 團圓、月餅',
+    '端午': '🐉 端午 — 粽子、傳統',
     'summer': '☀️ Summer — energy, holidays, refreshment',
   };
   for (const [keyword, hook] of Object.entries(seasonalMap)) {
@@ -314,18 +425,33 @@ If mentioning returns, MUST add: 「投資涉及風險，過去表現不代表�
       break;
     }
   }
+
   if (triggers.length === 0) return '';
-  return `=== LAYER 3: CONTEXT TRIGGERS ===\n${triggers.join('\n\n')}`;
+  return `=== LAYER 3: COMPLIANCE & CONTEXT ===\n${triggers.join('\n\n')}`;
 }
 
 // ════════════════════════════════════════════════════
-// TOPICS ENDPOINT
+// TOPICS ENDPOINT — B2 Enhanced
 // ════════════════════════════════════════════════════
 app.post('/api/topics', async (req, res) => {
   try {
-    const { clientName, industry, tone, brandStory, targetAudience, platform, language, contentDirection } = req.body;
+    const { clientName, industry, tone, brandStory, targetAudience,
+            platform, language, contentDirection,
+            selectedPillars, pillarRotationIndex } = req.body;
+
     const layer1 = buildLayer1([platform], language);
-    const layer2 = buildLayer2({ clientName, industry, tone, brandStory, targetAudience });
+
+    // Use compressed brand context for topics (prevent over-restriction)
+    const layer2 = buildLayer2({
+      clientName, industry, tone,
+      brandStory: brandStory ? brandStory.substring(0, 100) : '',
+      targetAudience: targetAudience ? targetAudience.substring(0, 80) : ''
+    });
+
+    // Pillar as inspiration, not restriction
+    const pillarHint = selectedPillars && selectedPillars.length > 0
+      ? `\nCONTENT ANGLE INSPIRATION: Mix topics across these angles — ${selectedPillars.map(p => p.name).join(', ')}`
+      : '';
 
     const langMap = { tc: 'Traditional Chinese', sc: 'Simplified Chinese', en: 'English' };
     const langName = langMap[language] || langMap.tc;
@@ -335,14 +461,17 @@ app.post('/api/topics', async (req, res) => {
 ${layer1}
 
 ${layer2}
+${pillarHint}
 
-OUTPUT EXACTLY 8 TOPICS. NO intro text. Start directly with [Topic 1].
-${contentDirection ? 'Content Direction: ' + contentDirection : ''}
+TASK: Generate EXACTLY 8 diverse topic suggestions.
+${contentDirection ? `Content Direction Focus: ${contentDirection}` : ''}
+
+CRITICAL: Output MUST start with [Topic 1] immediately. NO intro text. NO preamble.
 
 [Topic 1]
 Angle: Sales/Promotion
 Title: [concise title in ${langName}]
-Description: [1-2 sentences]
+Description: [1-2 sentences why this works for this brand]
 
 [Topic 2]
 Angle: Education/Tips
@@ -375,13 +504,23 @@ Title: [concise title]
 Description: [1-2 sentences]
 
 [Topic 8]
-Angle: Sales/Promotion
+Angle: Behind-the-Scenes
 Title: [concise title]
 Description: [1-2 sentences]
 
-Write all Titles and Descriptions in ${langName}.`;
+All titles and descriptions in ${langName}. Be specific and creative — NOT generic.`;
 
     const result = await callAI(prompt, 2000);
+
+    // Log usage
+    if (req.body.user_id && req.body.client_id) {
+      await sbFetch('/usage_logs', 'POST', {
+        user_id: req.body.user_id,
+        client_id: req.body.client_id,
+        action: 'topic_suggest'
+      });
+    }
+
     res.json({ success: true, text: result.text, provider: result.provider });
   } catch (err) {
     console.error('Topics error:', err.message);
@@ -390,16 +529,30 @@ Write all Titles and Descriptions in ${langName}.`;
 });
 
 // ════════════════════════════════════════════════════
-// GENERATE ENDPOINT
+// GENERATE ENDPOINT — B2 Enhanced with Pillar
 // ════════════════════════════════════════════════════
 app.post('/api/generate', async (req, res) => {
   try {
-    const { topic, clientName, industry, tone, brandStory, targetAudience, forbiddenWords, platforms, language } = req.body;
+    const { topic, clientName, industry, tone, brandStory, targetAudience,
+            forbiddenWords, mustMentionItems, platforms, language,
+            selectedPillars, pillarRotationIndex } = req.body;
+
     const layer1 = buildLayer1(platforms, language);
-    const layer2 = buildLayer2({ clientName, industry, tone, brandStory, targetAudience, forbiddenWords });
+    const layer2 = buildLayer2({
+      clientName, industry, tone, brandStory, targetAudience,
+      forbiddenWords, mustMentionItems
+    });
+
+    // B2: Pillar injection
+    const pillarLayer = buildPillarLayer(selectedPillars || [], pillarRotationIndex || 0);
+
     const layer3 = buildLayer3(platforms, topic, industry);
 
-    const langMap = { tc: 'Traditional Chinese (繁體中文)', sc: 'Simplified Chinese (簡體中文)', en: 'English' };
+    const langMap = {
+      tc: 'Traditional Chinese (繁體中文)',
+      sc: 'Simplified Chinese (簡體中文)',
+      en: 'English'
+    };
 
     const variationFormat = platforms.map((p, i) =>
       `[Variation ${i + 1}] (${p.toUpperCase()})\n[Write ${p} content here]`
@@ -411,15 +564,15 @@ ${layer1}
 
 ${layer2}
 
-${layer3 ? layer3 + '\n\n' : ''}=== CONTENT GENERATION TASK ===
+${pillarLayer ? pillarLayer + '\n\n' : ''}${layer3 ? layer3 + '\n\n' : ''}=== GENERATION TASK ===
 Topic: "${topic}"
 Platforms: ${platforms.join(', ')}
-Output Language: ${langMap[language] || langMap.tc}
+Language: ${langMap[language] || langMap.tc}
 
-Generate ONE content variation per platform (${platforms.length} total).
-Each variation must follow that platform's rules exactly and sound human.
+Generate ONE variation per platform (${platforms.length} total).
+Each variation MUST follow that platform's exact rules and sound like a real human wrote it.
 
-OUTPUT FORMAT:
+OUTPUT FORMAT (use exactly):
 ${variationFormat}`;
 
     const result = await callAI(prompt, 4000);
@@ -431,5 +584,5 @@ ${variationFormat}`;
 });
 
 app.listen(PORT, () => {
-  console.log(`Flux running on port ${PORT} | Supabase: ${SUPABASE_SERVICE_KEY ? 'YES' : 'NO'} | Gemini: ${process.env.GEMINI_API_KEY ? 'YES' : 'NO'}`);
+  console.log(`Flux v2.1 running on port ${PORT} | Supabase: ${SUPABASE_SERVICE_KEY ? 'YES' : 'NO'} | Gemini: ${process.env.GEMINI_API_KEY ? 'YES' : 'NO'}`);
 });
