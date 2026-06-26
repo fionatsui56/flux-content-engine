@@ -518,6 +518,69 @@ select option { background: var(--bg-dark); color: var(--primary); }
   opacity: 0; transition: opacity 0.3s; pointer-events: none;
 }
 .saving-indicator.visible { opacity: 1; }
+
+/* ── ACCORDION ── */
+.accordion-section { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+.accordion-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px; cursor: pointer; background: var(--bg-card);
+  transition: background 0.2s; user-select: none;
+}
+.accordion-header:hover { background: rgba(255,255,255,0.03); }
+.accordion-header.open { border-bottom: 1px solid var(--border); }
+.accordion-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary); }
+.accordion-title.filled { color: var(--accent-mint); }
+.accordion-arrow { font-size: 14px; color: var(--muted); transition: transform 0.2s; }
+.accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+.accordion-body { padding: 16px; background: var(--bg-card); display: none; }
+.accordion-body.open { display: block; }
+
+/* ── PILLAR CARDS ── */
+.pillar-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.pillar-card {
+  border: 1px solid var(--border); border-radius: 8px; padding: 14px;
+  background: var(--bg-dark); transition: border-color 0.2s;
+}
+.pillar-card.selected { border-color: var(--accent-mint); background: rgba(205,255,216,0.04); }
+.pillar-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pillar-checkbox { width: 18px; height: 18px; accent-color: var(--accent-mint); cursor: pointer; flex-shrink: 0; }
+.pillar-name-select {
+  flex: 1; padding: 6px 10px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--primary); font-family: inherit; font-size: 13px;
+  font-weight: 600; outline: none;
+}
+.pillar-name-select:focus { border-color: rgba(205,255,216,0.3); }
+.pillar-desc-input {
+  width: 100%; padding: 8px 10px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--primary); font-family: inherit; font-size: 12px;
+  resize: none; min-height: 52px; outline: none; transition: border-color 0.2s;
+}
+.pillar-desc-input:focus { border-color: rgba(205,255,216,0.3); }
+.pillar-desc-input::placeholder { color: rgba(255,255,255,0.2); }
+.pillar-count { font-size: 11px; color: var(--secondary); margin-bottom: 8px; }
+.pillar-count.valid { color: var(--accent-mint); }
+
+/* ── PILLAR OVERRIDE (Generate/Topics) ── */
+.pillar-indicator {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: rgba(205,255,216,0.06);
+  border: 1px solid rgba(205,255,216,0.2); border-radius: 8px;
+  margin-bottom: 16px; font-size: 13px;
+}
+.pillar-indicator-label { color: var(--secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+.pillar-indicator-value { color: var(--accent-mint); font-weight: 600; margin-top: 2px; }
+.pillar-override-btn {
+  padding: 5px 12px; background: transparent; border: 1px solid var(--border-mid);
+  color: var(--secondary); border-radius: 999px; font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;
+}
+.pillar-override-btn:hover { border-color: rgba(205,255,216,0.3); color: var(--accent-mint); }
+.pillar-override-select {
+  width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--primary); font-family: inherit; font-size: 13px;
+  outline: none; margin-bottom: 12px; display: none;
+}
+.pillar-override-select.visible { display: block; }
 </style>
 </head>
 <body>
@@ -654,49 +717,64 @@ select option { background: var(--bg-dark); color: var(--primary); }
 
     <!-- CLIENTS -->
     <div class="section" id="clients">
-      <div class="form-group">
-        <label class="label">Client Name *</label>
-        <input type="text" id="clientName" placeholder="Enter client name...">
-      </div>
-      <div class="form-group">
-        <label class="label">Industry</label>
-        <select id="clientIndustry">
-          <option value="">Select industry...</option>
-          <option value="beauty">Beauty & Personal Care (美容護膚)</option>
-          <option value="fashion">Fashion & Apparel (時尚服裝)</option>
-          <option value="food">Food & Beverage (食品飲料)</option>
-          <option value="technology">Technology (科技)</option>
-          <option value="finance">Finance & Banking (金融)</option>
-          <option value="health">Health & Wellness (健康)</option>
-          <option value="realestate">Real Estate (房地產)</option>
-          <option value="travel">Travel & Tourism (旅遊)</option>
-          <option value="education">Education (教育)</option>
-          <option value="entertainment">Entertainment (娛樂)</option>
-          <option value="ecommerce">E-commerce (電商)</option>
-          <option value="luxury">Luxury Goods (奢侈品)</option>
-          <option value="fitness">Fitness & Sports (運動健身)</option>
-          <option value="home">Home & Living (家居生活)</option>
-          <option value="nonprofit">Nonprofit (非牟利)</option>
-          <option value="other">Other (其他)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="label">Brand Tone *</label>
-        <select id="clientTone">
-          <option value="professional">Professional 專業</option>
-          <option value="casual">Casual 輕鬆</option>
-          <option value="luxury">Luxury 奢華</option>
-          <option value="energetic">Energetic 活力</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="label">Brand Story</label>
-        <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." style="min-height:80px;resize:vertical;"></textarea>
+
+      <!-- ACCORDION 1: Brand Basics -->
+      <div class="accordion-section" id="acc-basics">
+        <div class="accordion-header open" onclick="toggleAccordion('acc-basics')">
+          <span class="accordion-title" id="acc-basics-title">① Brand Basics</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body open">
+          <div class="form-group">
+            <label class="label">Client Name *</label>
+            <input type="text" id="clientName" placeholder="Enter client name..." oninput="updateAccordionTitles()">
+          </div>
+          <div class="form-group">
+            <label class="label">Industry</label>
+            <select id="clientIndustry" onchange="updateAccordionTitles()">
+              <option value="">Select industry...</option>
+              <option value="beauty">Beauty & Personal Care (美容護膚)</option>
+              <option value="fashion">Fashion & Apparel (時尚服裝)</option>
+              <option value="food">Food & Beverage (食品飲料)</option>
+              <option value="technology">Technology (科技)</option>
+              <option value="finance">Finance & Banking (金融)</option>
+              <option value="health">Health & Wellness (健康)</option>
+              <option value="realestate">Real Estate (房地產)</option>
+              <option value="travel">Travel & Tourism (旅遊)</option>
+              <option value="education">Education (教育)</option>
+              <option value="entertainment">Entertainment (娛樂)</option>
+              <option value="ecommerce">E-commerce (電商)</option>
+              <option value="luxury">Luxury Goods (奢侈品)</option>
+              <option value="fitness">Fitness & Sports (運動健身)</option>
+              <option value="home">Home & Living (家居生活)</option>
+              <option value="nonprofit">Nonprofit (非牟利)</option>
+              <option value="other">Other (其他)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="label">Brand Tone *</label>
+            <select id="clientTone">
+              <option value="professional">Professional 專業</option>
+              <option value="casual">Casual 輕鬆</option>
+              <option value="luxury">Luxury 奢華</option>
+              <option value="energetic">Energetic 活力</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="label">Brand Story</label>
+            <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." style="min-height:80px;resize:vertical;"></textarea>
+          </div>
+        </div>
       </div>
 
-      <!-- AUDIENCE TAG CHIPS -->
+      <!-- ACCORDION 2: Target Audience -->
+      <div class="accordion-section" id="acc-audience">
+        <div class="accordion-header" onclick="toggleAccordion('acc-audience')">
+          <span class="accordion-title" id="acc-audience-title">② Target Audience</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
       <div class="form-group">
-        <label class="label">Target Audience</label>
         <div class="tag-section">
           <span class="tag-section-label" data-sectionkey="gender_label">Gender</span>
           <div class="tag-chips">
@@ -783,6 +861,32 @@ select option { background: var(--bg-dark); color: var(--primary); }
         <div class="audience-summary" id="audienceSummary"></div>
       </div>
 
+        </div><!-- end accordion-body audience -->
+      </div><!-- end accordion-section audience -->
+
+      <!-- ACCORDION 3: Content Angles (Pillars) -->
+      <div class="accordion-section" id="acc-pillars">
+        <div class="accordion-header" onclick="toggleAccordion('acc-pillars')">
+          <span class="accordion-title" id="acc-pillars-title">③ Content Angles</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
+          <div style="font-size:12px;color:var(--secondary);margin-bottom:14px;line-height:1.6;">
+            Pick 3–5 content angles for this brand. The system will rotate through them automatically — keeping your content varied and strategic.
+          </div>
+          <div class="pillar-count" id="pillarCount">0 / 5 angles selected (min 3)</div>
+          <div class="pillar-grid" id="pillarGrid"></div>
+          <button onclick="addPillarCard()" style="padding:8px 16px;background:transparent;border:1px dashed var(--border-mid);color:var(--secondary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(205,255,216,0.3)';this.style.color='var(--accent-mint)'" onmouseout="this.style.borderColor='var(--border-mid)';this.style.color='var(--secondary)'">+ Add Another Angle</button>
+        </div>
+      </div>
+
+      <!-- ACCORDION 4: Brand Rules -->
+      <div class="accordion-section" id="acc-rules">
+        <div class="accordion-header" onclick="toggleAccordion('acc-rules')">
+          <span class="accordion-title" id="acc-rules-title">④ Brand Rules</span>
+          <span class="accordion-arrow">▼</span>
+        </div>
+        <div class="accordion-body">
       <div class="form-group">
         <label class="label">Competitors</label>
         <textarea id="clientCompetitors" placeholder="Main competitors..." style="min-height:60px;resize:vertical;"></textarea>
@@ -791,6 +895,13 @@ select option { background: var(--bg-dark); color: var(--primary); }
         <label class="label">Forbidden Words</label>
         <textarea id="clientForbiddenWords" placeholder="Words to avoid..." style="min-height:60px;resize:vertical;"></textarea>
       </div>
+      <div class="form-group">
+        <label class="label">Must Mention Items</label>
+        <textarea id="clientMustMention" placeholder="e.g., low fees, family-owned, 24/7 support..." style="min-height:60px;resize:vertical;"></textarea>
+      </div>
+        </div><!-- end accordion-body rules -->
+      </div><!-- end accordion-section rules -->
+
       <button class="button" id="saveClientBtn" onclick="saveClient()">Add Client</button>
       <div id="clientSaveStatus" style="margin-top:10px; font-size:12px; color:var(--accent-mint); display:none;"></div>
 
@@ -806,6 +917,20 @@ select option { background: var(--bg-dark); color: var(--primary); }
           <option value="">Choose client...</option>
         </select>
       </div>
+      <!-- Pillar Indicator -->
+      <div id="generatePillarIndicator" style="display:none;">
+        <div class="pillar-indicator">
+          <div>
+            <div class="pillar-indicator-label">Content Angle (Auto)</div>
+            <div class="pillar-indicator-value" id="generatePillarName">—</div>
+          </div>
+          <button class="pillar-override-btn" onclick="toggleGeneratePillarOverride()">Change</button>
+        </div>
+        <select class="pillar-override-select" id="generatePillarOverride" onchange="updateGeneratePillarOverride()">
+          <option value="">Auto (use rotation)</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label class="label">Topic / Idea *</label>
         <textarea id="topic" placeholder="e.g., Spring Collection" maxlength="200" oninput="updateTopicCount()" style="min-height:80px;resize:vertical;"></textarea>
@@ -847,6 +972,20 @@ select option { background: var(--bg-dark); color: var(--primary); }
           <option value="">Choose client...</option>
         </select>
       </div>
+      <!-- Pillar Indicator -->
+      <div id="discoverPillarIndicator" style="display:none;">
+        <div class="pillar-indicator">
+          <div>
+            <div class="pillar-indicator-label">Content Angle (Auto)</div>
+            <div class="pillar-indicator-value" id="discoverPillarName">—</div>
+          </div>
+          <button class="pillar-override-btn" onclick="toggleDiscoverPillarOverride()">Change</button>
+        </div>
+        <select class="pillar-override-select" id="discoverPillarOverride">
+          <option value="">Auto (use rotation)</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label class="label">Content Direction (Optional)</label>
         <input type="text" id="discoverContentDirection" placeholder="e.g., Health Insurance, Retirement Life...">
@@ -1088,6 +1227,8 @@ async function initApp(user) {
   updateStats();
   updateAllUI();
   startKeepAlive();
+  // Init pillar cards with defaults for new client form
+  setTimeout(() => loadPillarData([]), 100);
 }
 
 // ═══════════════════════════════════════════
@@ -1108,7 +1249,10 @@ async function loadClients() {
       targetAudience: c.target_audience,
       targetAudienceTags: c.target_audience_tags,
       competitors: c.competitors,
-      forbiddenWords: c.forbidden_words
+      forbiddenWords: c.forbidden_words,
+      selectedPillars: c.selected_pillars || [],
+      pillarRotationIndex: c.pillar_rotation_index || 0,
+      mustMentionItems: c.must_mention_items || ''
     }));
     updateClientsList();
     updateClientSelect();
@@ -1132,6 +1276,9 @@ async function saveClient() {
   btn.disabled = true;
   btn.textContent = editingClientId ? 'Updating...' : 'Saving...';
 
+  const selectedPillarsData = getPillarData();
+  const mustMention = document.getElementById('clientMustMention')?.value || '';
+
   const record = {
     user_id: currentUser.id,
     name, industry, tone,
@@ -1140,6 +1287,8 @@ async function saveClient() {
     target_audience_tags: targetAudienceTags,
     competitors,
     forbidden_words: forbiddenWords,
+    selected_pillars: selectedPillarsData,
+    must_mention_items: mustMention || null,
     is_active: true
   };
 
@@ -1175,6 +1324,8 @@ async function saveClient() {
   loadAudienceTags(null);
   document.getElementById('clientCompetitors').value = '';
   document.getElementById('clientForbiddenWords').value = '';
+  if (document.getElementById('clientMustMention')) document.getElementById('clientMustMention').value = '';
+  loadPillarData([]);
   editingClientId = null;
   btn.textContent = LANGS[currentLang].addClient;
 
@@ -1318,6 +1469,7 @@ function selectClientById(id) {
 function selectCurrentClient() {
   const id = document.getElementById('selectClient').value;
   currentClient = clients.find(c => c.id === id) || null;
+  updatePillarIndicators();
 }
 
 function editClient(id) {
@@ -1330,6 +1482,10 @@ function editClient(id) {
   loadAudienceTags(c.targetAudienceTags || null);
   document.getElementById('clientCompetitors').value = c.competitors || '';
   document.getElementById('clientForbiddenWords').value = c.forbiddenWords || '';
+  if (document.getElementById('clientMustMention')) {
+    document.getElementById('clientMustMention').value = c.mustMentionItems || '';
+  }
+  loadPillarData(c.selectedPillars || []);
   editingClientId = id;
   document.getElementById('saveClientBtn').textContent = LANGS[currentLang].updateClient;
   document.getElementById('clientName').focus();
@@ -1438,6 +1594,11 @@ function generateContent() {
   const btn = document.getElementById('generateBtn');
   btn.disabled = true; btn.textContent = 'Generating...';
 
+  const overrideVal = document.getElementById('generatePillarOverride')?.value;
+  const pillarIdx = overrideVal !== undefined && overrideVal !== ''
+    ? parseInt(overrideVal)
+    : (currentClient.pillarRotationIndex || 0);
+
   fetch(BACKEND + '/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1445,6 +1606,9 @@ function generateContent() {
       topic, clientName: currentClient.name, industry: currentClient.industry,
       tone: currentClient.tone, brandStory: currentClient.brandStory,
       targetAudience: currentClient.targetAudience, forbiddenWords: currentClient.forbiddenWords,
+      mustMentionItems: currentClient.mustMentionItems,
+      selectedPillars: currentClient.selectedPillars || [],
+      pillarRotationIndex: pillarIdx,
       platforms: selectedPlatforms, language: contentLang
     })
   })
@@ -1463,6 +1627,24 @@ function generateContent() {
 
     await saveContent(entry);
     renderVariations();
+
+    // Advance pillar rotation
+    if (currentClient && currentClient.selectedPillars && currentClient.selectedPillars.length > 0) {
+      fetch(BACKEND + '/api/clients/' + currentClient.id + '/advance-pillar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          current_index: pillarIdx,
+          pillar_count: currentClient.selectedPillars.length
+        })
+      }).then(() => {
+        // Update local state
+        currentClient.pillarRotationIndex = (pillarIdx + 1) % currentClient.selectedPillars.length;
+        updatePillarIndicators();
+        // Refresh clients list to get updated rotation
+        loadClients();
+      }).catch(() => {});
+    }
 
     document.getElementById('topic').value = '';
     document.getElementById('topicCount').textContent = '0';
@@ -1598,13 +1780,21 @@ function generateTopicSuggestions() {
   const btn = document.getElementById('topicBtn');
   btn.disabled = true; btn.textContent = 'Generating...';
 
+  const discoverOverrideVal = document.getElementById('discoverPillarOverride')?.value;
+  const discoverPillarIdx = discoverOverrideVal !== undefined && discoverOverrideVal !== ''
+    ? parseInt(discoverOverrideVal)
+    : (client.pillarRotationIndex || 0);
+
   fetch(BACKEND + '/api/topics', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       clientName: client.name, industry: client.industry, tone: client.tone,
       brandStory: client.brandStory, targetAudience: client.targetAudience,
-      platform, language: contentLang, contentDirection
+      platform, language: contentLang, contentDirection,
+      selectedPillars: client.selectedPillars || [],
+      pillarRotationIndex: discoverPillarIdx,
+      user_id: currentUser?.id, client_id: clientId
     })
   })
   .then(r => r.json())
@@ -1727,6 +1917,214 @@ function startKeepAlive() {
   fetch(BACKEND + '/ping').catch(() => {});
   setInterval(() => fetch(BACKEND + '/ping').catch(() => {}), 10 * 60 * 1000);
 }
+
+// ═══════════════════════════════════════════
+// ACCORDION
+// ═══════════════════════════════════════════
+function toggleAccordion(id) {
+  const section = document.getElementById(id);
+  if (!section) return;
+  const header = section.querySelector('.accordion-header');
+  const body = section.querySelector('.accordion-body');
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function updateAccordionTitles() {
+  const name = document.getElementById('clientName')?.value;
+  if (name) {
+    document.getElementById('acc-basics-title').textContent = '① Brand Basics — ' + name;
+    document.getElementById('acc-basics-title').classList.add('filled');
+  } else {
+    document.getElementById('acc-basics-title').textContent = '① Brand Basics';
+    document.getElementById('acc-basics-title').classList.remove('filled');
+  }
+}
+
+// ═══════════════════════════════════════════
+// PILLAR CARDS
+// ═══════════════════════════════════════════
+const PILLAR_PRESETS = [
+  { name: 'Education', placeholder: 'e.g., Teach audience how-to tips and industry insights' },
+  { name: 'Product', placeholder: 'e.g., Showcase new items and seasonal offerings' },
+  { name: 'Behind-the-Scenes', placeholder: 'e.g., Show real team culture and authentic moments' },
+  { name: 'Customer Stories', placeholder: 'e.g., Share real customer experiences and results' },
+  { name: 'Lifestyle', placeholder: 'e.g., Show brand in everyday moments and contexts' },
+  { name: 'Thought Leadership', placeholder: 'e.g., Share industry insights and expert opinions' },
+  { name: 'Community', placeholder: 'e.g., Engage audience with questions and discussions' },
+  { name: 'Seasonal', placeholder: 'e.g., Connect brand to holidays and trending moments' },
+  { name: 'Personal Brand', placeholder: 'e.g., Share founder story and personal values' },
+  { name: 'Q&A', placeholder: 'e.g., Answer common audience questions and concerns' },
+];
+
+function addPillarCard(name, description, checked) {
+  const grid = document.getElementById('pillarGrid');
+  if (!grid) return;
+  const idx = grid.children.length;
+  if (idx >= 5) { alert('Maximum 5 content angles allowed.'); return; }
+
+  const isChecked = checked !== undefined ? checked : true;
+  const presetName = name || (PILLAR_PRESETS[idx] ? PILLAR_PRESETS[idx].name : 'Custom');
+  const presetPlaceholder = PILLAR_PRESETS[idx] ? PILLAR_PRESETS[idx].placeholder : 'Describe this content angle...';
+
+  const card = document.createElement('div');
+  card.className = 'pillar-card' + (isChecked ? ' selected' : '');
+  card.innerHTML = `
+    <div class="pillar-card-header">
+      <input type="checkbox" class="pillar-checkbox" ${isChecked ? 'checked' : ''} onchange="togglePillarCard(this)">
+      <select class="pillar-name-select">
+        ${PILLAR_PRESETS.map(p => `<option value="${p.name}" ${p.name === presetName ? 'selected' : ''}>${p.name}</option>`).join('')}
+        <option value="Custom" ${!PILLAR_PRESETS.find(p=>p.name===presetName) ? 'selected' : ''}>Custom</option>
+      </select>
+      <button onclick="removePillarCard(this)" style="padding:4px 8px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;" title="Remove">×</button>
+    </div>
+    <textarea class="pillar-desc-input" placeholder="${presetPlaceholder}" maxlength="150">${description || ''}</textarea>
+    <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:3px;">max 150 chars</div>`;
+
+  grid.appendChild(card);
+  updatePillarCount();
+}
+
+function togglePillarCard(checkbox) {
+  const card = checkbox.closest('.pillar-card');
+  if (checkbox.checked) card.classList.add('selected');
+  else card.classList.remove('selected');
+  updatePillarCount();
+}
+
+function removePillarCard(btn) {
+  btn.closest('.pillar-card').remove();
+  updatePillarCount();
+}
+
+function updatePillarCount() {
+  const grid = document.getElementById('pillarGrid');
+  if (!grid) return;
+  const selected = [...grid.querySelectorAll('.pillar-checkbox:checked')].length;
+  const total = grid.children.length;
+  const countEl = document.getElementById('pillarCount');
+  if (!countEl) return;
+  countEl.textContent = `${selected} / 5 angles selected (min 3)`;
+  countEl.className = 'pillar-count' + (selected >= 3 ? ' valid' : '');
+
+  const title = document.getElementById('acc-pillars-title');
+  if (title) {
+    if (selected >= 3) {
+      title.textContent = `③ Content Angles — ${selected} selected ✓`;
+      title.classList.add('filled');
+    } else {
+      title.textContent = '③ Content Angles';
+      title.classList.remove('filled');
+    }
+  }
+}
+
+function getPillarData() {
+  const grid = document.getElementById('pillarGrid');
+  if (!grid) return [];
+  const pillars = [];
+  [...grid.querySelectorAll('.pillar-card')].forEach((card, idx) => {
+    const checkbox = card.querySelector('.pillar-checkbox');
+    if (!checkbox.checked) return;
+    const nameSelect = card.querySelector('.pillar-name-select');
+    const descInput = card.querySelector('.pillar-desc-input');
+    pillars.push({
+      id: 'pillar_' + Date.now() + '_' + idx,
+      name: nameSelect.value,
+      description: descInput.value.trim(),
+      lastUsed: null
+    });
+  });
+  return pillars;
+}
+
+function loadPillarData(pillars) {
+  const grid = document.getElementById('pillarGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  if (pillars && pillars.length > 0) {
+    pillars.forEach(p => addPillarCard(p.name, p.description, true));
+  } else {
+    // Default: add 3 starter cards
+    addPillarCard('Education', '', true);
+    addPillarCard('Product', '', true);
+    addPillarCard('Behind-the-Scenes', '', true);
+  }
+  updatePillarCount();
+}
+
+// ═══════════════════════════════════════════
+// PILLAR INDICATORS (Generate + Discover)
+// ═══════════════════════════════════════════
+function updatePillarIndicators() {
+  // Generate tab
+  const genIndicator = document.getElementById('generatePillarIndicator');
+  const genName = document.getElementById('generatePillarName');
+  const genOverride = document.getElementById('generatePillarOverride');
+
+  if (currentClient && currentClient.selectedPillars && currentClient.selectedPillars.length > 0) {
+    const idx = currentClient.pillarRotationIndex || 0;
+    const pillar = currentClient.selectedPillars[idx % currentClient.selectedPillars.length];
+    if (genIndicator) genIndicator.style.display = 'block';
+    if (genName) genName.textContent = pillar.name;
+    if (genOverride) {
+      genOverride.innerHTML = '<option value="">Auto (use rotation)</option>' +
+        currentClient.selectedPillars.map((p, i) =>
+          `<option value="${i}">${p.name}</option>`
+        ).join('');
+    }
+  } else {
+    if (genIndicator) genIndicator.style.display = 'none';
+  }
+}
+
+function toggleGeneratePillarOverride() {
+  const sel = document.getElementById('generatePillarOverride');
+  if (sel) sel.classList.toggle('visible');
+}
+
+function updateGeneratePillarOverride() {
+  const sel = document.getElementById('generatePillarOverride');
+  const nameEl = document.getElementById('generatePillarName');
+  if (!sel || !currentClient || !currentClient.selectedPillars) return;
+  if (sel.value === '') {
+    const idx = currentClient.pillarRotationIndex || 0;
+    const pillar = currentClient.selectedPillars[idx % currentClient.selectedPillars.length];
+    if (nameEl && pillar) nameEl.textContent = pillar.name + ' (Auto)';
+  } else {
+    const pillar = currentClient.selectedPillars[parseInt(sel.value)];
+    if (nameEl && pillar) nameEl.textContent = pillar.name + ' (Manual)';
+  }
+  sel.classList.remove('visible');
+}
+
+function toggleDiscoverPillarOverride() {
+  const sel = document.getElementById('discoverPillarOverride');
+  if (sel) sel.classList.toggle('visible');
+}
+
+// Update discover pillar when client changes
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.id === 'discoverSelectClient') {
+    const clientId = e.target.value;
+    const client = clients.find(c => c.id === clientId);
+    const indicator = document.getElementById('discoverPillarIndicator');
+    const nameEl = document.getElementById('discoverPillarName');
+    const overrideSel = document.getElementById('discoverPillarOverride');
+    if (client && client.selectedPillars && client.selectedPillars.length > 0) {
+      const idx = client.pillarRotationIndex || 0;
+      const pillar = client.selectedPillars[idx % client.selectedPillars.length];
+      if (indicator) indicator.style.display = 'block';
+      if (nameEl) nameEl.textContent = pillar.name;
+      if (overrideSel) {
+        overrideSel.innerHTML = '<option value="">Auto (use rotation)</option>' +
+          client.selectedPillars.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+      }
+    } else {
+      if (indicator) indicator.style.display = 'none';
+    }
+  }
+});
 
 // ═══════════════════════════════════════════
 // BOOT
