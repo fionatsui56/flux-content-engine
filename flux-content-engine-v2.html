@@ -1717,51 +1717,127 @@ function rateVariation(varId, rating) {
 // ═══════════════════════════════════════════
 // HISTORY
 // ═══════════════════════════════════════════
-async function renderHistory() {
+async function renderHistory(filterPillar) {
   const div = document.getElementById('historyList');
   div.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:16px 0;">Loading history...</div>';
 
-  const history = await loadHistory();
+  let history = await loadHistory();
   if (!history.length) {
     div.innerHTML = '<div style="color:var(--secondary);text-align:center;padding:48px 0;font-size:14px;">No content generated yet.</div>';
     return;
   }
 
-  let html = '';
+  // Store history entries for lookup by id (avoids inline JSON issues)
+  window._historyCache = {};
+  history.forEach(e => { window._historyCache[e.id] = e; });
+
+  // Filter by pillar if specified
+  if (filterPillar) {
+    history = history.filter(e => {
+      const vars = e.variations || [];
+      return vars.some(v => v.pillar === filterPillar);
+    });
+  }
+
+  // Group by pillar for display
+  const pillarGroups = {};
+  const noPillar = [];
   history.forEach(entry => {
-    const client = clients.find(c => c.id === entry.client_id);
-    const clientName = client ? client.name : 'Unknown Client';
-    const date = new Date(entry.created_at).toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const platforms = (entry.platforms || []).join(', ').toUpperCase();
     const vars = entry.variations || [];
-    const bestVar = vars.find(v => v.isBest) || vars[0];
-    const preview = bestVar ? bestVar.content.substring(0, 120) + '...' : '';
-
-    html += `<div class="card" style="margin-bottom:16px;cursor:pointer;" onclick="loadHistoryEntry('${entry.id}','${JSON.stringify(entry.variations).replace(/'/g,"\\'")}')">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-        <div>
-          <div style="font-weight:600;color:var(--accent-mint);margin-bottom:4px;">${entry.topic}</div>
-          <div style="font-size:11px;color:var(--muted);">${clientName} · ${platforms} · ${date}</div>
-        </div>
-        ${bestVar && bestVar.isBest ? '<div style="font-size:10px;color:var(--accent-mint);font-weight:600;letter-spacing:0.08em;">★ BEST</div>' : ''}
-      </div>
-      ${preview ? `<div style="font-size:12px;color:var(--secondary);line-height:1.5;">${preview}</div>` : ''}
-      <div style="font-size:11px;color:var(--muted);margin-top:10px;">${vars.length} variations</div>
-    </div>`;
+    const pillarName = vars[0]?.pillar || null;
+    if (pillarName) {
+      if (!pillarGroups[pillarName]) pillarGroups[pillarName] = [];
+      pillarGroups[pillarName].push(entry);
+    } else {
+      noPillar.push(entry);
+    }
   });
-  div.innerHTML = html;
-}
 
-function loadHistoryEntry(entryId, variationsJson) {
-  try {
-    generatedVariations = JSON.parse(variationsJson.replace(/\\'/g,"'"));
-  } catch(e) { return; }
+  // Build pillar filter tabs
+  const allPillars = Object.keys(pillarGroups);
+  let filterHtml = '';
+  if (allPillars.length > 0) {
+    filterHtml = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+      <button onclick="renderHistory()" style="padding:6px 14px;border:1px solid ${!filterPillar ? 'var(--accent-mint)' : 'var(--border-mid)'};background:${!filterPillar ? 'rgba(205,255,216,0.1)' : 'transparent'};color:${!filterPillar ? 'var(--accent-mint)' : 'var(--secondary)'};border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">All</button>
+      ${allPillars.map(p => `<button onclick="renderHistory('${p}')" style="padding:6px 14px;border:1px solid ${filterPillar===p ? 'var(--accent-mint)' : 'var(--border-mid)'};background:${filterPillar===p ? 'rgba(205,255,216,0.1)' : 'transparent'};color:${filterPillar===p ? 'var(--accent-mint)' : 'var(--secondary)'};border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">${p}</button>`).join('')}
+    </div>`;
+  }
+
+  function renderEntries(entries) {
+    return entries.map(entry => {
+      const client = clients.find(c => c.id === entry.client_id);
+      const clientName = client ? client.name : 'Unknown Client';
+      const date = new Date(entry.created_at).toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const platforms = (entry.platforms || []).join(', ').toUpperCase();
+      const vars = entry.variations || [];
+      const bestVar = vars.find(v => v.isBest) || vars[0];
+      const preview = bestVar ? bestVar.content.substring(0, 120) + '...' : 'No content preview';
+      const pillarTag = vars[0]?.pillar ? `<span style="font-size:10px;padding:2px 8px;background:rgba(205,255,216,0.1);border:1px solid rgba(205,255,216,0.2);border-radius:999px;color:var(--accent-mint);margin-left:8px;">${vars[0].pillar}</span>` : '';
+
+      return `<div class="card" style="margin-bottom:12px;cursor:pointer;" onclick="loadHistoryEntry('${entry.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:600;color:var(--accent-mint);margin-bottom:4px;">${entry.topic}${pillarTag}</div>
+            <div style="font-size:11px;color:var(--muted);">${clientName} · ${platforms} · ${date}</div>
+          </div>
+          ${bestVar && bestVar.isBest ? '<div style="font-size:10px;color:var(--accent-mint);font-weight:600;letter-spacing:0.08em;flex-shrink:0;">★ BEST</div>' : ''}
+        </div>
+        <div style="font-size:12px;color:var(--secondary);line-height:1.5;white-space:pre-wrap;">${preview}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;">${vars.length} variations · Click to view</div>
+      </div>`;
+    }).join('');
+  }
+
+  let html = filterHtml;
+
+  if (filterPillar) {
+    html += renderEntries(history);
+  } else if (allPillars.length > 0) {
+    // Show by pillar groups first, then ungrouped
+    allPillars.forEach(pillar => {
+      html += `<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">${pillar}</div>`;
+      html += renderEntries(pillarGroups[pillar]);
+    });
+    if (noPillar.length > 0) {
+      html += `<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Other</div>`;
+      html += renderEntries(noPillar);
+    }
+  } else {
+    html += renderEntries(noPillar);
+  }
+
+  div.innerHTML = html;
+
+
+function loadHistoryEntry(entryId) {
+  const entry = window._historyCache && window._historyCache[entryId];
+  if (!entry) { console.error('History entry not found:', entryId); return; }
+
+  generatedVariations = entry.variations || [];
+
+  // Switch to generate tab to show content
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('generate').classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.nav-item')[3].classList.add('active');
   updatePageTitle();
+
+  // Show topic info
+  const topicField = document.getElementById('topic');
+  if (topicField) topicField.value = entry.topic || '';
+  updateTopicCount();
+
   renderVariations();
+
+  // Show back-to-history button
+  const contentDiv = document.getElementById('generatedContent');
+  if (contentDiv) {
+    const backBtn = document.createElement('div');
+    backBtn.style.cssText = 'margin-bottom:16px;';
+    backBtn.innerHTML = `<button onclick="switchTab('history')" style="padding:7px 16px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">← Back to History</button>
+    <span style="font-size:12px;color:var(--muted);margin-left:12px;">Viewing: ${entry.topic}</span>`;
+    contentDiv.insertBefore(backBtn, contentDiv.firstChild);
+  }
 }
 
 // ═══════════════════════════════════════════

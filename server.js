@@ -307,15 +307,22 @@ function buildLayer1(platforms, lang) {
   };
 
   const langRules = {
-    tc: `LANGUAGE — Traditional Chinese (HK):
-- Professional: 書面語 (formal written)
-- Casual/Energetic: Natural HK Cantonese
-- NEVER Taiwan expressions: 棒、讚、超級`,
-    sc: `LANGUAGE — Simplified Chinese (Mainland):
-- Write as NATIVE mainland Chinese, not character conversion
-- Sound like 小紅書/WeChat native
-- AVOID: HK (冇、靠、得唔得) and Taiwan (棒、讚) expressions
-- Use: 很棒 not 好正 | 没问题 not 冇問題`,
+    tc: `LANGUAGE — Traditional Chinese (HK) — STRICT:
+⚠️ OUTPUT IN TRADITIONAL CHINESE ONLY. NO English words, NO English phrases.
+- Exception: Brand names, product names, platform names (e.g., Instagram) are OK
+- Hashtags: Chinese hashtags preferred; English hashtags only if standard in HK
+- Professional tone: 書面語 (formal written Chinese)
+- Casual/Energetic: Natural HK Cantonese style
+- NEVER use: Taiwan expressions (棒、讚、超級、哦)
+- If you want to say "hashtag" — write # directly, not the word "hashtag"`,
+    sc: `LANGUAGE — Simplified Chinese (Mainland) — STRICT:
+⚠️ OUTPUT IN SIMPLIFIED CHINESE ONLY. NO English words, NO English phrases.
+- Exception: Brand names, product names, platform names (e.g., Instagram) are OK
+- Hashtags: Chinese hashtags preferred; English hashtags only if native to XHS culture
+- Write as NATIVE mainland Chinese, not just character conversion
+- Sound like 小红书/WeChat native content
+- AVOID: HK expressions (冇、靠、得唔得、係咁先), Taiwan expressions (棒、讚)
+- Use: 很棒 not 好正 | 没问题 not 冇問題 | 试试看 not 試吓`,
     en: `LANGUAGE — English (Hong Kong):
 - British spelling: colour, organisation, realise
 - AVOID American jargon: leverage, synergise, game-changer
@@ -508,7 +515,7 @@ Angle: Behind-the-Scenes
 Title: [concise title]
 Description: [1-2 sentences]
 
-All titles and descriptions in ${langName}. Be specific and creative — NOT generic.`;
+All titles and descriptions in ${langName} ONLY. No English words except brand/platform names. Be specific and creative — NOT generic.`;
 
     const result = await callAI(prompt, 2000);
 
@@ -568,6 +575,10 @@ ${pillarLayer ? pillarLayer + '\n\n' : ''}${layer3 ? layer3 + '\n\n' : ''}=== GE
 Topic: "${topic}"
 Platforms: ${platforms.join(', ')}
 Language: ${langMap[language] || langMap.tc}
+
+⚠️ LANGUAGE ENFORCEMENT: Every word of the output MUST be in ${langMap[language] || langMap.tc}.
+Do NOT switch to English mid-sentence. Do NOT use English adjectives or filler words.
+Exception: Brand names, proper nouns, platform names only.
 
 Generate ONE variation per platform (${platforms.length} total).
 Each variation MUST follow that platform's exact rules and sound like a real human wrote it.
