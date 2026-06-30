@@ -385,13 +385,20 @@ function buildPillarLayer(pillars, rotationIndex) {
   const pillar = pillars[idx];
   if (!pillar) return '';
 
-  return `=== CONTENT ANGLE (TODAY'S FOCUS) ===
+  let layer = `=== CONTENT ANGLE (TODAY'S FOCUS) ===
 Pillar: ${pillar.name}
-Direction: ${pillar.description || 'Create content aligned with this angle'}
+Direction: ${pillar.description || 'Create content aligned with this angle'}`;
 
-RULE: Your content should reflect the "${pillar.name}" angle.
+  if (pillar.cta) {
+    layer += `\nCall-to-Action: Naturally work in this CTA at the end — "${pillar.cta}"
+(Don't force it word-for-word if it breaks the platform's tone — adapt the phrasing while keeping the intent)`;
+  }
+
+  layer += `\n\nRULE: Your content should reflect the "${pillar.name}" angle.
 This is strategic guidance — use it to shape the angle/perspective, not to restrict the topic.
 If you genuinely cannot align with this pillar, create the best content for the topic anyway.`;
+
+  return layer;
 }
 
 function buildLayer3(platforms, topic, industry) {

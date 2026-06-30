@@ -1173,7 +1173,7 @@ const LANGS = {
     industry_education:'教育', industry_entertainment:'娛樂', industry_ecommerce:'電商', industry_luxury:'奢侈品',
     industry_fitness:'運動健身', industry_home:'家居生活', industry_nonprofit:'非牟利', industry_other:'其他',
     tone_professional:'專業', tone_casual:'輕鬆', tone_luxury:'奢華', tone_energetic:'活力',
-    pillarsDesc:'揀選 3–5 個內容角度。系統會自動輪流使用，保持內容多元化同有策略性。',
+    pillarsDesc:'揀選 3–5 個內容角度。系統會自動輪流使用，保持內容多元化同有策略性。', ph_pillarCta:'此角度嘅行動呼籲（例如：DM我哋查詢）',
     pillarCountMin:'已選 {n} / 5 個角度（最少 3 個）',
     addAngle:'+ 新增角度',
     lbl_topic:'話題 / 想法 *', ph_topic:'例如：春季系列',
@@ -1221,7 +1221,7 @@ const LANGS = {
     industry_education:'教育', industry_entertainment:'娱乐', industry_ecommerce:'电商', industry_luxury:'奢侈品',
     industry_fitness:'运动健身', industry_home:'家居生活', industry_nonprofit:'非营利', industry_other:'其他',
     tone_professional:'专业', tone_casual:'轻松', tone_luxury:'奢华', tone_energetic:'活力',
-    pillarsDesc:'选择 3–5 个内容角度。系统会自动轮流使用，保持内容多元化和策略性。',
+    pillarsDesc:'选择 3–5 个内容角度。系统会自动轮流使用，保持内容多元化和策略性。', ph_pillarCta:'此角度的行动呼吁（例如：私信我们咨询）',
     pillarCountMin:'已选 {n} / 5 个角度（最少 3 个）',
     addAngle:'+ 新增角度',
     lbl_topic:'话题 / 想法 *', ph_topic:'例如：春季系列',
@@ -1269,7 +1269,7 @@ const LANGS = {
     industry_education:'Education', industry_entertainment:'Entertainment', industry_ecommerce:'E-commerce', industry_luxury:'Luxury Goods',
     industry_fitness:'Fitness & Sports', industry_home:'Home & Living', industry_nonprofit:'Nonprofit', industry_other:'Other',
     tone_professional:'Professional', tone_casual:'Casual', tone_luxury:'Luxury', tone_energetic:'Energetic',
-    pillarsDesc:'Pick 3–5 content angles. The system rotates through them automatically, keeping content varied and strategic.',
+    pillarsDesc:'Pick 3–5 content angles. The system rotates through them automatically, keeping content varied and strategic.', ph_pillarCta:'Call-to-action for this angle (e.g., DM us to order)',
     pillarCountMin:'{n} / 5 angles selected (min 3)',
     addAngle:'<span data-i18n="addAngle">+ Add Another Angle</span>',
     lbl_topic:'Topic / Idea *', ph_topic:'e.g., Spring Collection',
@@ -1661,6 +1661,9 @@ function refreshPillarPresetLabels() {
   document.querySelectorAll('.pillar-name-select option').forEach(opt => {
     const translated = presetMap[opt.value];
     if (translated) opt.textContent = translated;
+  });
+  document.querySelectorAll('.pillar-cta-input').forEach(input => {
+    if (t.ph_pillarCta) input.placeholder = t.ph_pillarCta;
   });
 }
 
@@ -2297,7 +2300,7 @@ const PILLAR_PRESETS = [
   { name: 'Q&A', placeholder: 'e.g., Answer common audience questions and concerns' },
 ];
 
-function addPillarCard(name, description, checked) {
+function addPillarCard(name, description, checked, cta) {
   const grid = document.getElementById('pillarGrid');
   if (!grid) return;
   const idx = grid.children.length;
@@ -2319,7 +2322,8 @@ function addPillarCard(name, description, checked) {
       <button onclick="removePillarCard(this)" style="padding:4px 8px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;" title="Remove">×</button>
     </div>
     <textarea class="pillar-desc-input" placeholder="${presetPlaceholder}" maxlength="150">${description || ''}</textarea>
-    <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:3px;">max 150 chars</div>`;
+    <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:3px;">max 150 chars</div>
+    <input type="text" class="pillar-cta-input" data-i18n-placeholder="ph_pillarCta" placeholder="CTA for this angle (e.g., DM us to order)" maxlength="60" value="${cta || ''}" style="width:100%;margin-top:8px;padding:8px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--primary);font-family:inherit;font-size:12px;outline:none;">`;
 
   grid.appendChild(card);
   updatePillarCount();
@@ -2368,10 +2372,12 @@ function getPillarData() {
     if (!checkbox.checked) return;
     const nameSelect = card.querySelector('.pillar-name-select');
     const descInput = card.querySelector('.pillar-desc-input');
+    const ctaInput = card.querySelector('.pillar-cta-input');
     pillars.push({
       id: 'pillar_' + Date.now() + '_' + idx,
       name: nameSelect.value,
       description: descInput.value.trim(),
+      cta: ctaInput ? ctaInput.value.trim() : '',
       lastUsed: null
     });
   });
@@ -2383,12 +2389,12 @@ function loadPillarData(pillars) {
   if (!grid) return;
   grid.innerHTML = '';
   if (pillars && pillars.length > 0) {
-    pillars.forEach(p => addPillarCard(p.name, p.description, true));
+    pillars.forEach(p => addPillarCard(p.name, p.description, true, p.cta));
   } else {
     // Default: add 3 starter cards
-    addPillarCard('Education', '', true);
-    addPillarCard('Product', '', true);
-    addPillarCard('Behind-the-Scenes', '', true);
+    addPillarCard('Education', '', true, '');
+    addPillarCard('Product', '', true, '');
+    addPillarCard('Behind-the-Scenes', '', true, '');
   }
   updatePillarCount();
 }
