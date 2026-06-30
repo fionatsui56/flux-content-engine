@@ -519,6 +519,89 @@ select option { background: var(--bg-dark); color: var(--primary); }
 }
 .saving-indicator.visible { opacity: 1; }
 
+/* ── MOBILE: HAMBURGER MENU ── */
+.hamburger-btn {
+  display: none;
+  position: fixed; top: 16px; left: 16px; z-index: 1001;
+  width: 44px; height: 44px;
+  background: var(--bg-dark); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--primary); font-size: 20px;
+  cursor: pointer; align-items: center; justify-content: center;
+}
+.mobile-close-btn {
+  display: none;
+  position: absolute; top: 16px; right: 16px;
+  width: 36px; height: 36px;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 8px; color: var(--secondary); font-size: 20px;
+  cursor: pointer; align-items: center; justify-content: center;
+}
+.mobile-overlay {
+  display: none;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 999;
+}
+.mobile-overlay.visible { display: block; }
+
+/* ── RESPONSIVE: TABLET (<768px) ── */
+@media (max-width: 768px) {
+  .hamburger-btn { display: flex; }
+  .mobile-close-btn { display: flex; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 280px; z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .logo { position: relative; padding-top: 20px; }
+
+  .main { padding: 20px 16px 16px; padding-top: 72px; max-width: 100%; }
+
+  .header { flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+  .h1 { font-size: 22px; }
+  .lang-toggle { width: 100%; }
+  .lang-btn { flex: 1; min-height: 44px; }
+
+  .dashboard-grid { grid-template-columns: 1fr; }
+
+  .platform-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .platform-btn { min-height: 44px; padding: 8px 4px; font-size: 10px; }
+
+  button, .button, input, select, textarea { min-height: 44px; }
+  .pillar-checkbox { width: 22px; height: 22px; }
+  .tag-chip { min-height: 38px; padding: 8px 14px; }
+  .star { font-size: 24px; padding: 4px; }
+
+  .accordion-header { padding: 16px; min-height: 44px; }
+  .pillar-card-header { flex-wrap: wrap; }
+  .pillar-name-select { min-width: 120px; }
+
+  .sidebar-btns { flex-wrap: wrap; }
+  .sidebar-btn { min-height: 40px; }
+}
+
+/* ── RESPONSIVE: MOBILE (<480px) ── */
+@media (max-width: 480px) {
+  .main { padding: 16px 12px; padding-top: 68px; }
+  .h1 { font-size: 19px; }
+
+  .platform-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .auth-box { max-width: 100%; }
+  .auth-title { font-size: 22px; }
+
+  .variation-card { padding: 14px; }
+  .stat-number { font-size: 28px; }
+
+  .pillar-card { padding: 12px; }
+  .pillar-name-select { font-size: 12px; padding: 8px; }
+
+  .accordion-title { font-size: 11px; }
+}
+
 /* ── ACCORDION ── */
 .accordion-section { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
 .accordion-header {
@@ -659,12 +742,15 @@ select option { background: var(--bg-dark); color: var(--primary); }
 
 <!-- MAIN APP -->
 <div id="appScreen">
+<button class="hamburger-btn" id="hamburgerBtn" onclick="openMobileMenu()">☰</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
 <div class="app">
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="logo">
       <div class="logo-text">Flux Strategy</div>
       <div class="logo-sub">Content Engine</div>
     </div>
+    <button class="mobile-close-btn" onclick="closeMobileMenu()">×</button>
     <div class="nav">
       <button class="nav-item active" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="nav-item" onclick="switchTab('clients')">Client Management</button>
@@ -1099,9 +1185,9 @@ const LANGS = {
     pillar_Education:'教育', pillar_Product:'產品', pillar_BTS:'幕後花絮', pillar_Customer:'顧客故事',
     pillar_Lifestyle:'生活風格', pillar_Thought:'思想領導', pillar_Community:'社群互動', pillar_Seasonal:'季節性',
     pillar_Personal:'個人品牌', pillar_QA:'問答', pillar_Custom:'自訂',
-    gettingStarted:'開始使用', gs_step1:'前往「客戶管理」→ 建立你嘅品牌Profile',
-    gs_step2:'已有品牌Profile？直接去「生成內容」開始生成貼文',
-    gs_step3:'想更有策略？設定「內容角度」，系統會自動輪換方向'
+    gettingStarted:'開始使用', gs_step1:'前往「客戶管理」，建立品牌資料',
+    gs_step2:'已建立品牌資料？可直接前往「生成內容」開始製作貼文',
+    gs_step3:'如需更具策略性，可設定「內容角度」，系統將自動輪換內容方向'
   },
   sc: {
     dashboard:'仪表板', clients:'客户管理', discover:'主题探索', generate:'生成内容', history:'历史记录',
@@ -1458,13 +1544,34 @@ function showSaving(msg) {
   setTimeout(() => el.classList.remove('visible'), 2000);
 }
 
-function switchTab(tab) {
+function switchTab(tab, fromHistory) {
+  closeMobileMenu();
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(tab).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  else {
+    // Called programmatically (e.g. from history) - highlight correct nav item
+    const navMap = { dashboard: 0, clients: 1, discover: 2, generate: 3, history: 4 };
+    const navItems = document.querySelectorAll('.nav-item');
+    if (navItems[navMap[tab]]) navItems[navMap[tab]].classList.add('active');
+  }
   updatePageTitle();
   if (tab === 'history') renderHistory();
+
+  // Clear stale generated content when navigating to Generate tab directly
+  // (not when coming from a History click, which intentionally loads content)
+  if (tab === 'generate' && !fromHistory) {
+    const viewingFromHistory = document.getElementById('generatedContent')?.dataset.fromHistory === 'true';
+    if (viewingFromHistory) {
+      generatedVariations = [];
+      document.getElementById('generatedContent').innerHTML = '';
+      document.getElementById('generatedContent').dataset.fromHistory = 'false';
+      const topicField = document.getElementById('topic');
+      if (topicField) topicField.value = '';
+      updateTopicCount();
+    }
+  }
 }
 
 function updatePageTitle() {
@@ -1972,6 +2079,7 @@ function loadHistoryEntry(entryId) {
   updateTopicCount();
 
   renderVariations();
+  document.getElementById('generatedContent').dataset.fromHistory = 'true';
 
   // Show back-to-history button
   const contentDiv = document.getElementById('generatedContent');
@@ -2136,6 +2244,18 @@ async function importData() {
 function startKeepAlive() {
   fetch(BACKEND + '/ping').catch(() => {});
   setInterval(() => fetch(BACKEND + '/ping').catch(() => {}), 10 * 60 * 1000);
+}
+
+// ═══════════════════════════════════════════
+// MOBILE MENU
+// ═══════════════════════════════════════════
+function openMobileMenu() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('mobileOverlay').classList.add('visible');
+}
+function closeMobileMenu() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('visible');
 }
 
 // ═══════════════════════════════════════════
