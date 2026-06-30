@@ -707,11 +707,20 @@ select option { background: var(--bg-dark); color: var(--primary); }
           <div class="stat-label" id="contentLabel">Content Items</div>
         </div>
       </div>
-      <div style="padding: 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--secondary); line-height: 1.7;">
-        <div style="color: var(--accent-mint); font-weight: 600; margin-bottom: 8px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">Getting Started</div>
-        1. Go to <strong style="color:var(--primary)">Client Management</strong> → Add your brand profile<br>
-        2. Go to <strong style="color:var(--primary)">Topics</strong> → Get 8 content ideas<br>
-        3. Go to <strong style="color:var(--primary)">Generate</strong> → Create platform-ready content
+      <div style="padding: 18px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--secondary); line-height: 1.8;">
+        <div id="gsTitle" style="color: var(--accent-mint); font-weight: 600; margin-bottom: 12px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;">Getting Started</div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+          <span style="color:var(--accent-mint);font-weight:700;flex-shrink:0;">①</span>
+          <span id="gsStep1">Go to "Client Management" → Build your brand profile</span>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+          <span style="color:var(--accent-mint);font-weight:700;flex-shrink:0;">②</span>
+          <span id="gsStep2">Already have a profile? Go straight to "Generate" to start posting</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="color:var(--accent-mint);font-weight:700;flex-shrink:0;">③</span>
+          <span id="gsStep3">Want more strategy? Set up "Content Angles" for automatic rotation</span>
+        </div>
       </div>
     </div>
 
@@ -721,48 +730,48 @@ select option { background: var(--bg-dark); color: var(--primary); }
       <!-- ACCORDION 1: Brand Basics -->
       <div class="accordion-section" id="acc-basics">
         <div class="accordion-header open" onclick="toggleAccordion('acc-basics')">
-          <span class="accordion-title" id="acc-basics-title">① Brand Basics</span>
+          <span class="accordion-title" id="acc-basics-title" data-i18n="acc_basics" data-i18n-prefix="①">① Brand Basics</span>
           <span class="accordion-arrow">▼</span>
         </div>
         <div class="accordion-body open">
           <div class="form-group">
-            <label class="label">Client Name *</label>
-            <input type="text" id="clientName" placeholder="Enter client name..." oninput="updateAccordionTitles()">
+            <label class="label" data-i18n="lbl_clientName">Client Name *</label>
+            <input type="text" id="clientName" placeholder="Enter client name..." data-i18n-placeholder="ph_clientName" oninput="updateAccordionTitles()">
           </div>
           <div class="form-group">
-            <label class="label">Industry</label>
+            <label class="label" data-i18n="lbl_industry">Industry</label>
             <select id="clientIndustry" onchange="updateAccordionTitles()">
-              <option value="">Select industry...</option>
-              <option value="beauty">Beauty & Personal Care (美容護膚)</option>
-              <option value="fashion">Fashion & Apparel (時尚服裝)</option>
-              <option value="food">Food & Beverage (食品飲料)</option>
-              <option value="technology">Technology (科技)</option>
-              <option value="finance">Finance & Banking (金融)</option>
-              <option value="health">Health & Wellness (健康)</option>
-              <option value="realestate">Real Estate (房地產)</option>
-              <option value="travel">Travel & Tourism (旅遊)</option>
-              <option value="education">Education (教育)</option>
-              <option value="entertainment">Entertainment (娛樂)</option>
-              <option value="ecommerce">E-commerce (電商)</option>
-              <option value="luxury">Luxury Goods (奢侈品)</option>
-              <option value="fitness">Fitness & Sports (運動健身)</option>
-              <option value="home">Home & Living (家居生活)</option>
-              <option value="nonprofit">Nonprofit (非牟利)</option>
-              <option value="other">Other (其他)</option>
+              <option value="" data-i18n="ph_industry">Select industry...</option>
+              <option value="beauty" data-i18n="industry_beauty">Beauty & Personal Care</option>
+              <option value="fashion" data-i18n="industry_fashion">Fashion & Apparel</option>
+              <option value="food" data-i18n="industry_food">Food & Beverage</option>
+              <option value="technology" data-i18n="industry_tech">Technology</option>
+              <option value="finance" data-i18n="industry_finance">Finance & Banking</option>
+              <option value="health" data-i18n="industry_health">Health & Wellness</option>
+              <option value="realestate" data-i18n="industry_realestate">Real Estate</option>
+              <option value="travel" data-i18n="industry_travel">Travel & Tourism</option>
+              <option value="education" data-i18n="industry_education">Education</option>
+              <option value="entertainment" data-i18n="industry_entertainment">Entertainment</option>
+              <option value="ecommerce" data-i18n="industry_ecommerce">E-commerce</option>
+              <option value="luxury" data-i18n="industry_luxury">Luxury Goods</option>
+              <option value="fitness" data-i18n="industry_fitness">Fitness & Sports</option>
+              <option value="home" data-i18n="industry_home">Home & Living</option>
+              <option value="nonprofit" data-i18n="industry_nonprofit">Nonprofit</option>
+              <option value="other" data-i18n="industry_other">Other</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="label">Brand Tone *</label>
+            <label class="label" data-i18n="lbl_brandTone">Brand Tone *</label>
             <select id="clientTone">
-              <option value="professional">Professional 專業</option>
-              <option value="casual">Casual 輕鬆</option>
-              <option value="luxury">Luxury 奢華</option>
-              <option value="energetic">Energetic 活力</option>
+              <option value="professional" data-i18n="tone_professional">Professional</option>
+              <option value="casual" data-i18n="tone_casual">Casual</option>
+              <option value="luxury" data-i18n="tone_luxury">Luxury</option>
+              <option value="energetic" data-i18n="tone_energetic">Energetic</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="label">Brand Story</label>
-            <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." style="min-height:80px;resize:vertical;"></textarea>
+            <label class="label" data-i18n="lbl_brandStory">Brand Story</label>
+            <textarea id="clientBrandStory" placeholder="Brand background, mission, values..." data-i18n-placeholder="ph_brandStory" style="min-height:80px;resize:vertical;"></textarea>
           </div>
         </div>
       </div>
@@ -770,7 +779,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
       <!-- ACCORDION 2: Target Audience -->
       <div class="accordion-section" id="acc-audience">
         <div class="accordion-header" onclick="toggleAccordion('acc-audience')">
-          <span class="accordion-title" id="acc-audience-title">② Target Audience</span>
+          <span class="accordion-title" id="acc-audience-title" data-i18n="acc_audience" data-i18n-prefix="②">② Target Audience</span>
           <span class="accordion-arrow">▼</span>
         </div>
         <div class="accordion-body">
@@ -867,37 +876,37 @@ select option { background: var(--bg-dark); color: var(--primary); }
       <!-- ACCORDION 3: Content Angles (Pillars) -->
       <div class="accordion-section" id="acc-pillars">
         <div class="accordion-header" onclick="toggleAccordion('acc-pillars')">
-          <span class="accordion-title" id="acc-pillars-title">③ Content Angles</span>
+          <span class="accordion-title" id="acc-pillars-title" data-i18n="acc_pillars" data-i18n-prefix="③">③ Content Angles</span>
           <span class="accordion-arrow">▼</span>
         </div>
         <div class="accordion-body">
           <div style="font-size:12px;color:var(--secondary);margin-bottom:14px;line-height:1.6;">
-            Pick 3–5 content angles for this brand. The system will rotate through them automatically — keeping your content varied and strategic.
+            <span data-i18n="pillarsDesc">Pick 3–5 content angles for this brand. The system will rotate through them automatically — keeping your content varied and strategic.</span>
           </div>
           <div class="pillar-count" id="pillarCount">0 / 5 angles selected (min 3)</div>
           <div class="pillar-grid" id="pillarGrid"></div>
-          <button onclick="addPillarCard()" style="padding:8px 16px;background:transparent;border:1px dashed var(--border-mid);color:var(--secondary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(205,255,216,0.3)';this.style.color='var(--accent-mint)'" onmouseout="this.style.borderColor='var(--border-mid)';this.style.color='var(--secondary)'">+ Add Another Angle</button>
+          <button onclick="addPillarCard()" style="padding:8px 16px;background:transparent;border:1px dashed var(--border-mid);color:var(--secondary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(205,255,216,0.3)';this.style.color='var(--accent-mint)'" onmouseout="this.style.borderColor='var(--border-mid)';this.style.color='var(--secondary)'"><span data-i18n="addAngle">+ Add Another Angle</span></button>
         </div>
       </div>
 
       <!-- ACCORDION 4: Brand Rules -->
       <div class="accordion-section" id="acc-rules">
         <div class="accordion-header" onclick="toggleAccordion('acc-rules')">
-          <span class="accordion-title" id="acc-rules-title">④ Brand Rules</span>
+          <span class="accordion-title" id="acc-rules-title" data-i18n="acc_rules" data-i18n-prefix="④">④ Brand Rules</span>
           <span class="accordion-arrow">▼</span>
         </div>
         <div class="accordion-body">
       <div class="form-group">
-        <label class="label">Competitors</label>
-        <textarea id="clientCompetitors" placeholder="Main competitors..." style="min-height:60px;resize:vertical;"></textarea>
+        <label class="label" data-i18n="lbl_competitors">Competitors</label>
+        <textarea id="clientCompetitors" placeholder="Main competitors..." data-i18n-placeholder="ph_competitors" style="min-height:60px;resize:vertical;"></textarea>
       </div>
       <div class="form-group">
-        <label class="label">Forbidden Words</label>
-        <textarea id="clientForbiddenWords" placeholder="Words to avoid..." style="min-height:60px;resize:vertical;"></textarea>
+        <label class="label" data-i18n="lbl_forbiddenWords">Forbidden Words</label>
+        <textarea id="clientForbiddenWords" placeholder="Words to avoid..." data-i18n-placeholder="ph_forbiddenWords" style="min-height:60px;resize:vertical;"></textarea>
       </div>
       <div class="form-group">
-        <label class="label">Must Mention Items</label>
-        <textarea id="clientMustMention" placeholder="e.g., low fees, family-owned, 24/7 support..." style="min-height:60px;resize:vertical;"></textarea>
+        <label class="label" data-i18n="lbl_mustMention">Must Mention Items</label>
+        <textarea id="clientMustMention" placeholder="e.g., low fees, family-owned, 24/7 support..." data-i18n-placeholder="ph_mustMention" style="min-height:60px;resize:vertical;"></textarea>
       </div>
         </div><!-- end accordion-body rules -->
       </div><!-- end accordion-section rules -->
@@ -912,7 +921,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
     <!-- GENERATE -->
     <div class="section" id="generate">
       <div class="form-group">
-        <label class="label">Select Client *</label>
+        <label class="label" data-i18n="lbl_selectClient">Select Client *</label>
         <select id="selectClient" onchange="selectCurrentClient()">
           <option value="">Choose client...</option>
         </select>
@@ -921,23 +930,23 @@ select option { background: var(--bg-dark); color: var(--primary); }
       <div id="generatePillarIndicator" style="display:none;">
         <div class="pillar-indicator">
           <div>
-            <div class="pillar-indicator-label">Content Angle (Auto)</div>
+            <div class="pillar-indicator-label" data-i18n="angleAuto">Content Angle (Auto)</div>
             <div class="pillar-indicator-value" id="generatePillarName">—</div>
           </div>
-          <button class="pillar-override-btn" onclick="toggleGeneratePillarOverride()">Change</button>
+          <button class="pillar-override-btn" onclick="toggleGeneratePillarOverride()" data-i18n="changeBtn">Change</button>
         </div>
         <select class="pillar-override-select" id="generatePillarOverride" onchange="updateGeneratePillarOverride()">
-          <option value="">Auto (use rotation)</option>
+          <option value="" data-i18n="autoOption">Auto (use rotation)</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label class="label">Topic / Idea *</label>
-        <textarea id="topic" placeholder="e.g., Spring Collection" maxlength="200" oninput="updateTopicCount()" style="min-height:80px;resize:vertical;"></textarea>
+        <label class="label" data-i18n="lbl_topic">Topic / Idea *</label>
+        <textarea id="topic" placeholder="e.g., Spring Collection" data-i18n-placeholder="ph_topic" maxlength="200" oninput="updateTopicCount()" style="min-height:80px;resize:vertical;"></textarea>
         <div style="text-align:right; font-size:11px; color:var(--muted); margin-top:4px;"><span id="topicCount">0</span> / 200</div>
       </div>
       <div class="form-group">
-        <label class="label">Select Platforms *</label>
+        <label class="label" data-i18n="lbl_platforms">Select Platforms *</label>
         <div class="platform-grid">
           <button class="platform-btn" onclick="togglePlatform('facebook',event)">Facebook</button>
           <button class="platform-btn" onclick="togglePlatform('instagram',event)">Instagram</button>
@@ -948,7 +957,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
         </div>
       </div>
       <div class="form-group">
-        <label class="label">Content Language</label>
+        <label class="label" data-i18n="lbl_contentLang">Content Language</label>
         <select id="contentLanguage">
           <option value="tc">Traditional Chinese (繁體中文)</option>
           <option value="sc">Simplified Chinese (簡體中文)</option>
@@ -967,7 +976,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
     <!-- TOPICS/DISCOVER -->
     <div class="section" id="discover">
       <div class="form-group">
-        <label class="label">Select Client *</label>
+        <label class="label" data-i18n="lbl_selectClient">Select Client *</label>
         <select id="discoverSelectClient">
           <option value="">Choose client...</option>
         </select>
@@ -976,22 +985,22 @@ select option { background: var(--bg-dark); color: var(--primary); }
       <div id="discoverPillarIndicator" style="display:none;">
         <div class="pillar-indicator">
           <div>
-            <div class="pillar-indicator-label">Content Angle (Auto)</div>
+            <div class="pillar-indicator-label" data-i18n="angleAuto">Content Angle (Auto)</div>
             <div class="pillar-indicator-value" id="discoverPillarName">—</div>
           </div>
-          <button class="pillar-override-btn" onclick="toggleDiscoverPillarOverride()">Change</button>
+          <button class="pillar-override-btn" onclick="toggleDiscoverPillarOverride()" data-i18n="changeBtn">Change</button>
         </div>
         <select class="pillar-override-select" id="discoverPillarOverride">
-          <option value="">Auto (use rotation)</option>
+          <option value="" data-i18n="autoOption">Auto (use rotation)</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label class="label">Content Direction (Optional)</label>
-        <input type="text" id="discoverContentDirection" placeholder="e.g., Health Insurance, Retirement Life...">
+        <label class="label" data-i18n="lbl_contentDirection">Content Direction (Optional)</label>
+        <input type="text" id="discoverContentDirection" placeholder="e.g., Health Insurance, Retirement Life..." data-i18n-placeholder="ph_contentDirection">
       </div>
       <div class="form-group">
-        <label class="label">Select Platform *</label>
+        <label class="label" data-i18n="lbl_platform">Select Platform *</label>
         <select id="discoverPlatform">
           <option value="">Choose platform...</option>
           <option value="facebook">Facebook</option>
@@ -1003,7 +1012,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
         </select>
       </div>
       <div class="form-group">
-        <label class="label">Content Language *</label>
+        <label class="label" data-i18n="lbl_contentLangReq">Content Language *</label>
         <select id="discoverContentLanguage">
           <option value="tc">Traditional Chinese (繁體中文)</option>
           <option value="sc">Simplified Chinese (簡體中文)</option>
@@ -1067,7 +1076,32 @@ const LANGS = {
     chip_wom:'口碑驅動', chip_impulse:'衝動消費',
     chip_time:'時間不足', chip_budget_pain:'預算有限', chip_info:'資訊過載',
     chip_trust:'唔信任品牌', chip_choice:'選擇困難', chip_motivation:'缺乏動力',
-    chip_active:'主動搜尋型', chip_passive:'被動滾動型', chip_social_b:'社群互動型', chip_lurker:'只睇唔留言'
+    chip_active:'主動搜尋型', chip_passive:'被動滾動型', chip_social_b:'社群互動型', chip_lurker:'只睇唔留言',
+    acc_basics:'品牌基本資料', acc_audience:'目標受眾', acc_pillars:'內容角度', acc_rules:'品牌規則',
+    lbl_clientName:'客戶名稱 *', lbl_industry:'行業', lbl_brandTone:'品牌語氣 *', lbl_brandStory:'品牌故事',
+    lbl_targetAudience:'目標受眾', lbl_competitors:'競爭對手', lbl_forbiddenWords:'禁用詞彙', lbl_mustMention:'必須提及項目',
+    ph_clientName:'輸入客戶名稱…', ph_industry:'選擇行業…', ph_brandStory:'品牌背景、使命、價值觀…',
+    ph_competitors:'主要競爭對手…', ph_forbiddenWords:'要避免嘅詞彙…', ph_mustMention:'例如：低收費、家族經營、24/7支援…',
+    industry_beauty:'美容護膚', industry_fashion:'時尚服裝', industry_food:'食品飲料', industry_tech:'科技',
+    industry_finance:'金融', industry_health:'健康', industry_realestate:'房地產', industry_travel:'旅遊',
+    industry_education:'教育', industry_entertainment:'娛樂', industry_ecommerce:'電商', industry_luxury:'奢侈品',
+    industry_fitness:'運動健身', industry_home:'家居生活', industry_nonprofit:'非牟利', industry_other:'其他',
+    tone_professional:'專業', tone_casual:'輕鬆', tone_luxury:'奢華', tone_energetic:'活力',
+    pillarsDesc:'揀選 3–5 個內容角度。系統會自動輪流使用，保持內容多元化同有策略性。',
+    pillarCountMin:'已選 {n} / 5 個角度（最少 3 個）',
+    addAngle:'+ 新增角度',
+    lbl_topic:'話題 / 想法 *', ph_topic:'例如：春季系列',
+    lbl_platforms:'選擇平台 *', lbl_contentLang:'生成內容語言',
+    lbl_selectClient:'選擇客戶 *', lbl_contentDirection:'內容方向（選填）',
+    ph_contentDirection:'例如：醫療保險、退休生活…',
+    lbl_platform:'選擇平台 *', lbl_contentLangReq:'生成內容語言 *',
+    angleAuto:'內容角度（自動）', changeBtn:'更改', autoOption:'自動（使用輪換）',
+    pillar_Education:'教育', pillar_Product:'產品', pillar_BTS:'幕後花絮', pillar_Customer:'顧客故事',
+    pillar_Lifestyle:'生活風格', pillar_Thought:'思想領導', pillar_Community:'社群互動', pillar_Seasonal:'季節性',
+    pillar_Personal:'個人品牌', pillar_QA:'問答', pillar_Custom:'自訂',
+    gettingStarted:'開始使用', gs_step1:'前往「客戶管理」→ 建立你嘅品牌Profile',
+    gs_step2:'已有品牌Profile？直接去「生成內容」開始生成貼文',
+    gs_step3:'想更有策略？設定「內容角度」，系統會自動輪換方向'
   },
   sc: {
     dashboard:'仪表板', clients:'客户管理', discover:'主题探索', generate:'生成内容', history:'历史记录',
@@ -1090,7 +1124,32 @@ const LANGS = {
     chip_wom:'口碑驱动', chip_impulse:'冲动消费',
     chip_time:'时间不足', chip_budget_pain:'预算有限', chip_info:'信息过载',
     chip_trust:'不信任品牌', chip_choice:'选择困难', chip_motivation:'缺乏动力',
-    chip_active:'主动搜索型', chip_passive:'被动浏览型', chip_social_b:'社群互动型', chip_lurker:'只看不评论'
+    chip_active:'主动搜索型', chip_passive:'被动浏览型', chip_social_b:'社群互动型', chip_lurker:'只看不评论',
+    acc_basics:'品牌基本资料', acc_audience:'目标受众', acc_pillars:'内容角度', acc_rules:'品牌规则',
+    lbl_clientName:'客户名称 *', lbl_industry:'行业', lbl_brandTone:'品牌语气 *', lbl_brandStory:'品牌故事',
+    lbl_targetAudience:'目标受众', lbl_competitors:'竞争对手', lbl_forbiddenWords:'禁用词汇', lbl_mustMention:'必须提及项目',
+    ph_clientName:'输入客户名称…', ph_industry:'选择行业…', ph_brandStory:'品牌背景、使命、价值观…',
+    ph_competitors:'主要竞争对手…', ph_forbiddenWords:'要避免的词汇…', ph_mustMention:'例如：低收费、家族经营、24/7支持…',
+    industry_beauty:'美容护肤', industry_fashion:'时尚服装', industry_food:'食品饮料', industry_tech:'科技',
+    industry_finance:'金融', industry_health:'健康', industry_realestate:'房地产', industry_travel:'旅游',
+    industry_education:'教育', industry_entertainment:'娱乐', industry_ecommerce:'电商', industry_luxury:'奢侈品',
+    industry_fitness:'运动健身', industry_home:'家居生活', industry_nonprofit:'非营利', industry_other:'其他',
+    tone_professional:'专业', tone_casual:'轻松', tone_luxury:'奢华', tone_energetic:'活力',
+    pillarsDesc:'选择 3–5 个内容角度。系统会自动轮流使用，保持内容多元化和策略性。',
+    pillarCountMin:'已选 {n} / 5 个角度（最少 3 个）',
+    addAngle:'+ 新增角度',
+    lbl_topic:'话题 / 想法 *', ph_topic:'例如：春季系列',
+    lbl_platforms:'选择平台 *', lbl_contentLang:'生成内容语言',
+    lbl_selectClient:'选择客户 *', lbl_contentDirection:'内容方向（选填）',
+    ph_contentDirection:'例如：医疗保险、退休生活…',
+    lbl_platform:'选择平台 *', lbl_contentLangReq:'生成内容语言 *',
+    angleAuto:'内容角度（自动）', changeBtn:'更改', autoOption:'自动（使用轮换）',
+    pillar_Education:'教育', pillar_Product:'产品', pillar_BTS:'幕后花絮', pillar_Customer:'顾客故事',
+    pillar_Lifestyle:'生活方式', pillar_Thought:'思想领导', pillar_Community:'社群互动', pillar_Seasonal:'季节性',
+    pillar_Personal:'个人品牌', pillar_QA:'问答', pillar_Custom:'自定义',
+    gettingStarted:'开始使用', gs_step1:'前往"客户管理" → 建立你的品牌Profile',
+    gs_step2:'已有品牌Profile？直接去"生成内容"开始生成贴文',
+    gs_step3:'想更有策略？设定"内容角度"，系统会自动轮换方向'
   },
   en: {
     dashboard:'Dashboard', clients:'Client Management', discover:'Topics', generate:'Generate', history:'History',
@@ -1113,7 +1172,32 @@ const LANGS = {
     chip_wom:'Word of Mouth', chip_impulse:'Impulse Buyer',
     chip_time:'Time-poor', chip_budget_pain:'Budget Conscious', chip_info:'Info Overload',
     chip_trust:'Low Brand Trust', chip_choice:'Choice Paralysis', chip_motivation:'Lacks Motivation',
-    chip_active:'Active Searcher', chip_passive:'Passive Scroller', chip_social_b:'Community Engager', chip_lurker:'Lurker'
+    chip_active:'Active Searcher', chip_passive:'Passive Scroller', chip_social_b:'Community Engager', chip_lurker:'Lurker',
+    acc_basics:'Brand Basics', acc_audience:'Target Audience', acc_pillars:'Content Angles', acc_rules:'Brand Rules',
+    lbl_clientName:'Client Name *', lbl_industry:'Industry', lbl_brandTone:'Brand Tone *', lbl_brandStory:'Brand Story',
+    lbl_targetAudience:'Target Audience', lbl_competitors:'Competitors', lbl_forbiddenWords:'Forbidden Words', lbl_mustMention:'Must Mention Items',
+    ph_clientName:'Enter client name...', ph_industry:'Select industry...', ph_brandStory:'Brand background, mission, values...',
+    ph_competitors:'Main competitors...', ph_forbiddenWords:'Words to avoid...', ph_mustMention:'e.g., low fees, family-owned, 24/7 support...',
+    industry_beauty:'Beauty & Personal Care', industry_fashion:'Fashion & Apparel', industry_food:'Food & Beverage', industry_tech:'Technology',
+    industry_finance:'Finance & Banking', industry_health:'Health & Wellness', industry_realestate:'Real Estate', industry_travel:'Travel & Tourism',
+    industry_education:'Education', industry_entertainment:'Entertainment', industry_ecommerce:'E-commerce', industry_luxury:'Luxury Goods',
+    industry_fitness:'Fitness & Sports', industry_home:'Home & Living', industry_nonprofit:'Nonprofit', industry_other:'Other',
+    tone_professional:'Professional', tone_casual:'Casual', tone_luxury:'Luxury', tone_energetic:'Energetic',
+    pillarsDesc:'Pick 3–5 content angles. The system rotates through them automatically, keeping content varied and strategic.',
+    pillarCountMin:'{n} / 5 angles selected (min 3)',
+    addAngle:'<span data-i18n="addAngle">+ Add Another Angle</span>',
+    lbl_topic:'Topic / Idea *', ph_topic:'e.g., Spring Collection',
+    lbl_platforms:'Select Platforms *', lbl_contentLang:'Content Language',
+    lbl_selectClient:'Select Client *', lbl_contentDirection:'Content Direction (Optional)',
+    ph_contentDirection:'e.g., Health Insurance, Retirement Life...',
+    lbl_platform:'Select Platform *', lbl_contentLangReq:'Content Language *',
+    angleAuto:'Content Angle (Auto)', changeBtn:'Change', autoOption:'Auto (use rotation)',
+    pillar_Education:'Education', pillar_Product:'Product', pillar_BTS:'Behind-the-Scenes', pillar_Customer:'Customer Stories',
+    pillar_Lifestyle:'Lifestyle', pillar_Thought:'Thought Leadership', pillar_Community:'Community', pillar_Seasonal:'Seasonal',
+    pillar_Personal:'Personal Brand', pillar_QA:'Q&A', pillar_Custom:'Custom',
+    gettingStarted:'Getting Started', gs_step1:'Go to "Client Management" → Build your brand profile',
+    gs_step2:'Already have a profile? Go straight to "Generate" to start posting',
+    gs_step3:'Want more strategy? Set up "Content Angles" for automatic rotation'
   }
 };
 
@@ -1422,7 +1506,67 @@ function updateAllUI() {
     if (t[key]) el.textContent = t[key];
   });
 
+  // Generic data-i18n handler (text content, with optional numbered prefix)
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (!t[key]) return;
+    const prefix = el.getAttribute('data-i18n-prefix');
+    el.textContent = prefix ? (prefix + ' ' + t[key]) : t[key];
+  });
+
+  // Placeholder handler
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
+
+  // Refresh accordion titles (preserve filled state with name/count suffix)
+  refreshAccordionTitles();
+
+  // Refresh pillar card preset dropdowns
+  refreshPillarPresetLabels();
+
+  // Refresh Dashboard Getting Started
+  refreshDashboardText();
+
   updatePageTitle();
+}
+
+function refreshAccordionTitles() {
+  const t = LANGS[currentLang];
+  const name = document.getElementById('clientName')?.value;
+  const basicsTitle = document.getElementById('acc-basics-title');
+  if (basicsTitle) {
+    basicsTitle.textContent = name ? `① ${t.acc_basics} — ${name}` : `① ${t.acc_basics}`;
+  }
+  updatePillarCount();
+}
+
+function refreshPillarPresetLabels() {
+  const t = LANGS[currentLang];
+  const presetMap = {
+    'Education': t.pillar_Education, 'Product': t.pillar_Product,
+    'Behind-the-Scenes': t.pillar_BTS, 'Customer Stories': t.pillar_Customer,
+    'Lifestyle': t.pillar_Lifestyle, 'Thought Leadership': t.pillar_Thought,
+    'Community': t.pillar_Community, 'Seasonal': t.pillar_Seasonal,
+    'Personal Brand': t.pillar_Personal, 'Q&A': t.pillar_QA, 'Custom': t.pillar_Custom
+  };
+  document.querySelectorAll('.pillar-name-select option').forEach(opt => {
+    const translated = presetMap[opt.value];
+    if (translated) opt.textContent = translated;
+  });
+}
+
+function refreshDashboardText() {
+  const t = LANGS[currentLang];
+  const gsTitle = document.getElementById('gsTitle');
+  const gsStep1 = document.getElementById('gsStep1');
+  const gsStep2 = document.getElementById('gsStep2');
+  const gsStep3 = document.getElementById('gsStep3');
+  if (gsTitle) gsTitle.textContent = t.gettingStarted;
+  if (gsStep1) gsStep1.textContent = t.gs_step1;
+  if (gsStep2) gsStep2.textContent = t.gs_step2;
+  if (gsStep3) gsStep3.textContent = t.gs_step3;
 }
 
 function updateStats() {
@@ -2144,7 +2288,7 @@ function updatePillarIndicators() {
     if (genIndicator) genIndicator.style.display = 'block';
     if (genName) genName.textContent = pillar.name;
     if (genOverride) {
-      genOverride.innerHTML = '<option value="">Auto (use rotation)</option>' +
+      genOverride.innerHTML = '<option value="" data-i18n="autoOption">Auto (use rotation)</option>' +
         currentClient.selectedPillars.map((p, i) =>
           `<option value="${i}">${p.name}</option>`
         ).join('');
@@ -2193,7 +2337,7 @@ document.addEventListener('change', function(e) {
       if (indicator) indicator.style.display = 'block';
       if (nameEl) nameEl.textContent = pillar.name;
       if (overrideSel) {
-        overrideSel.innerHTML = '<option value="">Auto (use rotation)</option>' +
+        overrideSel.innerHTML = '<option value="" data-i18n="autoOption">Auto (use rotation)</option>' +
           client.selectedPillars.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
       }
     } else {
