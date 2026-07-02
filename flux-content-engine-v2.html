@@ -3223,43 +3223,54 @@ function generateTopicSuggestions() {
   });
 }
 
-// BUG 2 FIX: 改進 Parser（防止 [Topic 2] 污染）
+// ROBUST PARSER: matchAll + numbered-list fallback
 function parseTopicSuggestions(text) {
   const suggestions = [];
-  const topicRegex = /^\[Topic \d+\]/im;
-  const parts = text.split(topicRegex).filter(p => p.trim());
 
-  parts.forEach((block, index) => {
-    const lines = block.trim().split('\n');
-    let angle = '', title = '', description = '';
+  // ── STRATEGY 1: match [Topic N] blocks (primary format) ──
+  const topicMatches = [...text.matchAll(/\[Topic\s*\d+\]([\s\S]*?)(?=\[Topic\s*\d+\]|$)/gi)];
 
-    lines.forEach((line, i) => {
-      const clean = line.replace(/^\*+|\*+$/g, '').trim();
-      if (/^angle[:\s]/i.test(clean)) {
-        angle = clean.replace(/^angle[:\s]*/i, '').trim();
-      } else if (/^title[:\s]/i.test(clean)) {
-        title = clean.replace(/^title[:\s]*/i, '').trim();
-      } else if (/^desc/i.test(clean)) {
-        description = clean.replace(/^desc[a-z]*[:\s]*/i, '').trim();
-      } else if (i === 0 && !title) {
-        title = clean;
+  if (topicMatches.length >= 2) {
+    topicMatches.forEach((match, index) => {
+      const block = match[1].trim();
+      const lines = block.split('\n').map(l => l.replace(/^\*+|\*+$/g, '').trim()).filter(Boolean);
+      let angle = '', title = '', description = '';
+
+      lines.forEach((line, i) => {
+        if (/^angle[:\s]/i.test(line))       angle       = line.replace(/^angle[:\s]*/i, '').trim();
+        else if (/^title[:\s]/i.test(line))  title       = line.replace(/^title[:\s]*/i, '').trim();
+        else if (/^desc/i.test(line))        description = line.replace(/^desc[a-z]*[:\s]*/i, '').trim();
+        else if (i === 0 && !title)          title       = line;
+      });
+
+      title = title.replace(/\[Topic \d+\]/gi, '').trim();
+      if (title && title.length > 2) {
+        suggestions.push({
+          id: 'topic_' + Date.now() + '_' + index,
+          angle: angle || 'General', title, description
+        });
       }
     });
+  }
 
-    // 清理殘留 [Topic X]
-    title = title.replace(/\[Topic \d+\]/gi, '').trim();
-    description = description.replace(/\[Topic \d+\]/gi, '').trim();
+  // ── STRATEGY 2: fallback — numbered list (1. / 2. / 1) / 2) ) ──
+  if (suggestions.length < 2) {
+    const numberedMatches = [...text.matchAll(/(?:^|\n)\s*\d+[\.\)、]\s*\**([^\n\*]+)\**(?:\n([\s\S]*?))?(?=\n\s*\d+[\.\)、]|$)/gm)];
+    numberedMatches.forEach((match, index) => {
+      const rawTitle = (match[1] || '').trim();
+      const rawDesc  = (match[2] || '').replace(/^\s*(Description|描述|說明)[:\s]*/i, '').split('\n')[0].trim();
+      if (rawTitle.length > 2) {
+        suggestions.push({
+          id: 'topic_fallback_' + index,
+          angle: 'General',
+          title: rawTitle,
+          description: rawDesc || ''
+        });
+      }
+    });
+  }
 
-    if (title && title.length > 2) {
-      suggestions.push({
-        id: 'topic_' + Date.now() + '_' + index,
-        angle: angle || 'General',
-        title,
-        description
-      });
-    }
-  });
-
+  // Deduplicate + cap at 8
   const seen = new Set();
   return suggestions.filter(s => {
     if (seen.has(s.title)) return false;
