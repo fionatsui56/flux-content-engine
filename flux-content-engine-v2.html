@@ -2218,6 +2218,7 @@ function refreshAccordionTitles() {
   const basicsTitle = document.getElementById('acc-basics-title');
   if (basicsTitle) {
     basicsTitle.textContent = name ? `① ${t.acc_basics} — ${name}` : `① ${t.acc_basics}`;
+    basicsTitle.classList.remove('filled');
   }
   updatePillarCount();
 }
@@ -2457,8 +2458,8 @@ function updateClientsList() {
     <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
       <div style="cursor:pointer;flex:1;" onclick="selectClientById('${c.id}')">
         <div style="font-weight:600;color:var(--accent-mint);">${c.name}</div>
-        <div style="font-size:12px;color:var(--secondary);margin-top:4px;">${c.tone}${c.industry ? ' · ' + c.industry : ''}</div>
-        ${c.brandStory ? '<div style="font-size:11px;color:var(--muted);margin-top:2px;">📝 Has story</div>' : ''}
+        <div style="font-size:12px;color:var(--secondary);margin-top:4px;">${getToneLabel(c.tone)}${c.industry ? ' · ' + getIndustryLabel(c.industry) : ''}</div>
+
       </div>
       <div style="display:flex;gap:8px;">
         <button onclick="editClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.color='var(--accent-mint)'" onmouseout="this.style.color='var(--secondary)'">Edit</button>
@@ -3261,6 +3262,35 @@ async function importData() {
 function startKeepAlive() {
   fetch(BACKEND + '/ping').catch(() => {});
   setInterval(() => fetch(BACKEND + '/ping').catch(() => {}), 10 * 60 * 1000);
+}
+
+// ═══════════════════════════════════════════
+// LABEL HELPERS
+// ═══════════════════════════════════════════
+function getToneLabel(tone) {
+  const t = LANGS[currentLang];
+  const map = {
+    professional: t.tone_professional || 'Professional',
+    casual: t.tone_casual || 'Casual',
+    luxury: t.tone_luxury || 'Luxury',
+    energetic: t.tone_energetic || 'Energetic'
+  };
+  return map[tone] || tone || '';
+}
+
+function getIndustryLabel(industry) {
+  const t = LANGS[currentLang];
+  const map = {
+    beauty: t.industry_beauty, fashion: t.industry_fashion,
+    food: t.industry_food, technology: t.industry_tech,
+    finance: t.industry_finance, health: t.industry_health,
+    realestate: t.industry_realestate, travel: t.industry_travel,
+    education: t.industry_education, entertainment: t.industry_entertainment,
+    ecommerce: t.industry_ecommerce, luxury: t.industry_luxury,
+    fitness: t.industry_fitness, home: t.industry_home,
+    nonprofit: t.industry_nonprofit, other: t.industry_other
+  };
+  return map[industry] || industry || '';
 }
 
 // ═══════════════════════════════════════════
