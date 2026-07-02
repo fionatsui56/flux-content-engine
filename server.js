@@ -405,19 +405,21 @@ MUST NOT:
     layer += `\n\n${toneRules[tone]}`;
   }
 
-  if (brandStory) layer += `\nBrand Story: ${brandStory}`;
-  if (targetAudience) layer += `\nTarget Audience: ${targetAudience}`;
-  
-  if (forbiddenWords) {
-    layer += `\n\nFORBIDDEN WORDS (NEVER use these):
-${forbiddenWords}
-Explanation: These words break brand trust. Find alternatives instead.`;
+    // Compress to prevent brand context overwhelming tone rule
+  if (brandStory) {
+    const s = brandStory.length > 120 ? brandStory.substring(0, 117) + '...' : brandStory;
+    layer += `\\nBrand Essence: ${s}`;
   }
-  
-  if (mustMentionItems) {
-    layer += `\n\nMUST MENTION (include in every post if relevant):
-${mustMentionItems}
-These strengthen brand identity. Work them in naturally.`;
+  if (targetAudience) {
+    const a = targetAudience.length > 100 ? targetAudience.substring(0, 97) + '...' : targetAudience;
+    layer += `\\nAudience: ${a}`;
+  }
+  if (forbiddenWords) layer += `\\nFORBIDDEN WORDS: ${forbiddenWords}`;
+  if (mustMentionItems) layer += `\\nMUST MENTION: ${mustMentionItems}`;
+
+  // Tone reminder at end — reinforces tone as primary voice filter
+  if (tone && toneRules[tone]) {
+    layer += `\\n\\n⚠️ TONE PRIORITY: Confirm output matches ${tone.toUpperCase()} tone. Brand context is secondary — TONE is the primary voice filter.`;
   }
 
   return layer;
@@ -508,10 +510,10 @@ app.post('/api/topics', async (req, res) => {
       targetAudience: targetAudience ? targetAudience.substring(0, 60) : '' // 減到 60 chars
     });
 
-    // Pillar as inspiration, not restriction
+    // Pillar as NAME ONLY inspiration — descriptions omitted to prevent topic restriction
     const pillarHint = selectedPillars && selectedPillars.length > 0
-      ? `\nCONTENT ANGLE SUGGESTIONS: Consider these angles — ${selectedPillars.map(p => p.name).join(', ')}`
-      : '';
+      ? `\nCONTENT ANGLES (inspiration only — do NOT limit topics to these): ${selectedPillars.map(p => p.name).join(', ')}`
+      : ''
 
     const langMap = { tc: 'Traditional Chinese', sc: 'Simplified Chinese', en: 'English' };
     const langName = langMap[language] || langMap.tc;
