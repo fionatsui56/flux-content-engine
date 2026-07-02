@@ -1544,6 +1544,16 @@ select {
           <option value="en">English</option>
         </select>
       </div>
+      <div class="form-group">
+        <label class="label" data-i18n="lbl_generateTone">Content Tone</label>
+        <select id="generateTone">
+          <option value="" data-i18n="tone_auto">Follow client setting</option>
+          <option value="professional" data-i18n="tone_professional">Professional</option>
+          <option value="casual" data-i18n="tone_casual">Casual</option>
+          <option value="luxury" data-i18n="tone_luxury">Luxury</option>
+          <option value="energetic" data-i18n="tone_energetic">Energetic</option>
+        </select>
+      </div>
       <button class="button" onclick="generateContent()" id="generateBtn">Generate</button>
       <div id="generatedContent" style="margin-top:24px;"></div>
     </div>
@@ -1758,8 +1768,9 @@ const LANGS = {
     industry_nonprofit: '非營利組織',
     industry_other: '其他',
     
-    // Tones
-    tone_professional: '專業',
+    // Generate page tone override
+    lbl_generateTone: '內容語氣',
+    tone_auto: '跟隨客戶設定',
     tone_casual: '輕鬆',
     tone_luxury: '奢華',
     tone_energetic: '活力',
@@ -1927,8 +1938,9 @@ const LANGS = {
     industry_nonprofit: '非营利组织',
     industry_other: '其他',
     
-    // Tones
-    tone_professional: '专业',
+    // Generate page tone override
+    lbl_generateTone: '内容语气',
+    tone_auto: '跟随客户设定',
     tone_casual: '轻松',
     tone_luxury: '奢华',
     tone_energetic: '活力',
@@ -2096,8 +2108,9 @@ const LANGS = {
     industry_nonprofit: 'Nonprofit',
     industry_other: 'Other',
     
-    // Tones
-    tone_professional: 'Professional',
+    // Generate page tone override
+    lbl_generateTone: 'Content Tone',
+    tone_auto: 'Follow client setting',
     tone_casual: 'Casual',
     tone_luxury: 'Luxury',
     tone_energetic: 'Energetic',
@@ -2597,6 +2610,9 @@ function selectClientById(id) {
 function selectCurrentClient() {
   const id = document.getElementById('selectClient').value;
   currentClient = clients.find(c => c.id === id) || null;
+  // Auto-fill tone dropdown with client default (user can override)
+  const toneEl = document.getElementById('generateTone');
+  if (toneEl) toneEl.value = currentClient ? (currentClient.tone || '') : '';
   updatePillarIndicators();
 }
 
@@ -2911,7 +2927,8 @@ function generateContent() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       topic, clientName: currentClient.name, industry: currentClient.industry,
-      tone: currentClient.tone, brandStory: currentClient.brandStory,
+      tone: document.getElementById('generateTone')?.value || currentClient.tone,
+      brandStory: currentClient.brandStory,
       targetAudience: currentClient.targetAudience, forbiddenWords: currentClient.forbiddenWords,
       mustMentionItems: currentClient.mustMentionItems,
       selectedPillars: currentClient.selectedPillars || [],
@@ -2967,37 +2984,54 @@ function generateContent() {
   });
 }
 
-// BUG 2 + 3 FIX: 改進 Parser（防止 [Topic 2] 污染 + 確保返 8 個）
 function parseVariations(content) {
   const variations = [];
-  
-  // 改用更穩健嘅 split（防止 [Topic X] 喺中間被 capture）
-  const topicRegex = /^\[Topic \d+\]/im;
-  const parts = content.split(topicRegex).filter(p => p.trim());
 
-  parts.forEach((block, index) => {
-    const text = block.trim();
-    if (text) {
-      // 清理殘留嘅 [Topic X]
-      const cleanedText = text.replace(/\[Topic \d+\]/gi, '').trim();
-      variations.push({
-        id: 'var_' + Date.now() + '_' + (index + 1),
-        number: index + 1,
-        content: cleanedText,
-        rating: 0,
-        isBest: false
-      });
-    }
-  });
+  // Match [Variation N] (PLATFORM) blocks
+  const varMatches = [...content.matchAll(/\[Variation\s*(\d+)\]\s*(?:\(([^)]+)\))?([\s\S]*?)(?=\[Variation\s*\d+\]|$)/gi)];
 
-  return variations.length > 0 ? variations : [{
-    id: 'var_' + Date.now() + '_1',
-    number: 1,
-    content: content,
-    rating: 0,
-    isBest: false
-  }];
+  if (varMatches.length >= 1) {
+    varMatches.forEach((match, index) => {
+      const num      = parseInt(match[1]) || (index + 1);
+      const platform = (match[2] || '').trim().toLowerCase();
+      const text     = (match[3] || '').trim();
+      if (text) {
+        variations.push({
+          id: 'var_' + Date.now() + '_' + (index + 1),
+          number: num,
+          platform: platform,
+          content: text,
+          rating: 0,
+          isBest: false
+        });
+      }
+    });
+  }
+
+  // Fallback: no [Variation] markers found — treat whole text as 1 card
+  if (!variations.length) {
+    variations.push({
+      id: 'var_' + Date.now() + '_1',
+      number: 1,
+      platform: '',
+      content: content.trim(),
+      rating: 0,
+      isBest: false
+    });
+  }
+
+  return variations;
 }
+
+const PLATFORM_META = {
+  facebook:    { label: 'Facebook',    color: '#1877F2' },
+  instagram:   { label: 'Instagram',   color: '#E1306C' },
+  threads:     { label: 'Threads',     color: '#aaaaaa' },
+  linkedin:    { label: 'LinkedIn',    color: '#0A66C2' },
+  xiaohongshu: { label: 'XHS',         color: '#FF2442' },
+  xhs:         { label: 'XHS',         color: '#FF2442' },
+  wechat:      { label: 'WeChat',      color: '#07C160' },
+};
 
 function renderVariations() {
   const div = document.getElementById('generatedContent');
@@ -3005,9 +3039,16 @@ function renderVariations() {
 
   let html = `<div class="generated-title">${LANGS[currentLang].generated} (${generatedVariations.length})</div>`;
   generatedVariations.forEach(v => {
+    const meta = PLATFORM_META[v.platform] || null;
+    const platformBadge = meta
+      ? `<span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px;background:${meta.color}22;border:1px solid ${meta.color}55;border-radius:999px;font-size:11px;font-weight:700;color:${meta.color};letter-spacing:0.04em;">
+           <span style="width:6px;height:6px;border-radius:50%;background:${meta.color};flex-shrink:0;"></span>${meta.label}
+         </span>`
+      : `<span style="font-size:12px;color:var(--secondary);">Variation ${v.number}</span>`;
+
     html += `<div class="variation-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div class="variation-title" style="margin-bottom:0;">Variation ${v.number}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        ${platformBadge}
         <button onclick="copyVariation('${v.id}',this)" style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Copy</button>
       </div>
       <div class="variation-content">${v.content}</div>
