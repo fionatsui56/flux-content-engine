@@ -779,7 +779,8 @@ select {
     flex-wrap: wrap;
   }
 
-  .pillar-name-select {
+  .pillar-name-select,
+  .pillar-name-input {
     min-width: 120px;
   }
 
@@ -827,7 +828,8 @@ select {
     padding: 12px;
   }
 
-  .pillar-name-select {
+  .pillar-name-select,
+  .pillar-name-input {
     font-size: 12px;
     padding: 8px;
   }
@@ -1674,10 +1676,11 @@ const LANGS = {
     ph_mustMention: '例如：低費用、家族經營、24/7 支持...',
     ph_contentDirection: '例如：健康保險、退休生活...',
     ph_pillarCta: '此角度的 CTA（例如：DM 我們訂購）',
+    ph_pillarName: '例如：教育型 / 夏季系列 / 品牌故事',
     
     // Buttons & UI
     generate_btn: '生成',
-    pillarsDesc: '為此品牌選擇 3–5 個內容角度。系統會自動輪轉 — 保持內容多樣且有策略。',
+    pillarsDesc: '為此品牌選擇 3–5 個核心內容角度。系統會自動輪轉，保持內容多樣且有策略。如需更多角度（例如新產品線或季節 Campaign），建議開新客戶檔案管理。',
     addAngle: '+ 新增另一個角度',
     angleAuto: '內容角度（自動）',
     changeBtn: '更改',
@@ -1842,10 +1845,11 @@ const LANGS = {
     ph_mustMention: '例如：低费用、家族经营、24/7 支持...',
     ph_contentDirection: '例如：健康保险、退休生活...',
     ph_pillarCta: '此角度的 CTA（例如：DM 我们订购）',
+    ph_pillarName: '例如：教育型 / 夏季系列 / 品牌故事',
     
     // Buttons & UI
     generate_btn: '生成',
-    pillarsDesc: '为此品牌选择 3–5 个内容角度。系统会自动轮转 — 保持内容多样且有策略。',
+    pillarsDesc: '为此品牌选择 3–5 个核心内容角度。系统会自动轮转，保持内容多样且有策略。如需更多角度（例如新产品线或季节 Campaign），建议开新客户档案管理。',
     addAngle: '+ 新增另一个角度',
     angleAuto: '内容角度（自动）',
     changeBtn: '更改',
@@ -2010,10 +2014,11 @@ const LANGS = {
     ph_mustMention: 'e.g., low fees, family-owned, 24/7 support...',
     ph_contentDirection: 'e.g., Health Insurance, Retirement Life...',
     ph_pillarCta: 'CTA for this angle (e.g., DM us to order)',
+    ph_pillarName: 'e.g., Education / Summer Campaign / Brand Story',
     
     // Buttons & UI
     generate_btn: 'Generate',
-    pillarsDesc: 'Pick 3–5 content angles for this brand. The system will rotate through them automatically — keeping your content varied and strategic.',
+    pillarsDesc: 'Pick 3–5 core content angles for this brand. The system rotates through them automatically — keeping your content varied and strategic. For new product lines or seasonal campaigns, create a separate client profile.',
     addAngle: '+ Add Another Angle',
     angleAuto: 'Content Angle (Auto)',
     changeBtn: 'Change',
@@ -2323,36 +2328,9 @@ function refreshAccordionTitles() {
   updatePillarCount();
 }
 
-// NEW FUNCTION (BUG 1 FIX)
+// NEW FUNCTION (BUG 1 FIX) — no-op since pillar names are now free text inputs
 function refreshPillarPresetLabels() {
-  const t = LANGS[currentLang];
-  const presetMap = {
-    'Education': t.pillar_Education || 'Education',
-    'Product': t.pillar_Product || 'Product',
-    'Behind-the-Scenes': t.pillar_BTS || 'Behind-the-Scenes',
-    'Customer Stories': t.pillar_Customer || 'Customer Stories',
-    'Lifestyle': t.pillar_Lifestyle || 'Lifestyle',
-    'Thought Leadership': t.pillar_Thought || 'Thought Leadership',
-    'Community': t.pillar_Community || 'Community',
-    'Seasonal': t.pillar_Seasonal || 'Seasonal',
-    'Personal Brand': t.pillar_Personal || 'Personal Brand',
-    'Q&A': t.pillar_QA || 'Q&A',
-  };
-  
-  // Re-render all pillar dropdowns
-  document.querySelectorAll('.pillar-name-select').forEach(sel => {
-    const currentValue = sel.value;
-    sel.innerHTML = [
-      ...PILLAR_PRESETS.map(p => `
-        <option value="${p.name}" ${currentValue === p.name ? 'selected' : ''}>
-          ${presetMap[p.name] || p.name}
-        </option>
-      `),
-      `<option value="Custom" ${currentValue === 'Custom' ? 'selected' : ''}>
-        ${t.pillar_Custom || 'Custom'}
-      </option>`
-    ].join('');
-  });
+  // Pillar names are free text — no dropdown labels to refresh
 }
 
 function refreshDashboardText() {
@@ -2721,38 +2699,21 @@ function addPillarCard(name, description, checked, cta) {
   if (idx >= 5) { alert('Maximum 5 content angles allowed.'); return; }
 
   const isChecked = checked !== undefined ? checked : true;
-  const presetName = name || (PILLAR_PRESETS[idx] ? PILLAR_PRESETS[idx].name : 'Custom');
-  const presetPlaceholder = PILLAR_PRESETS[idx] ? PILLAR_PRESETS[idx].placeholder : 'Describe this content angle...';
   const t = LANGS[currentLang];
-  
-  // Get pillar label translation
-  const presetMap = {
-    'Education': t.pillar_Education || 'Education',
-    'Product': t.pillar_Product || 'Product',
-    'Behind-the-Scenes': t.pillar_BTS || 'Behind-the-Scenes',
-    'Customer Stories': t.pillar_Customer || 'Customer Stories',
-    'Lifestyle': t.pillar_Lifestyle || 'Lifestyle',
-    'Thought Leadership': t.pillar_Thought || 'Thought Leadership',
-    'Community': t.pillar_Community || 'Community',
-    'Seasonal': t.pillar_Seasonal || 'Seasonal',
-    'Personal Brand': t.pillar_Personal || 'Personal Brand',
-    'Q&A': t.pillar_QA || 'Q&A',
-  };
+  const namePlaceholder = t.ph_pillarName || 'e.g., Education / Summer Campaign';
+  const descPlaceholder = 'Describe this content angle...';
 
   const card = document.createElement('div');
   card.className = 'pillar-card' + (isChecked ? ' selected' : '');
   card.innerHTML = `
     <div class="pillar-card-header">
       <input type="checkbox" class="pillar-checkbox" ${isChecked ? 'checked' : ''} onchange="togglePillarCard(this)">
-      <select class="pillar-name-select">
-        ${PILLAR_PRESETS.map(p => `<option value="${p.name}" ${p.name === presetName ? 'selected' : ''}>${presetMap[p.name] || p.name}</option>`).join('')}
-        <option value="Custom" ${!PILLAR_PRESETS.find(p=>p.name===presetName) ? 'selected' : ''}>${t.pillar_Custom || 'Custom'}</option>
-      </select>
+      <input type="text" class="pillar-name-input" placeholder="${namePlaceholder}" maxlength="40" value="${name || ''}" style="flex:1;padding:6px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--primary);font-family:inherit;font-size:13px;font-weight:600;outline:none;">
       <button onclick="removePillarCard(this)" style="padding:4px 8px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;font-family:inherit;" title="Remove">×</button>
     </div>
-    <textarea class="pillar-desc-input" placeholder="${presetPlaceholder}" maxlength="150">${description || ''}</textarea>
+    <textarea class="pillar-desc-input" placeholder="${descPlaceholder}" maxlength="150">${description || ''}</textarea>
     <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:3px;">max 150 chars</div>
-    <input type="text" class="pillar-cta-input" data-i18n-placeholder="ph_pillarCta" placeholder="CTA for this angle (e.g., DM us to order)" maxlength="60" value="${cta || ''}" style="width:100%;margin-top:8px;padding:8px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--primary);font-family:inherit;font-size:12px;outline:none;">`;
+    <input type="text" class="pillar-cta-input" placeholder="${t.ph_pillarCta || 'CTA for this angle'}" maxlength="60" value="${cta || ''}" style="width:100%;margin-top:8px;padding:8px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;color:var(--primary);font-family:inherit;font-size:12px;outline:none;">`;
 
   grid.appendChild(card);
   updatePillarCount();
@@ -2794,12 +2755,13 @@ function getPillarData() {
   [...grid.querySelectorAll('.pillar-card')].forEach((card, idx) => {
     const checkbox = card.querySelector('.pillar-checkbox');
     if (!checkbox.checked) return;
-    const nameSelect = card.querySelector('.pillar-name-select');
+    const nameInput = card.querySelector('.pillar-name-input');
     const descInput = card.querySelector('.pillar-desc-input');
     const ctaInput = card.querySelector('.pillar-cta-input');
+    const name = nameInput ? nameInput.value.trim() : '';
     pillars.push({
       id: 'pillar_' + Date.now() + '_' + idx,
-      name: nameSelect.value,
+      name: name || 'Pillar ' + (idx + 1),
       description: descInput.value.trim(),
       cta: ctaInput ? ctaInput.value.trim() : '',
       lastUsed: null
@@ -2815,9 +2777,10 @@ function loadPillarData(pillars) {
   if (pillars && pillars.length > 0) {
     pillars.forEach(p => addPillarCard(p.name, p.description, true, p.cta));
   } else {
-    addPillarCard('Education', '', true, '');
-    addPillarCard('Product', '', true, '');
-    addPillarCard('Behind-the-Scenes', '', true, '');
+    // 3 blank cards for new clients
+    addPillarCard('', '', true, '');
+    addPillarCard('', '', true, '');
+    addPillarCard('', '', true, '');
   }
   updatePillarCount();
 }
