@@ -837,6 +837,38 @@ select {
   }
 }
 
+/* ── CLIENT TABS ── */
+.client-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.client-tab {
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.client-tab:hover {
+  color: var(--primary);
+}
+
+.client-tab.active {
+  color: var(--accent-mint);
+  border-bottom-color: var(--accent-mint);
+}
+
 /* ── ACCORDION ── */
 .accordion-section {
   border: 1px solid var(--border);
@@ -1260,6 +1292,21 @@ select {
 
     <!-- CLIENT MANAGEMENT -->
     <div class="section" id="clients">
+
+      <!-- TAB BAR -->
+      <div class="client-tabs">
+        <button class="client-tab active" id="tab-list" onclick="switchClientTab('list')" data-i18n="tab_myClients">My Clients</button>
+        <button class="client-tab" id="tab-form" onclick="switchClientTab('form')" data-i18n="tab_addNew">+ Add New</button>
+      </div>
+
+      <!-- LIST PANEL (default) -->
+      <div id="clientListPanel">
+        <div id="clientsList"></div>
+      </div>
+
+      <!-- FORM PANEL -->
+      <div id="clientFormPanel" style="display:none;">
+
       <!-- ACCORDION 1: Brand Basics -->
       <div class="accordion-section" id="acc-basics">
         <div class="accordion-header open" onclick="toggleAccordion('acc-basics')">
@@ -1446,8 +1493,7 @@ select {
       <button class="button" id="saveClientBtn" onclick="saveClient()">Add Client</button>
       <div id="clientSaveStatus" style="margin-top:10px; font-size:12px; color:var(--accent-mint); display:none;"></div>
 
-      <h2 style="color:var(--accent-mint); margin-top:28px; font-size:18px; margin-bottom:16px;" id="yourClientsHeader" data-i18n="yourClients">Your Clients</h2>
-      <div id="clientsList"></div>
+      </div><!-- end clientFormPanel -->
     </div>
 
     <!-- GENERATE -->
@@ -1727,6 +1773,12 @@ const LANGS = {
     editBtn: '編輯',
     deleteBtn: '刪除',
     
+    // Client tab labels
+    tab_myClients: '我的客戶',
+    tab_addNew: '＋ 新增客戶',
+    noClientsYet: '暫無客戶',
+    addFirstClient: '新增第一個客戶，馬上開始生成內容',
+    
     // Sidebar buttons
     backup: '備份',
     importBtn: '匯入',
@@ -1889,6 +1941,12 @@ const LANGS = {
     editBtn: '编辑',
     deleteBtn: '删除',
     
+    // Client tab labels
+    tab_myClients: '我的客户',
+    tab_addNew: '＋ 新增客户',
+    noClientsYet: '暂无客户',
+    addFirstClient: '新增第一个客户，马上开始生成内容',
+    
     // Sidebar buttons
     backup: '备份',
     importBtn: '导入',
@@ -2050,6 +2108,12 @@ const LANGS = {
     // Client list buttons
     editBtn: 'Edit',
     deleteBtn: 'Delete',
+    
+    // Client tab labels
+    tab_myClients: 'My Clients',
+    tab_addNew: '+ Add New',
+    noClientsYet: 'No clients yet',
+    addFirstClient: 'Add your first client to start generating content',
     
     // Sidebar buttons
     backup: 'Backup',
@@ -2432,6 +2496,7 @@ async function saveClient() {
 
   await loadClients();
   showSaving('Saved ✓');
+  switchClientTab('list');
 }
 
 async function saveContent(entry) {
@@ -2478,7 +2543,29 @@ function switchTab(tab) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navIdx = ['dashboard', 'clients', 'discover', 'generate', 'history'].indexOf(tab);
   if (navIdx >= 0) document.querySelectorAll('.nav-item')[navIdx].classList.add('active');
+  // When switching to clients, always land on list panel
+  if (tab === 'clients') switchClientTab('list');
   updatePageTitle();
+}
+
+function switchClientTab(panel) {
+  const listPanel = document.getElementById('clientListPanel');
+  const formPanel = document.getElementById('clientFormPanel');
+  const tabList = document.getElementById('tab-list');
+  const tabForm = document.getElementById('tab-form');
+  if (!listPanel || !formPanel) return;
+  if (panel === 'list') {
+    listPanel.style.display = 'block';
+    formPanel.style.display = 'none';
+    tabList.classList.add('active');
+    tabForm.classList.remove('active');
+  } else {
+    listPanel.style.display = 'none';
+    formPanel.style.display = 'block';
+    tabList.classList.remove('active');
+    tabForm.classList.add('active');
+    document.getElementById('clientName').focus();
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -2486,8 +2573,22 @@ function switchTab(tab) {
 // ═══════════════════════════════════════════
 function updateClientsList() {
   const list = document.getElementById('clientsList');
+  const tabListBtn = document.getElementById('tab-list');
+  const t = LANGS[currentLang];
+  
+  // Update tab label with count
+  if (tabListBtn) {
+    const baseLabel = t.tab_myClients || 'My Clients';
+    tabListBtn.textContent = clients.length > 0 ? `${baseLabel} (${clients.length})` : baseLabel;
+  }
+  
   if (!clients.length) {
-    list.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:16px 0;">No clients yet. Add your first client above.</div>';
+    list.innerHTML = `<div style="text-align:center;padding:48px 0;">
+      <div style="font-size:32px;margin-bottom:16px;">👥</div>
+      <div style="color:var(--primary);font-weight:600;margin-bottom:8px;font-size:15px;">${t.noClientsYet || 'No clients yet'}</div>
+      <div style="color:var(--secondary);font-size:13px;margin-bottom:20px;">${t.addFirstClient || 'Add your first client to get started'}</div>
+      <button onclick="switchClientTab('form')" style="padding:10px 24px;background:var(--grad);color:#0d1521;border:none;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;">${t.tab_addNew || '+ Add New'}</button>
+    </div>`;
     return;
   }
   list.innerHTML = clients.map(c => `
@@ -2537,8 +2638,8 @@ function editClient(id) {
   loadPillarData(c.selectedPillars || []);
   editingClientId = id;
   document.getElementById('saveClientBtn').textContent = LANGS[currentLang].updateClient;
-  document.getElementById('clientName').focus();
   switchTab('clients');
+  switchClientTab('form');
 }
 
 async function deleteClient(id) {
