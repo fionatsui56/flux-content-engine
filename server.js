@@ -599,11 +599,28 @@ app.post('/api/generate', async (req, res) => {
             forbiddenWords, mustMentionItems, platforms, language,
             selectedPillars, pillarRotationIndex } = req.body;
 
-    // BUG 5 FIX: Force SC for XHS + WeChat
+    // Per-platform language: XHS/WeChat always SC; other platforms follow user selection
     const mainlandPlatforms = platforms.filter(p => ['xiaohongshu', 'wechat'].includes(p));
-    if (mainlandPlatforms.length > 0) {
-      console.log(`Force SC for Mainland platforms: ${mainlandPlatforms.join(',')}`);
-      language = 'sc'; // 強制簡體
+    const otherPlatforms    = platforms.filter(p => !['xiaohongshu', 'wechat'].includes(p));
+
+    const langMap = {
+      tc: 'Traditional Chinese (繁體中文)',
+      sc: 'Simplified Chinese (簡體中文)',
+      en: 'English'
+    };
+
+    let langInstruction = '';
+    if (mainlandPlatforms.length > 0 && otherPlatforms.length > 0) {
+      // Mixed platforms: specify per-platform
+      langInstruction = `LANGUAGE RULES (per platform — strictly follow):
+- ${otherPlatforms.map(p => p.toUpperCase()).join(' / ')}: ${langMap[language] || langMap.tc} — authentic grammar and vocabulary for this language
+- ${mainlandPlatforms.map(p => p.toUpperCase()).join(' / ')}: Simplified Chinese (簡體中文) ONLY — authentic mainland vocabulary, NO Hong Kong or Taiwan terms`;
+    } else if (mainlandPlatforms.length > 0) {
+      // All mainland only
+      language = 'sc';
+      langInstruction = `LANGUAGE: Simplified Chinese (簡體中文) ONLY — authentic mainland vocabulary, NO Hong Kong or Taiwan terms`;
+    } else {
+      langInstruction = `LANGUAGE: ${langMap[language] || langMap.tc} — every word must be in this language. No English words except brand names.`;
     }
 
     const layer1 = buildLayer1(platforms, language);
@@ -616,12 +633,6 @@ app.post('/api/generate', async (req, res) => {
     const pillarLayer = buildPillarLayer(selectedPillars || [], pillarRotationIndex || 0);
 
     const layer3 = buildLayer3(platforms, topic, industry);
-
-    const langMap = {
-      tc: 'Traditional Chinese (繁體中文)',
-      sc: 'Simplified Chinese (簡體中文)',
-      en: 'English'
-    };
 
     const variationFormat = platforms.map((p, i) =>
       `[Variation ${i + 1}] (${p.toUpperCase()})\n[Write ${p} content here]`
@@ -636,10 +647,9 @@ ${layer2}
 ${pillarLayer ? pillarLayer + '\n\n' : ''}${layer3 ? layer3 + '\n\n' : ''}=== GENERATION TASK ===
 Topic: "${topic}"
 Platforms: ${platforms.join(', ')}
-Language: ${langMap[language] || langMap.tc}
 
-⚠️ LANGUAGE ENFORCEMENT: Every word of the output MUST be in ${langMap[language] || langMap.tc}.
-Do NOT switch to English mid-sentence. Do NOT use English adjectives or filler words.
+⚠️ ${langInstruction}
+Do NOT mix languages between platforms unless specified above.
 Exception: Brand names, proper nouns, platform names only.
 
 Generate ONE variation per platform (${platforms.length} total).
