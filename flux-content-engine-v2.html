@@ -913,8 +913,8 @@ select {
 }
 
 .pillar-card.selected {
-  border-color: var(--accent-mint);
-  background: rgba(205, 255, 216, 0.04);
+  border-color: var(--border-mid);
+  background: var(--bg-dark);
 }
 
 .pillar-card-header {
@@ -1212,9 +1212,9 @@ select {
         <div class="user-email" id="userEmail">Loading...</div>
       </div>
       <div class="sidebar-btns">
-        <button class="sidebar-btn" onclick="exportData()">Backup</button>
-        <button class="sidebar-btn" onclick="importData()">Import</button>
-        <button class="sidebar-btn logout" onclick="handleLogout()">Sign Out</button>
+        <button class="sidebar-btn" onclick="exportData()" data-i18n="backup">Backup</button>
+        <button class="sidebar-btn" onclick="importData()" data-i18n="importBtn">Import</button>
+        <button class="sidebar-btn logout" onclick="handleLogout()" data-i18n="signOut">Sign Out</button>
       </div>
     </div>
   </div>
@@ -1415,7 +1415,7 @@ select {
           <div style="font-size:12px;color:var(--secondary);margin-bottom:14px;line-height:1.6;">
             <span data-i18n="pillarsDesc">Pick 3–5 content angles for this brand. The system will rotate through them automatically — keeping your content varied and strategic.</span>
           </div>
-          <div class="pillar-count" id="pillarCount">0 / 5 angles selected (min 3)</div>
+          <div class="pillar-count" id="pillarCount" style="display:none;">0 / 5 angles selected (min 3)</div>
           <div class="pillar-grid" id="pillarGrid"></div>
           <button onclick="addPillarCard()" style="padding:8px 16px;background:transparent;border:1px dashed var(--border-mid);color:var(--secondary);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(205,255,216,0.3)';this.style.color='var(--accent-mint)'" onmouseout="this.style.borderColor='var(--border-mid)';this.style.color='var(--secondary)'"><span data-i18n="addAngle">+ Add Another Angle</span></button>
         </div>
@@ -1446,7 +1446,7 @@ select {
       <button class="button" id="saveClientBtn" onclick="saveClient()">Add Client</button>
       <div id="clientSaveStatus" style="margin-top:10px; font-size:12px; color:var(--accent-mint); display:none;"></div>
 
-      <h2 style="color:var(--accent-mint); margin-top:28px; font-size:18px; margin-bottom:16px;" id="yourClientsHeader">Your Clients</h2>
+      <h2 style="color:var(--accent-mint); margin-top:28px; font-size:18px; margin-bottom:16px;" id="yourClientsHeader" data-i18n="yourClients">Your Clients</h2>
       <div id="clientsList"></div>
     </div>
 
@@ -1551,7 +1551,7 @@ select {
           <option value="en">English</option>
         </select>
       </div>
-      <button class="button" onclick="generateTopicSuggestions()" id="generateTopicsBtn">Generate Topic Suggestions</button>
+      <button class="button" onclick="generateTopicSuggestions()" id="generateTopicsBtn" data-i18n="generateTopics_btn">Generate Topic Suggestions</button>
       <div id="topicSuggestions" style="margin-top:24px;"></div>
     </div>
   </div>
@@ -1722,6 +1722,18 @@ const LANGS = {
     gs_step1: '進入「客戶管理」→ 建立你的品牌檔案',
     gs_step2: '設定 3–5 個內容角度（支柱）',
     gs_step3: '進入「生成」→ 選擇平台並輸入話題',
+    
+    // Client list buttons
+    editBtn: '編輯',
+    deleteBtn: '刪除',
+    
+    // Sidebar buttons
+    backup: '備份',
+    importBtn: '匯入',
+    signOut: '登出',
+    
+    // Topics button
+    generateTopics_btn: '生成話題建議',
   },
   
   sc: {
@@ -1872,6 +1884,18 @@ const LANGS = {
     gs_step1: '进入「客户管理」→ 建立你的品牌档案',
     gs_step2: '设定 3–5 个内容角度（支柱）',
     gs_step3: '进入「生成」→ 选择平台并输入话题',
+    
+    // Client list buttons
+    editBtn: '编辑',
+    deleteBtn: '删除',
+    
+    // Sidebar buttons
+    backup: '备份',
+    importBtn: '导入',
+    signOut: '退出',
+    
+    // Topics button
+    generateTopics_btn: '生成话题建议',
   },
   
   en: {
@@ -2022,6 +2046,18 @@ const LANGS = {
     gs_step1: 'Go to "Client Management" → Build your brand profile',
     gs_step2: 'Set up 3–5 content angles (Pillars)',
     gs_step3: 'Go to "Generate" → Pick platforms and write a topic',
+    
+    // Client list buttons
+    editBtn: 'Edit',
+    deleteBtn: 'Delete',
+    
+    // Sidebar buttons
+    backup: 'Backup',
+    importBtn: 'Import',
+    signOut: 'Sign Out',
+    
+    // Topics button
+    generateTopics_btn: 'Generate Topic Suggestions',
   }
 };
 
@@ -2462,8 +2498,8 @@ function updateClientsList() {
 
       </div>
       <div style="display:flex;gap:8px;">
-        <button onclick="editClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.color='var(--accent-mint)'" onmouseout="this.style.color='var(--secondary)'">Edit</button>
-        <button onclick="deleteClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:rgba(255,107,107,0.6);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;">Delete</button>
+        <button onclick="editClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.color='var(--accent-mint)'" onmouseout="this.style.color='var(--secondary)'">${LANGS[currentLang].editBtn || 'Edit'}</button>
+        <button onclick="deleteClient('${c.id}')" style="padding:6px 14px;background:transparent;border:1px solid var(--border-mid);color:rgba(255,107,107,0.6);border-radius:999px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;">${LANGS[currentLang].deleteBtn || 'Delete'}</button>
       </div>
     </div>`).join('');
 }
@@ -2645,13 +2681,8 @@ function updatePillarCount() {
 
   const title = document.getElementById('acc-pillars-title');
   if (title) {
-    if (selected >= 3) {
-      title.textContent = `③ ${LANGS[currentLang].acc_pillars} — ${selected} selected ✓`;
-      title.classList.add('filled');
-    } else {
-      title.textContent = `③ ${LANGS[currentLang].acc_pillars}`;
-      title.classList.remove('filled');
-    }
+    title.textContent = `③ ${LANGS[currentLang].acc_pillars}`;
+    title.classList.remove('filled');
   }
 }
 
@@ -3111,7 +3142,7 @@ function generateTopicSuggestions() {
   .then(r => r.json())
   .then(data => {
     btn.disabled = false;
-    btn.textContent = 'Generate Topic Suggestions';
+    btn.textContent = LANGS[currentLang].generateTopics_btn || 'Generate Topic Suggestions';
     
     if (!data.success) {
       alert('Error: ' + (data.error || 'Unknown error'));
@@ -3123,7 +3154,7 @@ function generateTopicSuggestions() {
   })
   .catch(err => {
     btn.disabled = false;
-    btn.textContent = 'Generate Topic Suggestions';
+    btn.textContent = LANGS[currentLang].generateTopics_btn || 'Generate Topic Suggestions';
     alert('Error: ' + err.message);
   });
 }
