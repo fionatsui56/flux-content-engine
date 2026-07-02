@@ -30,9 +30,9 @@ async function sbFetch(path, method, body) {
 app.get('/ping', (req, res) => res.json({ status: 'alive', time: new Date().toISOString() }));
 app.get('/', (req, res) => res.json({ service: 'Flux Strategy Content Engine', version: '2.1', status: 'running' }));
 
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // CLIENTS CRUD
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 
 // GET /api/clients?user_id=xxx
 app.get('/api/clients', async (req, res) => {
@@ -120,9 +120,9 @@ app.post('/api/clients/:id/advance-pillar', async (req, res) => {
   res.json({ success: true, next_index: nextIndex });
 });
 
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // CONTENT CRUD
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 
 app.get('/api/content', async (req, res) => {
   const { user_id } = req.query;
@@ -161,9 +161,9 @@ app.get('/api/content/count', async (req, res) => {
   res.json({ success: true, count: parseInt(count) });
 });
 
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // AI ENGINE — GEMINI + CLAUDE CASCADE
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 
 async function callGemini(prompt, maxTokens) {
   const key = process.env.GEMINI_API_KEY;
@@ -191,7 +191,6 @@ async function callGemini(prompt, maxTokens) {
       if (d.error) {
         console.log(`Gemini ${model} failed: ${d.error.message}`);
         lastError = d.error.message;
-        // Wait 1s before trying next model
         await new Promise(resolve => setTimeout(resolve, 1000));
         continue;
       }
@@ -212,213 +211,234 @@ async function callGemini(prompt, maxTokens) {
 async function callAI(prompt, maxTokens, retries = 2) {
   maxTokens = maxTokens || 3000;
 
-  // Try Claude first if available
-  if (process.env.ANTHROPIC_API_KEY) {
+  try {
+    return await callGemini(prompt, maxTokens);
+  } catch (geminiErr) {
+    console.log(`Gemini failed: ${geminiErr.message}. Trying Claude...`);
+    
+    if (retries <= 0) throw geminiErr;
+    
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const claudeKey = process.env.ANTHROPIC_API_KEY;
+      if (!claudeKey) throw new Error('No Anthropic API key');
+      
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'x-api-key': claudeKey,
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: maxTokens,
+          max_tokens: maxTokens || 3000,
           messages: [{ role: 'user', content: prompt }]
         })
       });
-      const data = await response.json();
-      if (!data.error) return { text: data.content[0].text, provider: 'claude' };
-      console.error('Claude error:', data.error.message);
-    } catch (err) {
-      console.error('Claude failed:', err.message);
+      
+      if (!r.ok) throw new Error(`Claude API error: ${r.status}`);
+      const d = await r.json();
+      const text = d.content?.[0]?.text;
+      if (!text) throw new Error('Empty Claude response');
+      console.log('Claude OK');
+      return { text, provider: 'claude', model: 'claude-sonnet-4-20250514' };
+    } catch (claudeErr) {
+      console.log(`Claude failed: ${claudeErr.message}`);
+      throw claudeErr;
     }
   }
-
-  // Gemini with retry
-  if (process.env.GEMINI_API_KEY) {
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        console.log(`Gemini attempt ${attempt}/${retries}`);
-        return await callGemini(prompt, maxTokens);
-      } catch (err) {
-        console.error(`Gemini attempt ${attempt} failed: ${err.message}`);
-        if (attempt < retries) {
-          await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
-        }
-      }
-    }
-  }
-
-  throw new Error('All AI providers failed. Please try again.');
 }
 
-// ════════════════════════════════════════════════════
-// B2: ENHANCED PROMPT BUILDER (4 LAYERS)
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// PROMPT BUILDER — 3-LAYER ARCHITECTURE
+// ════════════════════════════════════════════
 
-function buildLayer1(platforms, lang) {
-  const platformRules = {
-    facebook: `FACEBOOK:
-- Length: 100-200 words (300+ OK for long-form)
-- Hook: MUST open with question, bold statement, or story
-- Hashtags: 2-3 only
-- Style: Conversational, story-driven, warm
-- CTA: Question that drives comments`,
-
-    instagram: `INSTAGRAM:
-- Length: 50-100 words (hook MUST land in first 125 chars)
-- Hashtags: 8-10 at end
-- Style: Concise, visual-forward, emoji-rich
-- Line breaks between every sentence
-- CTA: Drive SAVES ("Save this")`,
-
-    threads: `THREADS:
-- Length: Under 80 words
-- Hashtags: 0-3 max
-- Style: Extremely casual, like texting a friend
-- Fragments OK. Open-ended is better than concluded.
-- NEVER corporate tone`,
-
-    linkedin: `LINKEDIN:
-- Length: 150-250 words
-- Hook in first 210 chars (before "see more")
-- Hashtags: 3-5 precise ones
-- Style: Professional but personal, thought-leadership
-- Must end with a genuine question`,
-
-    xiaohongshu: `XIAOHONGSHU (RED):
-- Length: 150-250 words
-- Title: MUST use 【】brackets e.g.【這個方法有效！】
-- Hashtags: 8-15, Chinese/English mix, at end
-- Emoji: After every key point
-- Style: 種草 — friend sharing a discovery
-- MAINLAND SIMPLIFIED CHINESE ONLY (no HK vocab)
-- FORBIDDEN: 最/第一/唯一/保證/限時特惠`,
-
-    wechat: `WECHAT MOMENTS:
-- Length: 80-150 words
-- NO hashtags (not supported)
-- Style: Warm, personal, first-person
-- MAINLAND SIMPLIFIED CHINESE ONLY
-- End with soft question: 「你呢？」
-- FORBIDDEN: Promotional language, superlatives`
+// LAYER 1: Platform + Language rules
+function buildLayer1(platforms, language) {
+  const langMap = { 
+    tc: 'Traditional Chinese (繁體中文)', 
+    sc: 'Simplified Chinese (簡體中文)', 
+    en: 'English' 
   };
+  const langName = langMap[language] || 'Traditional Chinese';
 
-  const langRules = {
-    tc: `LANGUAGE — Traditional Chinese (HK) — STRICT:
-⚠️ OUTPUT IN TRADITIONAL CHINESE ONLY. NO English words, NO English phrases.
-- Exception: Brand names, product names, platform names (e.g., Instagram) are OK
-- Hashtags: Chinese hashtags preferred; English hashtags only if standard in HK
-- Professional tone: 書面語 (formal written Chinese)
-- Casual/Energetic: Natural HK Cantonese style
-- NEVER use: Taiwan expressions (棒、讚、超級、哦)
-- If you want to say "hashtag" — write # directly, not the word "hashtag"`,
-    sc: `LANGUAGE — Simplified Chinese (Mainland) — STRICT:
-⚠️ OUTPUT IN SIMPLIFIED CHINESE ONLY. NO English words, NO English phrases.
-- Exception: Brand names, product names, platform names (e.g., Instagram) are OK
-- Hashtags: Chinese hashtags preferred; English hashtags only if native to XHS culture
-- Write as NATIVE mainland Chinese, not just character conversion
-- Sound like 小红书/WeChat native content
-- AVOID: HK expressions (冇、靠、得唔得、係咁先), Taiwan expressions (棒、讚)
-- Use: 很棒 not 好正 | 没问题 not 冇問題 | 试试看 not 試吓`,
-    en: `LANGUAGE — English (Hong Kong):
-- British spelling: colour, organisation, realise
-- AVOID American jargon: leverage, synergise, game-changer
-- AVOID AI clichés: "thrilled to share", "In today's world"
-- Direct, clear, approachable tone`
-  };
+  let rules = `=== LAYER 1: PLATFORM & LANGUAGE RULES ===
 
-  const antiAI = `
-ANTI-AI WRITING (CRITICAL — supersedes all other rules):
-- Sound like a REAL HUMAN, not a corporate announcement
-- Use specific details and concrete moments (not vague descriptions)
-- Vary sentence length naturally
-- NO markdown formatting: no **, no ##
-- FORBIDDEN: "In conclusion", "Game-changer", "Unlock potential", "Leverage", "Synergy", "I'm thrilled"
-- Open with a story, question, specific moment, or bold opinion`;
+LANGUAGE: ${langName} ONLY
+⚠️ CRITICAL: Every single word must be in ${langName}
+✗ FORBIDDEN: English words (except brand/product names)
+✗ FORBIDDEN: Code-switching (mixing languages)
+✗ FORBIDDEN: Inappropriate vocabulary for this variant`;
 
-  const selectedRules = platforms.filter(p => platformRules[p]).map(p => platformRules[p]).join('\n\n');
-  return `=== LAYER 1: PLATFORM & LANGUAGE RULES ===\n${selectedRules}\n\n${langRules[lang] || langRules['tc']}\n${antiAI}`;
+  if (language === 'tc') {
+    rules += `\n\nTRADITIONAL CHINESE (Hong Kong):
+✓ Use Hong Kong grammar & vocabulary
+✓ Natural Hong Kong phrasing (conversational or formal depending on tone)
+✗ FORBIDDEN: Simplified Chinese characters
+✗ FORBIDDEN: Mainland slang`;
+  }
+  
+  if (language === 'sc') {
+    rules += `\n\nSIMPLIFIED CHINESE (Mainland):
+✓ Use Mainland grammar & vocabulary
+✓ Native Mainland phrasing
+✗ FORBIDDEN: Traditional Chinese characters
+✗ FORBIDDEN: Hong Kong colloquialisms`;
+  }
+
+  // Platform-specific rules
+  const platformRules = [];
+  if (platforms.includes('facebook')) {
+    platformRules.push(`FACEBOOK:
+- Conversational, community-focused tone
+- Call-to-action encouraged (Link, Comment, Share)
+- Emojis welcome (1-3 per post)
+- Length: 150-300 words`);
+  }
+  if (platforms.includes('instagram')) {
+    platformRules.push(`INSTAGRAM:
+- Visual storytelling (write for image context)
+- Hashtags: 5-10 relevant tags
+- Emoji use natural and modest
+- Captions: 100-200 words
+- Use line breaks for readability`);
+  }
+  if (platforms.includes('xiaohongshu')) {
+    platformRules.push(`XIAOHONGSHU (Little Red Book):
+- Authentic, real-person voice (避免 AI 感)
+- Discovery-focused hashtags (#話題)
+- Emoji use high (2-5 per post)
+- Mention benefits/experiences naturally
+- Length: 200-400 words`);
+  }
+  if (platforms.includes('wechat')) {
+    platformRules.push(`WECHAT:
+- Intimate, personal tone
+- Stories > Hard sell
+- Use line breaks generously
+- Emoji: subtle, 1-2
+- Call-to-action: subtle (reply, share with group)
+- Length: 150-300 words`);
+  }
+  if (platforms.includes('linkedin')) {
+    platformRules.push(`LINKEDIN:
+- Professional, thought-leader voice
+- Industry insights prioritized
+- Educational or motivational angle
+- Emoji: minimal or none
+- Length: 200-400 words`);
+  }
+  if (platforms.includes('threads')) {
+    platformRules.push(`THREADS:
+- Conversational, Twitter-like brevity
+- Thread structure (use line breaks)
+- Emoji welcome
+- Length: 100-200 words per post
+- Can be opinionated or witty`);
+  }
+
+  if (platformRules.length > 0) {
+    rules += `\n\n${platformRules.join('\n\n')}`;
+  }
+
+  return rules;
 }
 
-function buildLayer2(client) {
-  const toneDescriptions = {
-    professional: 'Professional & trustworthy — authoritative but approachable',
-    casual: 'Casual & friendly — conversational, warm, relatable',
-    luxury: 'Luxury & premium — elegant, aspirational, refined',
-    energetic: 'Energetic & bold — high energy, action-oriented'
+// LAYER 2: Brand context + Tone enforcement (BUG 4 FIX)
+function buildLayer2(opts) {
+  const { clientName, industry, tone, brandStory, targetAudience, 
+          forbiddenWords, mustMentionItems } = opts;
+
+  let layer = `=== LAYER 2: BRAND CONTEXT & TONE ===
+Brand Name: ${clientName || 'Unknown'}`;
+
+  if (industry) layer += `\nIndustry: ${industry}`;
+  
+  // BUG 4 FIX: Explicit tone enforcement (强制执行)
+  const toneRules = {
+    'professional': `TONE: Professional
+MUST DO:
+  ✓ Formal vocabulary, complete sentences, no fragments
+  ✓ Industry-appropriate terminology, structured thinking
+  ✓ Credibility and authority (data, evidence when relevant)
+  ✓ Formal register (书面语, not conversational)
+MUST NOT:
+  ✗ Slang, internet language, Cantonese colloquialisms
+  ✗ Excessive emoji (max 0-1), casual markers
+  ✗ Short fragments or text-speak
+  ✗ Personal gossip or casual chitchat`,
+    
+    'casual': `TONE: Casual & Friendly
+MUST DO:
+  ✓ Conversational, warm, approachable
+  ✓ Fragments and informal structures OK
+  ✓ Personal touches, relatable stories
+  ✓ Emoji use natural and frequent (2-4 per post)
+MUST NOT:
+  ✗ Too corporate or formal
+  ✗ Overly technical jargon (explain if must use)
+  ✗ Cold or distant language`,
+    
+    'luxury': `TONE: Luxury & Sophisticated
+MUST DO:
+  ✓ Elegant, refined language, understatement
+  ✓ Premium positioning, timeless appeal
+  ✓ Subtle confidence, quality focus
+  ✓ Refined aesthetic (minimal emoji, high-quality vocabulary)
+MUST NOT:
+  ✗ Cheap language, hyperbole, over-selling
+  ✗ Excessive emoji or casual markers
+  ✗ Slang, colloquialisms, text-speak`,
+    
+    'energetic': `TONE: Energetic & Youthful
+MUST DO:
+  ✓ Enthusiastic, dynamic, fast-paced
+  ✓ Trend-aware, modern references welcome
+  ✓ Emoji & exclamation marks encouraged (3-5 per post)
+  ✓ Witty, playful, conversational
+MUST NOT:
+  ✗ Boring, slow-paced, overly formal
+  ✗ Outdated or corporate language`
   };
 
-  let layer = `=== LAYER 2: BRAND PROFILE ===\nBrand: ${client.clientName}`;
-  if (client.industry) layer += `\nIndustry: ${client.industry}`;
-  layer += `\nTone: ${toneDescriptions[client.tone] || client.tone}`;
-
-  // Brand story: compressed to 150 chars max to prevent over-restriction
-  if (client.brandStory) {
-    const story = client.brandStory.length > 150
-      ? client.brandStory.substring(0, 147) + '...'
-      : client.brandStory;
-    layer += `\nBrand Essence: ${story}`;
+  if (tone && toneRules[tone]) {
+    layer += `\n\n${toneRules[tone]}`;
   }
 
-  // Audience: compressed to 120 chars max
-  if (client.targetAudience) {
-    const audience = client.targetAudience.length > 120
-      ? client.targetAudience.substring(0, 117) + '...'
-      : client.targetAudience;
-    layer += `\nAudience: ${audience}`;
+  if (brandStory) layer += `\nBrand Story: ${brandStory}`;
+  if (targetAudience) layer += `\nTarget Audience: ${targetAudience}`;
+  
+  if (forbiddenWords) {
+    layer += `\n\nFORBIDDEN WORDS (NEVER use these):
+${forbiddenWords}
+Explanation: These words break brand trust. Find alternatives instead.`;
   }
-
-  if (client.forbiddenWords) layer += `\nFORBIDDEN WORDS (never use): ${client.forbiddenWords}`;
-  if (client.mustMentionItems) layer += `\nMUST MENTION (always include): ${client.mustMentionItems}`;
+  
+  if (mustMentionItems) {
+    layer += `\n\nMUST MENTION (include in every post if relevant):
+${mustMentionItems}
+These strengthen brand identity. Work them in naturally.`;
+  }
 
   return layer;
 }
 
-// B2: NEW — Pillar injection layer
-function buildPillarLayer(pillars, rotationIndex) {
-  if (!pillars || pillars.length === 0) return '';
-
-  const idx = rotationIndex % pillars.length;
-  const pillar = pillars[idx];
-  if (!pillar) return '';
-
-  let layer = `=== CONTENT ANGLE (TODAY'S FOCUS) ===
-Pillar: ${pillar.name}
-Direction: ${pillar.description || 'Create content aligned with this angle'}`;
-
-  if (pillar.cta) {
-    layer += `\nCall-to-Action: Naturally work in this CTA at the end — "${pillar.cta}"
-(Don't force it word-for-word if it breaks the platform's tone — adapt the phrasing while keeping the intent)`;
-  }
-
-  layer += `\n\nRULE: Your content should reflect the "${pillar.name}" angle.
-This is strategic guidance — use it to shape the angle/perspective, not to restrict the topic.
-If you genuinely cannot align with this pillar, create the best content for the topic anyway.`;
-
-  return layer;
-}
-
+// LAYER 3: Compliance + Context triggers
 function buildLayer3(platforms, topic, industry) {
   const triggers = [];
 
-  const mainlandPlatforms = platforms.filter(p => p === 'xiaohongshu' || p === 'wechat');
-  if (mainlandPlatforms.length > 0) {
-    triggers.push(`CHINA AD LAW (${mainlandPlatforms.join(', ')}):
-FORBIDDEN: 最優、最好、最佳、最強、第一、唯一、100%、絕對、革命性
-FORBIDDEN exaggeration: 火爆全港、瘋搶、秒空
-Content must feel EDUCATIONAL or personal, not sales-driven`);
-  }
+  // BUG 5 FIX: Already handled in /api/generate before this function
+  // (Language forced to SC for XHS/WeChat)
 
+  // Financial compliance
   const financialIndustries = ['finance', 'insurance', 'banking', 'investment'];
   if (industry && financialIndustries.some(f => industry.toLowerCase().includes(f))) {
     triggers.push(`FINANCIAL COMPLIANCE:
 FORBIDDEN: 保本、保息、穩賺、無風險、保證收益
-If mentioning returns: MUST add 「投資涉及風險，過去表現不代表未來」`);
+If mentioning returns: MUST add「投資涉及風險，過去表現不代表未來」`);
   }
 
+  // Seasonal context
   const topicLower = topic.toLowerCase();
   const seasonalMap = {
     'christmas': '🎄 Christmas — gift-giving, year-end, family warmth',
@@ -444,9 +464,35 @@ If mentioning returns: MUST add 「投資涉及風險，過去表現不代表未
   return `=== LAYER 3: COMPLIANCE & CONTEXT ===\n${triggers.join('\n\n')}`;
 }
 
-// ════════════════════════════════════════════════════
-// TOPICS ENDPOINT — B2 Enhanced
-// ════════════════════════════════════════════════════
+// Pillar-specific layer
+function buildPillarLayer(pillars, rotationIndex) {
+  if (!pillars || pillars.length === 0) return '';
+  
+  const pillar = pillars[rotationIndex % pillars.length];
+  if (!pillar) return '';
+  
+  let layer = `=== PILLAR LAYER: CONTENT ANGLE ===
+Selected Pillar: "${pillar.name}"`;
+  
+  if (pillar.description) {
+    layer += `\nPillar Description: ${pillar.description}`;
+  }
+  
+  if (pillar.cta) {
+    layer += `\n\nCall-to-Action for this pillar: ${pillar.cta}
+(Don't force it word-for-word if it breaks the platform's tone — adapt the phrasing while keeping the intent)`;
+  }
+
+  layer += `\n\nRULE: Your content should reflect the "${pillar.name}" angle.
+This is strategic guidance — use it to shape the angle/perspective, not to restrict the topic.
+If you genuinely cannot align with this pillar, create the best content for the topic anyway.`;
+
+  return layer;
+}
+
+// ════════════════════════════════════════════
+// TOPICS ENDPOINT — B2 Enhanced with Compression (BUG 3 FIX)
+// ════════════════════════════════════════════
 app.post('/api/topics', async (req, res) => {
   try {
     const { clientName, industry, tone, brandStory, targetAudience,
@@ -455,16 +501,16 @@ app.post('/api/topics', async (req, res) => {
 
     const layer1 = buildLayer1([platform], language);
 
-    // Use compressed brand context for topics (prevent over-restriction)
+    // BUG 3 FIX: Compress brand context to prevent over-restriction
     const layer2 = buildLayer2({
       clientName, industry, tone,
-      brandStory: brandStory ? brandStory.substring(0, 100) : '',
-      targetAudience: targetAudience ? targetAudience.substring(0, 80) : ''
+      brandStory: brandStory ? brandStory.substring(0, 60) : '', // 減到 60 chars
+      targetAudience: targetAudience ? targetAudience.substring(0, 60) : '' // 減到 60 chars
     });
 
     // Pillar as inspiration, not restriction
     const pillarHint = selectedPillars && selectedPillars.length > 0
-      ? `\nCONTENT ANGLE INSPIRATION: Mix topics across these angles — ${selectedPillars.map(p => p.name).join(', ')}`
+      ? `\nCONTENT ANGLE SUGGESTIONS: Consider these angles — ${selectedPillars.map(p => p.name).join(', ')}`
       : '';
 
     const langMap = { tc: 'Traditional Chinese', sc: 'Simplified Chinese', en: 'English' };
@@ -542,14 +588,21 @@ All titles and descriptions in ${langName} ONLY. No English words except brand/p
   }
 });
 
-// ════════════════════════════════════════════════════
-// GENERATE ENDPOINT — B2 Enhanced with Pillar
-// ════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// GENERATE ENDPOINT — B2 Enhanced with Pillar + BUG 5 FIX
+// ════════════════════════════════════════════
 app.post('/api/generate', async (req, res) => {
   try {
-    const { topic, clientName, industry, tone, brandStory, targetAudience,
+    let { topic, clientName, industry, tone, brandStory, targetAudience,
             forbiddenWords, mustMentionItems, platforms, language,
             selectedPillars, pillarRotationIndex } = req.body;
+
+    // BUG 5 FIX: Force SC for XHS + WeChat
+    const mainlandPlatforms = platforms.filter(p => ['xiaohongshu', 'wechat'].includes(p));
+    if (mainlandPlatforms.length > 0) {
+      console.log(`Force SC for Mainland platforms: ${mainlandPlatforms.join(',')}`);
+      language = 'sc'; // 強制簡體
+    }
 
     const layer1 = buildLayer1(platforms, language);
     const layer2 = buildLayer2({

@@ -203,24 +203,24 @@ body {
 }
 
 .auth-error {
-  padding: 10px 14px;
   background: rgba(255,107,107,0.1);
   border: 1px solid rgba(255,107,107,0.3);
-  border-radius: 8px;
-  color: var(--error);
-  font-size: 13px;
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 12px;
   margin-bottom: 16px;
   display: none;
 }
 .auth-error.visible { display: block; }
 
 .auth-success {
-  padding: 10px 14px;
-  background: rgba(205,255,216,0.08);
+  background: rgba(205,255,216,0.1);
   border: 1px solid rgba(205,255,216,0.3);
-  border-radius: 8px;
   color: var(--accent-mint);
-  font-size: 13px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 12px;
   margin-bottom: 16px;
   display: none;
 }
@@ -230,28 +230,28 @@ body {
 #loadingScreen {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-  display: none;
+  gap: 20px;
 }
 
 .loading-text {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--secondary);
   letter-spacing: 0.08em;
 }
 
-/* ── MAIN APP ── */
-#appScreen { display: none; }
+/* ── APP LAYOUT ── */
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
 
-.app { display: flex; height: 100vh; overflow: hidden; }
-
-/* ── SIDEBAR ── */
 .sidebar {
   width: 260px;
-  background: var(--bg-dark);
+  background: var(--bg-card);
   border-right: 1px solid var(--border);
   padding: 20px 0;
   overflow-y: auto;
@@ -259,34 +259,40 @@ body {
   flex-direction: column;
 }
 
-.logo { padding: 0 16px 28px; }
+.logo {
+  padding: 0 16px 24px;
+}
 
 .logo-text {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px;
+  font-weight: 400;
   color: var(--primary);
+  line-height: 1.2;
 }
 
 .logo-sub {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
-  margin-top: 6px;
+  color: var(--secondary);
+  margin-top: 4px;
 }
 
-.nav { flex: 1; padding: 0 10px; display: flex; flex-direction: column; gap: 2px; }
+.nav {
+  flex: 1;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 
 .nav-item {
-  padding: 11px 14px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
   color: var(--secondary);
   border: none;
   background: transparent;
@@ -295,13 +301,15 @@ body {
   text-align: left;
   width: 100%;
 }
-.nav-item:hover { color: var(--primary); background: rgba(255,255,255,0.04); }
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
 .nav-item.active {
-  background: rgba(205,255,216,0.08);
+  background: rgba(205,255,216,0.1);
   color: var(--accent-mint);
   font-weight: 600;
-  border-left: 2px solid var(--accent-mint);
-  padding-left: 12px;
 }
 
 .sidebar-footer {
@@ -311,237 +319,370 @@ body {
 
 .user-info {
   display: flex;
+  gap: 12px;
   align-items: center;
-  gap: 10px;
-  padding: 10px 4px;
-  margin-bottom: 8px;
+  margin-bottom: 14px;
+  padding: 0 4px;
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--grad);
+  width: 36px;
+  height: 36px;
+  background: rgba(205,255,216,0.1);
+  border: 1px solid rgba(205,255,216,0.2);
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  font-weight: 700;
-  color: #0d1521;
+  font-weight: 600;
+  color: var(--accent-mint);
   flex-shrink: 0;
 }
 
 .user-email {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.sidebar-btns { display: flex; gap: 6px; }
+.sidebar-btns {
+  display: flex;
+  gap: 8px;
+}
 
 .sidebar-btn {
   flex: 1;
-  padding: 9px;
+  padding: 8px;
   font-size: 11px;
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  color: var(--secondary);
+  border-radius: 4px;
+  cursor: pointer;
   font-weight: 600;
   font-family: inherit;
-  letter-spacing: 0.06em;
-  background: transparent;
-  color: var(--secondary);
-  border: 1px solid var(--border-mid);
-  border-radius: 999px;
-  cursor: pointer;
   transition: all 0.2s;
 }
-.sidebar-btn:hover { border-color: rgba(205,255,216,0.3); color: var(--accent-mint); }
-.sidebar-btn.logout { color: rgba(255,107,107,0.7); }
-.sidebar-btn.logout:hover { border-color: rgba(255,107,107,0.3); color: var(--error); }
 
-/* ── MAIN ── */
-.main { flex: 1; overflow-y: auto; padding: 32px; max-width: 1200px; }
+.sidebar-btn:hover {
+  border-color: rgba(205,255,216,0.3);
+  color: var(--accent-mint);
+}
 
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+.sidebar-btn.logout:hover {
+  border-color: rgba(255,107,107,0.3);
+  color: #ff6b6b;
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  max-width: 1200px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
 
 .h1 {
   font-family: 'DM Serif Display', serif;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 400;
-  background: var(--grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
   margin: 0;
 }
 
-.lang-toggle { display: flex; gap: 6px; }
+.lang-toggle {
+  display: flex;
+  gap: 8px;
+}
+
 .lang-btn {
-  padding: 7px 13px;
+  padding: 8px 12px;
   border: 1px solid var(--border-mid);
   background: transparent;
   color: var(--secondary);
-  border-radius: 999px;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   transition: all 0.2s;
 }
-.lang-btn:hover { color: var(--primary); border-color: rgba(255,255,255,0.2); }
-.lang-btn.active { background: var(--grad); color: #0d1521; border-color: transparent; }
 
-/* ── FORM ── */
-.form-group { margin-bottom: 18px; }
+.lang-btn:hover {
+  border-color: rgba(205,255,216,0.3);
+}
+
+.lang-btn.active {
+  background: var(--accent-mint);
+  color: #0d1521;
+  border-color: var(--accent-mint);
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
 
 .label {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 8px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  color: var(--secondary);
+  margin-bottom: 8px;
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 11px 14px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   font-family: inherit;
-  background: var(--bg-card);
+  background: var(--bg-dark);
   color: var(--primary);
   outline: none;
   transition: border-color 0.2s;
 }
-input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
-input:focus, select:focus, textarea:focus { border-color: rgba(205,255,216,0.35); }
-select option { background: var(--bg-dark); color: var(--primary); }
 
-/* ── TAG CHIPS ── */
-.tag-section { margin-bottom: 14px; }
-.tag-section-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block;
+input::placeholder, textarea::placeholder {
+  color: rgba(255,255,255,0.2);
 }
-.tag-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag-chip {
-  padding: 6px 12px; border: 1px solid var(--border-mid);
-  background: transparent; color: var(--secondary); border-radius: 999px;
-  font-size: 12px; font-weight: 500; font-family: inherit; cursor: pointer;
-  transition: all 0.15s; white-space: nowrap;
-}
-.tag-chip:hover { border-color: rgba(205,255,216,0.3); color: var(--primary); }
-.tag-chip.selected {
-  background: rgba(205,255,216,0.12); border-color: var(--accent-mint);
-  color: var(--accent-mint); font-weight: 600;
-}
-.audience-summary {
-  margin-top: 10px; padding: 10px 14px; background: var(--bg-dark);
-  border: 1px solid var(--border); border-radius: 8px; font-size: 12px;
-  color: var(--secondary); line-height: 1.5; display: none;
-}
-.audience-summary.visible { display: block; }
 
-/* ── PLATFORM GRID ── */
-.platform-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 16px; }
+input:focus, select:focus, textarea:focus {
+  border-color: rgba(205,255,216,0.4);
+}
+
+select {
+  cursor: pointer;
+}
+
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .platform-btn {
-  padding: 12px 6px; border: 1px solid var(--border); background: var(--bg-card);
-  border-radius: 10px; cursor: pointer; text-align: center; font-size: 11px;
-  font-weight: 500; font-family: inherit; color: var(--secondary); transition: all 0.2s;
-}
-.platform-btn:hover { border-color: var(--border-mid); color: var(--primary); }
-.platform-btn.active {
-  border-color: var(--accent-mint); background: rgba(205,255,216,0.08); color: var(--accent-mint); font-weight: 600;
+  padding: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 12px;
+  color: var(--secondary);
+  font-family: inherit;
+  transition: all 0.2s;
 }
 
-/* ── BUTTONS ── */
+.platform-btn:hover {
+  border-color: rgba(205,255,216,0.3);
+}
+
+.platform-btn.active {
+  border-color: var(--accent-mint);
+  background: rgba(205,255,216,0.1);
+  color: var(--accent-mint);
+  font-weight: 600;
+}
+
 .button {
-  padding: 13px 24px; background: var(--grad); color: #0d1521; border: none;
-  border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px;
-  font-family: inherit; letter-spacing: 0.06em; transition: opacity 0.2s;
+  padding: 12px 20px;
+  background: var(--grad);
+  color: #0d1521;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  transition: opacity 0.2s;
 }
 .button:hover { opacity: 0.85; }
 .button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* ── CARDS ── */
 .card {
-  padding: 16px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--bg-card); margin-bottom: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  margin-bottom: 12px;
 }
 
 .variation-card {
-  padding: 18px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--bg-card); margin-bottom: 16px; transition: border-color 0.2s;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  margin-bottom: 16px;
 }
-.variation-card:hover { border-color: var(--border-mid); }
 
 .variation-title {
-  font-weight: 600; font-size: 12px; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--accent-mint);
+  margin-bottom: 8px;
 }
 
 .variation-content {
-  white-space: pre-wrap; font-size: 14px; color: var(--primary);
-  margin-bottom: 14px; line-height: 1.7;
+  white-space: pre-wrap;
+  font-size: 13px;
+  color: var(--secondary);
+  margin-bottom: 12px;
+  line-height: 1.6;
 }
 
-/* ── STARS ── */
-.rating { display: flex; gap: 4px; margin-top: 8px; }
-.star { font-size: 20px; cursor: pointer; color: rgba(255,255,255,0.15); transition: color 0.15s; }
-.star:hover { color: var(--accent-mint); }
-.star.active { color: var(--accent-mint); }
+.rating {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
 
-/* ── SECTIONS ── */
-.section { display: none; }
-.section.active { display: block; }
+.star {
+  font-size: 20px;
+  cursor: pointer;
+  color: #4a4a4a;
+}
 
-/* ── DASHBOARD ── */
-.dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 24px; }
-.stat-card { padding: 20px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); }
+.star.active {
+  color: var(--accent-mint);
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-card);
+}
+
 .stat-number {
-  font-family: 'DM Serif Display', serif; font-size: 36px; font-weight: 400;
-  background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-family: 'DM Serif Display', serif;
+  font-size: 36px;
+  font-weight: 400;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-.stat-label { font-size: 12px; color: var(--secondary); margin-top: 6px; letter-spacing: 0.04em; }
 
-.best-badge { margin-top: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--accent-mint); text-transform: uppercase; }
-.generated-title { font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 400; color: var(--primary); margin-bottom: 16px; }
+.stat-label {
+  font-size: 12px;
+  color: var(--secondary);
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+}
+
+.best-badge {
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--accent-mint);
+  text-transform: uppercase;
+}
+
+.generated-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
 
 /* ── SAVING INDICATOR ── */
 .saving-indicator {
-  position: fixed; bottom: 20px; right: 20px;
-  padding: 8px 16px; background: var(--bg-dark); border: 1px solid var(--border);
-  border-radius: 999px; font-size: 12px; color: var(--secondary);
-  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--secondary);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
 }
-.saving-indicator.visible { opacity: 1; }
+
+.saving-indicator.visible {
+  opacity: 1;
+}
 
 /* ── MOBILE: HAMBURGER MENU ── */
 .hamburger-btn {
   display: none;
-  position: fixed; top: 16px; left: 16px; z-index: 1001;
-  width: 44px; height: 44px;
-  background: var(--bg-dark); border: 1px solid var(--border);
-  border-radius: 10px; color: var(--primary); font-size: 20px;
-  cursor: pointer; align-items: center; justify-content: center;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  width: 44px;
+  height: 44px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--primary);
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
 }
+
 .mobile-close-btn {
   display: none;
-  position: absolute; top: 16px; right: 16px;
-  width: 36px; height: 36px;
-  background: transparent; border: 1px solid var(--border);
-  border-radius: 8px; color: var(--secondary); font-size: 20px;
-  cursor: pointer; align-items: center; justify-content: center;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--secondary);
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
 }
+
 .mobile-overlay {
   display: none;
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
   z-index: 999;
 }
-.mobile-overlay.visible { display: block; }
+
+.mobile-overlay.visible {
+  display: block;
+}
 
 /* ── RESPONSIVE: TABLET (<768px) ── */
 @media (max-width: 768px) {
@@ -549,121 +690,428 @@ select option { background: var(--bg-dark); color: var(--primary); }
   .mobile-close-btn { display: flex; }
 
   .sidebar {
-    position: fixed; top: 0; left: 0; bottom: 0;
-    width: 280px; z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 1000;
     transform: translateX(-100%);
     transition: transform 0.25s ease;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.4);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
   }
-  .sidebar.open { transform: translateX(0); }
-  .logo { position: relative; padding-top: 20px; }
 
-  .main { padding: 20px 16px 16px; padding-top: 72px; max-width: 100%; }
+  .sidebar.open {
+    transform: translateX(0);
+  }
 
-  .header { flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
-  .h1 { font-size: 22px; }
-  .lang-toggle { width: 100%; }
-  .lang-btn { flex: 1; min-height: 44px; }
+  .logo {
+    position: relative;
+    padding-top: 20px;
+  }
 
-  .dashboard-grid { grid-template-columns: 1fr; }
+  .main {
+    padding: 20px 16px 16px;
+    padding-top: 72px;
+    max-width: 100%;
+  }
 
-  .platform-grid { grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .platform-btn { min-height: 44px; padding: 8px 4px; font-size: 10px; }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
 
-  button, .button, input, select, textarea { min-height: 44px; }
-  .pillar-checkbox { width: 22px; height: 22px; }
-  .tag-chip { min-height: 38px; padding: 8px 14px; }
-  .star { font-size: 24px; padding: 4px; }
+  .h1 {
+    font-size: 22px;
+  }
 
-  .accordion-header { padding: 16px; min-height: 44px; }
-  .pillar-card-header { flex-wrap: wrap; }
-  .pillar-name-select { min-width: 120px; }
+  .lang-toggle {
+    width: 100%;
+  }
 
-  .sidebar-btns { flex-wrap: wrap; }
-  .sidebar-btn { min-height: 40px; }
+  .lang-btn {
+    flex: 1;
+    min-height: 44px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .platform-btn {
+    min-height: 44px;
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+
+  button, .button, input, select, textarea {
+    min-height: 44px;
+  }
+
+  .pillar-checkbox {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tag-chip {
+    min-height: 38px;
+    padding: 8px 14px;
+  }
+
+  .star {
+    font-size: 24px;
+    padding: 4px;
+  }
+
+  .accordion-header {
+    padding: 16px;
+    min-height: 44px;
+  }
+
+  .pillar-card-header {
+    flex-wrap: wrap;
+  }
+
+  .pillar-name-select {
+    min-width: 120px;
+  }
+
+  .sidebar-btns {
+    flex-wrap: wrap;
+  }
+
+  .sidebar-btn {
+    min-height: 40px;
+  }
 }
 
 /* ── RESPONSIVE: MOBILE (<480px) ── */
 @media (max-width: 480px) {
-  .main { padding: 16px 12px; padding-top: 68px; }
-  .h1 { font-size: 19px; }
+  .main {
+    padding: 16px 12px;
+    padding-top: 68px;
+  }
 
-  .platform-grid { grid-template-columns: repeat(2, 1fr); }
+  .h1 {
+    font-size: 19px;
+  }
 
-  .auth-box { max-width: 100%; }
-  .auth-title { font-size: 22px; }
+  .platform-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-  .variation-card { padding: 14px; }
-  .stat-number { font-size: 28px; }
+  .auth-box {
+    max-width: 100%;
+  }
 
-  .pillar-card { padding: 12px; }
-  .pillar-name-select { font-size: 12px; padding: 8px; }
+  .auth-title {
+    font-size: 22px;
+  }
 
-  .accordion-title { font-size: 11px; }
+  .variation-card {
+    padding: 14px;
+  }
+
+  .stat-number {
+    font-size: 28px;
+  }
+
+  .pillar-card {
+    padding: 12px;
+  }
+
+  .pillar-name-select {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .accordion-title {
+    font-size: 11px;
+  }
 }
 
 /* ── ACCORDION ── */
-.accordion-section { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
-.accordion-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 16px; cursor: pointer; background: var(--bg-card);
-  transition: background 0.2s; user-select: none;
+.accordion-section {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
 }
-.accordion-header:hover { background: rgba(255,255,255,0.03); }
-.accordion-header.open { border-bottom: 1px solid var(--border); }
-.accordion-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--secondary); }
-.accordion-title.filled { color: var(--accent-mint); }
-.accordion-arrow { font-size: 14px; color: var(--muted); transition: transform 0.2s; }
-.accordion-header.open .accordion-arrow { transform: rotate(180deg); }
-.accordion-body { padding: 16px; background: var(--bg-card); display: none; }
-.accordion-body.open { display: block; }
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.accordion-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.accordion-header.open {
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--secondary);
+}
+
+.accordion-title.filled {
+  color: var(--accent-mint);
+}
+
+.accordion-arrow {
+  font-size: 14px;
+  color: var(--muted);
+  transition: transform 0.2s;
+}
+
+.accordion-header.open .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+.accordion-body {
+  padding: 16px;
+  background: var(--bg-card);
+  display: none;
+}
+
+.accordion-body.open {
+  display: block;
+}
 
 /* ── PILLAR CARDS ── */
-.pillar-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.pillar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
 .pillar-card {
-  border: 1px solid var(--border); border-radius: 8px; padding: 14px;
-  background: var(--bg-dark); transition: border-color 0.2s;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  background: var(--bg-dark);
+  transition: border-color 0.2s;
 }
-.pillar-card.selected { border-color: var(--accent-mint); background: rgba(205,255,216,0.04); }
-.pillar-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.pillar-checkbox { width: 18px; height: 18px; accent-color: var(--accent-mint); cursor: pointer; flex-shrink: 0; }
+
+.pillar-card.selected {
+  border-color: var(--accent-mint);
+  background: rgba(205, 255, 216, 0.04);
+}
+
+.pillar-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.pillar-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-mint);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 .pillar-name-select {
-  flex: 1; padding: 6px 10px; background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--primary); font-family: inherit; font-size: 13px;
-  font-weight: 600; outline: none;
+  flex: 1;
+  padding: 6px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
 }
-.pillar-name-select:focus { border-color: rgba(205,255,216,0.3); }
+
+.pillar-name-select:focus {
+  border-color: rgba(205, 255, 216, 0.3);
+}
+
 .pillar-desc-input {
-  width: 100%; padding: 8px 10px; background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 6px; color: var(--primary); font-family: inherit; font-size: 12px;
-  resize: none; min-height: 52px; outline: none; transition: border-color 0.2s;
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 12px;
+  resize: none;
+  min-height: 52px;
+  outline: none;
+  transition: border-color 0.2s;
 }
-.pillar-desc-input:focus { border-color: rgba(205,255,216,0.3); }
-.pillar-desc-input::placeholder { color: rgba(255,255,255,0.2); }
-.pillar-count { font-size: 11px; color: var(--secondary); margin-bottom: 8px; }
-.pillar-count.valid { color: var(--accent-mint); }
+
+.pillar-desc-input:focus {
+  border-color: rgba(205, 255, 216, 0.3);
+}
+
+.pillar-desc-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.pillar-count {
+  font-size: 11px;
+  color: var(--secondary);
+  margin-bottom: 8px;
+}
+
+.pillar-count.valid {
+  color: var(--accent-mint);
+}
+
+.pillar-cta-input {
+  width: 100% !important;
+  margin-top: 8px !important;
+}
 
 /* ── PILLAR OVERRIDE (Generate/Topics) ── */
 .pillar-indicator {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; background: rgba(205,255,216,0.06);
-  border: 1px solid rgba(205,255,216,0.2); border-radius: 8px;
-  margin-bottom: 16px; font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(205, 255, 216, 0.06);
+  border: 1px solid rgba(205, 255, 216, 0.2);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
 }
-.pillar-indicator-label { color: var(--secondary); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
-.pillar-indicator-value { color: var(--accent-mint); font-weight: 600; margin-top: 2px; }
+
+.pillar-indicator-label {
+  color: var(--secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pillar-indicator-value {
+  color: var(--accent-mint);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
 .pillar-override-btn {
-  padding: 5px 12px; background: transparent; border: 1px solid var(--border-mid);
-  color: var(--secondary); border-radius: 999px; font-size: 11px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  color: var(--secondary);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
 }
-.pillar-override-btn:hover { border-color: rgba(205,255,216,0.3); color: var(--accent-mint); }
+
+.pillar-override-btn:hover {
+  border-color: rgba(205, 255, 216, 0.3);
+  color: var(--accent-mint);
+}
+
 .pillar-override-select {
-  width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--primary); font-family: inherit; font-size: 13px;
-  outline: none; margin-bottom: 12px; display: none;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--primary);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+  display: none;
+  cursor: pointer;
 }
-.pillar-override-select.visible { display: block; }
+
+.pillar-override-select.visible {
+  display: block;
+}
+
+/* ── TAG CHIPS ── */
+.tag-section {
+  margin-bottom: 16px;
+}
+
+.tag-section-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin-bottom: 8px;
+}
+
+.tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag-chip {
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tag-chip:hover {
+  border-color: rgba(205, 255, 216, 0.3);
+}
+
+.tag-chip.selected {
+  background: rgba(205, 255, 216, 0.1);
+  border-color: var(--accent-mint);
+  color: var(--accent-mint);
+  font-weight: 600;
+}
+
+.audience-summary {
+  padding: 10px;
+  background: rgba(205, 255, 216, 0.06);
+  border: 1px solid rgba(205, 255, 216, 0.2);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--accent-mint);
+  margin-top: 16px;
+  display: none;
+  line-height: 1.6;
+}
+
+.audience-summary.visible {
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -741,7 +1189,7 @@ select option { background: var(--bg-dark); color: var(--primary); }
 </div>
 
 <!-- MAIN APP -->
-<div id="appScreen">
+<div id="appScreen" style="display:none;">
 <button class="hamburger-btn" id="hamburgerBtn" onclick="openMobileMenu()">☰</button>
 <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
 <div class="app">
@@ -801,22 +1249,21 @@ select option { background: var(--bg-dark); color: var(--primary); }
         </div>
         <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
           <span style="color:var(--accent-mint);font-weight:700;flex-shrink:0;">②</span>
-          <span id="gsStep2">Already have a profile? Go straight to "Generate" to start posting</span>
+          <span id="gsStep2">Set up 3–5 content angles (Pillars)</span>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start;">
           <span style="color:var(--accent-mint);font-weight:700;flex-shrink:0;">③</span>
-          <span id="gsStep3">Want more strategy? Set up "Content Angles" for automatic rotation</span>
+          <span id="gsStep3">Go to "Generate" → Pick platforms and write a topic</span>
         </div>
       </div>
     </div>
 
-    <!-- CLIENTS -->
+    <!-- CLIENT MANAGEMENT -->
     <div class="section" id="clients">
-
       <!-- ACCORDION 1: Brand Basics -->
       <div class="accordion-section" id="acc-basics">
         <div class="accordion-header open" onclick="toggleAccordion('acc-basics')">
-          <span class="accordion-title" id="acc-basics-title" data-i18n="acc_basics" data-i18n-prefix="①">① Brand Basics</span>
+          <span class="accordion-title filled" id="acc-basics-title" data-i18n="acc_basics" data-i18n-prefix="①">① Brand Basics</span>
           <span class="accordion-arrow">▼</span>
         </div>
         <div class="accordion-body open">
@@ -937,15 +1384,14 @@ select option { background: var(--bg-dark); color: var(--primary); }
           <span class="tag-section-label" data-sectionkey="painpoints_label">Pain Points</span>
           <div class="tag-chips">
             <button class="tag-chip" data-group="painpoints" data-val="時間不足" data-langkey="chip_time" onclick="toggleChip(this)">時間不足</button>
-            <button class="tag-chip" data-group="painpoints" data-val="預算有限" data-langkey="chip_budget_pain" onclick="toggleChip(this)">預算有限</button>
-            <button class="tag-chip" data-group="painpoints" data-val="資訊過載" data-langkey="chip_info" onclick="toggleChip(this)">資訊過載</button>
-            <button class="tag-chip" data-group="painpoints" data-val="唔信任品牌" data-langkey="chip_trust" onclick="toggleChip(this)">唔信任品牌</button>
+            <button class="tag-chip" data-group="painpoints" data-val="預算限制" data-langkey="chip_budget" onclick="toggleChip(this)">預算限制</button>
+            <button class="tag-chip" data-group="painpoints" data-val="品質擔憂" data-langkey="chip_quality_c" onclick="toggleChip(this)">品質擔憂</button>
             <button class="tag-chip" data-group="painpoints" data-val="選擇困難" data-langkey="chip_choice" onclick="toggleChip(this)">選擇困難</button>
-            <button class="tag-chip" data-group="painpoints" data-val="缺乏動力" data-langkey="chip_motivation" onclick="toggleChip(this)">缺乏動力</button>
+            <button class="tag-chip" data-group="painpoints" data-val="缺乏信任" data-langkey="chip_trust" onclick="toggleChip(this)">缺乏信任</button>
           </div>
         </div>
         <div class="tag-section">
-          <span class="tag-section-label" data-sectionkey="behaviour_label">Platform Behaviour</span>
+          <span class="tag-section-label" data-sectionkey="behaviour_label">Platform Behavior</span>
           <div class="tag-chips">
             <button class="tag-chip" data-group="behaviour" data-val="主動搜尋型" data-langkey="chip_active" onclick="toggleChip(this)">主動搜尋型</button>
             <button class="tag-chip" data-group="behaviour" data-val="被動滾動型" data-langkey="chip_passive" onclick="toggleChip(this)">被動滾動型</button>
@@ -1098,246 +1544,555 @@ select option { background: var(--bg-dark); color: var(--primary); }
         </select>
       </div>
       <div class="form-group">
-        <label class="label" data-i18n="lbl_contentLangReq">Content Language *</label>
+        <label class="label" data-i18n="lbl_contentLang">Content Language *</label>
         <select id="discoverContentLanguage">
           <option value="tc">Traditional Chinese (繁體中文)</option>
           <option value="sc">Simplified Chinese (簡體中文)</option>
           <option value="en">English</option>
         </select>
       </div>
-      <button class="button" onclick="generateTopicSuggestions()" id="topicBtn">Generate Topic Suggestions</button>
+      <button class="button" onclick="generateTopicSuggestions()" id="generateTopicsBtn">Generate Topic Suggestions</button>
       <div id="topicSuggestions" style="margin-top:24px;"></div>
     </div>
-
   </div>
 </div>
 </div>
 
-<div class="saving-indicator" id="savingIndicator">Saving...</div>
+<div id="savingIndicator" class="saving-indicator"></div>
 
 <script>
 // ═══════════════════════════════════════════
-// SUPABASE INIT
+// CONFIGURATION
 // ═══════════════════════════════════════════
-const SUPABASE_URL = 'https://rmvfihgclnzbxzuxnmzb.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtdmZpaGdjbG56Ynh6dXhubXpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNjAyNzcsImV4cCI6MjA5NzkzNjI3N30.9uOnrTeyrRUyXpimHh7GqTUhfQhoN-DzgDFDicz7dgM';
 const BACKEND = 'https://flux-content-engine.onrender.com';
-
-const { createClient } = supabase;
-const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let currentUser = null;
-let clients = [];
-let currentClient = null;
-let selectedPlatforms = [];
-let generatedVariations = [];
-let currentLang = 'tc';
-let editingClientId = null;
+const sb = supabase.createClient(
+  'https://rmvfihgclnzbxzuxnmzb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJtdmZpaGdjbG56Ynp1eG5temIiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTcwOTc0MzIwMCwiZXhwIjoxNzQxMjc5MjAwfQ.wz3wq3fpDTzLBBfV01pUt9EFP5W9Tx2z2K-hIhWNnIY'
+);
 
 // ═══════════════════════════════════════════
-// LANGUAGES
+// LANGUAGE PACK (完整版 + 新增 Pillar 翻譯)
 // ═══════════════════════════════════════════
 const LANGS = {
   tc: {
-    dashboard:'儀表板', clients:'客戶管理', discover:'主題探索', generate:'生成內容', history:'歷史記錄',
-    addClient:'新增客戶', updateClient:'更新客戶', selectClient:'選擇客戶', chooseClient:'選擇客戶…',
-    generate_btn:'生成', generateTopics:'生成主題建議',
-    yourClients:'你的客戶', generated:'生成的內容',
-    clients_label:'客戶數目', content_label:'內容數目',
-    gender_label:'性別', age_label:'年齡層', lifestage_label:'人生階段',
-    income_label:'收入水平', interests_label:'興趣', decision_label:'消費決策',
-    painpoints_label:'痛點', behaviour_label:'平台行為',
-    chip_female:'女性為主', chip_male:'男性為主', chip_balanced:'性別均衡',
-    chip_18:'18-24', chip_25:'25-34', chip_35:'35-44', chip_45:'45-54', chip_55:'55+',
-    chip_student:'學生', chip_newjob:'初入職場', chip_pro:'專業人士',
-    chip_married:'新婚', chip_parent:'為人父母', chip_retire:'退休準備',
-    chip_mass:'大眾消費', chip_midclass:'中產', chip_high:'高收入', chip_uhnw:'超高淨值',
-    chip_beauty:'美容護膚', chip_health:'健康養生', chip_finance:'投資理財',
-    chip_travel:'旅遊', chip_family:'親子', chip_fashion:'時尚',
-    chip_food:'飲食', chip_fitness:'運動健身', chip_tech:'科技數碼', chip_home:'家居生活',
-    chip_price:'價格敏感', chip_quality:'品質導向', chip_brand_loyal:'品牌忠誠',
-    chip_wom:'口碑驅動', chip_impulse:'衝動消費',
-    chip_time:'時間不足', chip_budget_pain:'預算有限', chip_info:'資訊過載',
-    chip_trust:'唔信任品牌', chip_choice:'選擇困難', chip_motivation:'缺乏動力',
-    chip_active:'主動搜尋型', chip_passive:'被動滾動型', chip_social_b:'社群互動型', chip_lurker:'只睇唔留言',
-    acc_basics:'品牌基本資料', acc_audience:'目標受眾', acc_pillars:'內容角度', acc_rules:'品牌規則',
-    lbl_clientName:'客戶名稱 *', lbl_industry:'行業', lbl_brandTone:'品牌語氣 *', lbl_brandStory:'品牌故事',
-    lbl_targetAudience:'目標受眾', lbl_competitors:'競爭對手', lbl_forbiddenWords:'禁用詞彙', lbl_mustMention:'必須提及項目',
-    ph_clientName:'輸入客戶名稱…', ph_industry:'選擇行業…', ph_brandStory:'品牌背景、使命、價值觀…',
-    ph_competitors:'主要競爭對手…', ph_forbiddenWords:'要避免嘅詞彙…', ph_mustMention:'例如：低收費、家族經營、24/7支援…',
-    industry_beauty:'美容護膚', industry_fashion:'時尚服裝', industry_food:'食品飲料', industry_tech:'科技',
-    industry_finance:'金融', industry_health:'健康', industry_realestate:'房地產', industry_travel:'旅遊',
-    industry_education:'教育', industry_entertainment:'娛樂', industry_ecommerce:'電商', industry_luxury:'奢侈品',
-    industry_fitness:'運動健身', industry_home:'家居生活', industry_nonprofit:'非牟利', industry_other:'其他',
-    tone_professional:'專業', tone_casual:'輕鬆', tone_luxury:'奢華', tone_energetic:'活力',
-    pillarsDesc:'揀選 3–5 個內容角度。系統會自動輪流使用，保持內容多元化同有策略性。', ph_pillarCta:'此角度嘅行動呼籲（例如：DM我哋查詢）',
-    pillarCountMin:'已選 {n} / 5 個角度（最少 3 個）',
-    addAngle:'+ 新增角度',
-    lbl_topic:'話題 / 想法 *', ph_topic:'例如：春季系列',
-    lbl_platforms:'選擇平台 *', lbl_contentLang:'生成內容語言',
-    lbl_selectClient:'選擇客戶 *', lbl_contentDirection:'內容方向（選填）',
-    ph_contentDirection:'例如：醫療保險、退休生活…',
-    lbl_platform:'選擇平台 *', lbl_contentLangReq:'生成內容語言 *',
-    angleAuto:'內容角度（自動）', changeBtn:'更改', autoOption:'自動（使用輪換）',
-    pillar_Education:'教育', pillar_Product:'產品', pillar_BTS:'幕後花絮', pillar_Customer:'顧客故事',
-    pillar_Lifestyle:'生活風格', pillar_Thought:'思想領導', pillar_Community:'社群互動', pillar_Seasonal:'季節性',
-    pillar_Personal:'個人品牌', pillar_QA:'問答', pillar_Custom:'自訂',
-    gettingStarted:'開始使用', gs_step1:'前往「客戶管理」，建立品牌資料',
-    gs_step2:'已建立品牌資料？可直接前往「生成內容」開始製作貼文',
-    gs_step3:'如需更具策略性，可設定「內容角度」，系統將自動輪換內容方向'
+    // Navigation
+    dashboard: '儀表板', clients: '客戶管理', discover: '發現趨勢', generate: '生成內容', history: '歷史記錄',
+    
+    // Common labels
+    apiKey: 'API Key', clientName: '客戶名稱', brandTone: '品牌語氣', addClient: '添加客戶', 
+    updateClient: '更新客戶', selectClient: '選擇客戶', topic: '話題', platforms: '選擇平台', 
+    yourClients: '你的客戶', generated: '生成的內容', chooseClient: '選擇客戶',
+    
+    // Accordion titles
+    acc_basics: '品牌基礎',
+    acc_audience: '目標受眾',
+    acc_pillars: '內容角度',
+    acc_rules: '品牌規則',
+    
+    // Pillar presets (NEW - FIXED)
+    pillar_Education: '教育型',
+    pillar_Product: '產品展示',
+    pillar_BTS: '幕後花絮',
+    pillar_Customer: '客戶故事',
+    pillar_Lifestyle: '生活風格',
+    pillar_Thought: '思想領導',
+    pillar_Community: '社群互動',
+    pillar_Seasonal: '時事季節',
+    pillar_Personal: '個人品牌',
+    pillar_QA: '問答解惑',
+    pillar_Custom: '自訂',
+    
+    // Form labels
+    lbl_clientName: '客戶名稱',
+    lbl_industry: '行業',
+    lbl_brandTone: '品牌語氣',
+    lbl_brandStory: '品牌故事',
+    lbl_targetAudience: '目標受眾',
+    lbl_competitors: '競爭對手',
+    lbl_forbiddenWords: '禁用詞彙',
+    lbl_mustMention: '必須提及的項目',
+    lbl_selectClient: '選擇客戶',
+    lbl_topic: '話題 / 想法',
+    lbl_platforms: '選擇平台',
+    lbl_contentLang: '生成內容語言',
+    lbl_contentDirection: '內容方向（選填）',
+    lbl_platform: '選擇平台',
+    
+    // Placeholders
+    ph_clientName: '輸入客戶名稱...',
+    ph_industry: '選擇行業...',
+    ph_brandStory: '品牌背景、使命、價值觀...',
+    ph_topic: '例如：春季系列',
+    ph_competitors: '主要競爭對手...',
+    ph_forbiddenWords: '要避免的詞彙...',
+    ph_mustMention: '例如：低費用、家族經營、24/7 支持...',
+    ph_contentDirection: '例如：健康保險、退休生活...',
+    ph_pillarCta: '此角度的 CTA（例如：DM 我們訂購）',
+    
+    // Buttons & UI
+    generate_btn: '生成',
+    pillarsDesc: '為此品牌選擇 3–5 個內容角度。系統會自動輪轉 — 保持內容多樣且有策略。',
+    addAngle: '+ 新增另一個角度',
+    angleAuto: '內容角度（自動）',
+    changeBtn: '更改',
+    autoOption: '自動（使用輪轉）',
+    
+    // Audience tags
+    chip_female: '女性為主',
+    chip_male: '男性為主',
+    chip_balanced: '性別均衡',
+    chip_18: '18-24',
+    chip_25: '25-34',
+    chip_35: '35-44',
+    chip_45: '45-54',
+    chip_55: '55+',
+    chip_student: '學生',
+    chip_newjob: '初入職場',
+    chip_pro: '專業人士',
+    chip_married: '新婚',
+    chip_parent: '為人父母',
+    chip_retire: '退休準備',
+    chip_mass: '大眾消費',
+    chip_midclass: '中產',
+    chip_high: '高收入',
+    chip_uhnw: '超高淨值',
+    chip_beauty: '美容護膚',
+    chip_health: '健康養生',
+    chip_finance: '投資理財',
+    chip_travel: '旅遊',
+    chip_family: '親子',
+    chip_fashion: '時尚',
+    chip_food: '飲食',
+    chip_fitness: '運動健身',
+    chip_tech: '科技數碼',
+    chip_home: '家居生活',
+    chip_price: '價格敏感',
+    chip_quality: '品質導向',
+    chip_brand_loyal: '品牌忠誠',
+    chip_wom: '口碑驅動',
+    chip_impulse: '衝動消費',
+    chip_time: '時間不足',
+    chip_budget: '預算限制',
+    chip_quality_c: '品質擔憂',
+    chip_choice: '選擇困難',
+    chip_trust: '缺乏信任',
+    chip_active: '主動搜尋型',
+    chip_passive: '被動滾動型',
+    chip_social_b: '社群互動型',
+    chip_lurker: '只睇唔留言',
+    
+    // Section labels
+    gender_label: '性別',
+    age_label: '年齡組別',
+    lifestage_label: '人生階段',
+    income_label: '收入水平',
+    interests_label: '興趣',
+    decision_label: '決策風格',
+    painpoints_label: '痛點',
+    behaviour_label: '平台行為',
+    
+    // Industries
+    industry_beauty: '美容護膚',
+    industry_fashion: '時尚服裝',
+    industry_food: '食品飲料',
+    industry_tech: '科技',
+    industry_finance: '金融',
+    industry_health: '健康',
+    industry_realestate: '房地產',
+    industry_travel: '旅遊',
+    industry_education: '教育',
+    industry_entertainment: '娛樂',
+    industry_ecommerce: '電商',
+    industry_luxury: '奢侈品',
+    industry_fitness: '運動健身',
+    industry_home: '家居生活',
+    industry_nonprofit: '非營利組織',
+    industry_other: '其他',
+    
+    // Tones
+    tone_professional: '專業',
+    tone_casual: '輕鬆',
+    tone_luxury: '奢華',
+    tone_energetic: '活力',
+    
+    // Dashboard
+    clients_label: '客戶',
+    content_label: '內容項目',
+    gettingStarted: '開始使用',
+    gs_step1: '進入「客戶管理」→ 建立你的品牌檔案',
+    gs_step2: '設定 3–5 個內容角度（支柱）',
+    gs_step3: '進入「生成」→ 選擇平台並輸入話題',
   },
+  
   sc: {
-    dashboard:'仪表板', clients:'客户管理', discover:'主题探索', generate:'生成内容', history:'历史记录',
-    addClient:'新增客户', updateClient:'更新客户', selectClient:'选择客户', chooseClient:'选择客户…',
-    generate_btn:'生成', generateTopics:'生成主题建议',
-    yourClients:'你的客户', generated:'生成的内容',
-    clients_label:'客户数目', content_label:'内容数目',
-    gender_label:'性别', age_label:'年龄层', lifestage_label:'人生阶段',
-    income_label:'收入水平', interests_label:'兴趣', decision_label:'消费决策',
-    painpoints_label:'痛点', behaviour_label:'平台行为',
-    chip_female:'女性为主', chip_male:'男性为主', chip_balanced:'性别均衡',
-    chip_18:'18-24', chip_25:'25-34', chip_35:'35-44', chip_45:'45-54', chip_55:'55+',
-    chip_student:'学生', chip_newjob:'初入职场', chip_pro:'专业人士',
-    chip_married:'新婚', chip_parent:'为人父母', chip_retire:'退休准备',
-    chip_mass:'大众消费', chip_midclass:'中产', chip_high:'高收入', chip_uhnw:'超高净值',
-    chip_beauty:'美容护肤', chip_health:'健康养生', chip_finance:'投资理财',
-    chip_travel:'旅游', chip_family:'亲子', chip_fashion:'时尚',
-    chip_food:'饮食', chip_fitness:'运动健身', chip_tech:'科技数码', chip_home:'家居生活',
-    chip_price:'价格敏感', chip_quality:'品质导向', chip_brand_loyal:'品牌忠诚',
-    chip_wom:'口碑驱动', chip_impulse:'冲动消费',
-    chip_time:'时间不足', chip_budget_pain:'预算有限', chip_info:'信息过载',
-    chip_trust:'不信任品牌', chip_choice:'选择困难', chip_motivation:'缺乏动力',
-    chip_active:'主动搜索型', chip_passive:'被动浏览型', chip_social_b:'社群互动型', chip_lurker:'只看不评论',
-    acc_basics:'品牌基本资料', acc_audience:'目标受众', acc_pillars:'内容角度', acc_rules:'品牌规则',
-    lbl_clientName:'客户名称 *', lbl_industry:'行业', lbl_brandTone:'品牌语气 *', lbl_brandStory:'品牌故事',
-    lbl_targetAudience:'目标受众', lbl_competitors:'竞争对手', lbl_forbiddenWords:'禁用词汇', lbl_mustMention:'必须提及项目',
-    ph_clientName:'输入客户名称…', ph_industry:'选择行业…', ph_brandStory:'品牌背景、使命、价值观…',
-    ph_competitors:'主要竞争对手…', ph_forbiddenWords:'要避免的词汇…', ph_mustMention:'例如：低收费、家族经营、24/7支持…',
-    industry_beauty:'美容护肤', industry_fashion:'时尚服装', industry_food:'食品饮料', industry_tech:'科技',
-    industry_finance:'金融', industry_health:'健康', industry_realestate:'房地产', industry_travel:'旅游',
-    industry_education:'教育', industry_entertainment:'娱乐', industry_ecommerce:'电商', industry_luxury:'奢侈品',
-    industry_fitness:'运动健身', industry_home:'家居生活', industry_nonprofit:'非营利', industry_other:'其他',
-    tone_professional:'专业', tone_casual:'轻松', tone_luxury:'奢华', tone_energetic:'活力',
-    pillarsDesc:'选择 3–5 个内容角度。系统会自动轮流使用，保持内容多元化和策略性。', ph_pillarCta:'此角度的行动呼吁（例如：私信我们咨询）',
-    pillarCountMin:'已选 {n} / 5 个角度（最少 3 个）',
-    addAngle:'+ 新增角度',
-    lbl_topic:'话题 / 想法 *', ph_topic:'例如：春季系列',
-    lbl_platforms:'选择平台 *', lbl_contentLang:'生成内容语言',
-    lbl_selectClient:'选择客户 *', lbl_contentDirection:'内容方向（选填）',
-    ph_contentDirection:'例如：医疗保险、退休生活…',
-    lbl_platform:'选择平台 *', lbl_contentLangReq:'生成内容语言 *',
-    angleAuto:'内容角度（自动）', changeBtn:'更改', autoOption:'自动（使用轮换）',
-    pillar_Education:'教育', pillar_Product:'产品', pillar_BTS:'幕后花絮', pillar_Customer:'顾客故事',
-    pillar_Lifestyle:'生活方式', pillar_Thought:'思想领导', pillar_Community:'社群互动', pillar_Seasonal:'季节性',
-    pillar_Personal:'个人品牌', pillar_QA:'问答', pillar_Custom:'自定义',
-    gettingStarted:'开始使用', gs_step1:'前往"客户管理" → 建立你的品牌Profile',
-    gs_step2:'已有品牌Profile？直接去"生成内容"开始生成贴文',
-    gs_step3:'想更有策略？设定"内容角度"，系统会自动轮换方向'
+    // Navigation
+    dashboard: '仪表板', clients: '客户管理', discover: '发现趋势', generate: '生成内容', history: '历史记录',
+    
+    // Common labels
+    apiKey: 'API Key', clientName: '客户名称', brandTone: '品牌语气', addClient: '添加客户',
+    updateClient: '更新客户', selectClient: '选择客户', topic: '话题', platforms: '选择平台',
+    yourClients: '你的客户', generated: '生成的内容', chooseClient: '选择客户',
+    
+    // Accordion titles
+    acc_basics: '品牌基础',
+    acc_audience: '目标受众',
+    acc_pillars: '内容角度',
+    acc_rules: '品牌规则',
+    
+    // Pillar presets (NEW - FIXED)
+    pillar_Education: '教育型',
+    pillar_Product: '产品展示',
+    pillar_BTS: '幕后花絮',
+    pillar_Customer: '客户故事',
+    pillar_Lifestyle: '生活风格',
+    pillar_Thought: '思想领导',
+    pillar_Community: '社群互动',
+    pillar_Seasonal: '时事季节',
+    pillar_Personal: '个人品牌',
+    pillar_QA: '问答解惑',
+    pillar_Custom: '自定',
+    
+    // Form labels
+    lbl_clientName: '客户名称',
+    lbl_industry: '行业',
+    lbl_brandTone: '品牌语气',
+    lbl_brandStory: '品牌故事',
+    lbl_targetAudience: '目标受众',
+    lbl_competitors: '竞争对手',
+    lbl_forbiddenWords: '禁用词汇',
+    lbl_mustMention: '必须提及的项目',
+    lbl_selectClient: '选择客户',
+    lbl_topic: '话题 / 想法',
+    lbl_platforms: '选择平台',
+    lbl_contentLang: '生成内容语言',
+    lbl_contentDirection: '内容方向（选填）',
+    lbl_platform: '选择平台',
+    
+    // Placeholders
+    ph_clientName: '输入客户名称...',
+    ph_industry: '选择行业...',
+    ph_brandStory: '品牌背景、使命、价值观...',
+    ph_topic: '例如：春季系列',
+    ph_competitors: '主要竞争对手...',
+    ph_forbiddenWords: '要避免的词汇...',
+    ph_mustMention: '例如：低费用、家族经营、24/7 支持...',
+    ph_contentDirection: '例如：健康保险、退休生活...',
+    ph_pillarCta: '此角度的 CTA（例如：DM 我们订购）',
+    
+    // Buttons & UI
+    generate_btn: '生成',
+    pillarsDesc: '为此品牌选择 3–5 个内容角度。系统会自动轮转 — 保持内容多样且有策略。',
+    addAngle: '+ 新增另一个角度',
+    angleAuto: '内容角度（自动）',
+    changeBtn: '更改',
+    autoOption: '自动（使用轮转）',
+    
+    // Audience tags
+    chip_female: '女性为主',
+    chip_male: '男性为主',
+    chip_balanced: '性别均衡',
+    chip_18: '18-24',
+    chip_25: '25-34',
+    chip_35: '35-44',
+    chip_45: '45-54',
+    chip_55: '55+',
+    chip_student: '学生',
+    chip_newjob: '初入职场',
+    chip_pro: '专业人士',
+    chip_married: '新婚',
+    chip_parent: '为人父母',
+    chip_retire: '退休准备',
+    chip_mass: '大众消费',
+    chip_midclass: '中产',
+    chip_high: '高收入',
+    chip_uhnw: '超高净值',
+    chip_beauty: '美容护肤',
+    chip_health: '健康养生',
+    chip_finance: '投资理财',
+    chip_travel: '旅游',
+    chip_family: '亲子',
+    chip_fashion: '时尚',
+    chip_food: '饮食',
+    chip_fitness: '运动健身',
+    chip_tech: '科技数码',
+    chip_home: '家居生活',
+    chip_price: '价格敏感',
+    chip_quality: '品质导向',
+    chip_brand_loyal: '品牌忠诚',
+    chip_wom: '口碑驱动',
+    chip_impulse: '冲动消费',
+    chip_time: '时间不足',
+    chip_budget: '预算限制',
+    chip_quality_c: '品质担忧',
+    chip_choice: '选择困难',
+    chip_trust: '缺乏信任',
+    chip_active: '主动搜寻型',
+    chip_passive: '被动滚动型',
+    chip_social_b: '社群互动型',
+    chip_lurker: '只看不留言',
+    
+    // Section labels
+    gender_label: '性别',
+    age_label: '年龄组别',
+    lifestage_label: '人生阶段',
+    income_label: '收入水平',
+    interests_label: '兴趣',
+    decision_label: '决策风格',
+    painpoints_label: '痛点',
+    behaviour_label: '平台行为',
+    
+    // Industries
+    industry_beauty: '美容护肤',
+    industry_fashion: '时尚服装',
+    industry_food: '食品饮料',
+    industry_tech: '科技',
+    industry_finance: '金融',
+    industry_health: '健康',
+    industry_realestate: '房地产',
+    industry_travel: '旅游',
+    industry_education: '教育',
+    industry_entertainment: '娱乐',
+    industry_ecommerce: '电商',
+    industry_luxury: '奢侈品',
+    industry_fitness: '运动健身',
+    industry_home: '家居生活',
+    industry_nonprofit: '非营利组织',
+    industry_other: '其他',
+    
+    // Tones
+    tone_professional: '专业',
+    tone_casual: '轻松',
+    tone_luxury: '奢华',
+    tone_energetic: '活力',
+    
+    // Dashboard
+    clients_label: '客户',
+    content_label: '内容项目',
+    gettingStarted: '开始使用',
+    gs_step1: '进入「客户管理」→ 建立你的品牌档案',
+    gs_step2: '设定 3–5 个内容角度（支柱）',
+    gs_step3: '进入「生成」→ 选择平台并输入话题',
   },
+  
   en: {
-    dashboard:'Dashboard', clients:'Client Management', discover:'Topics', generate:'Generate', history:'History',
-    addClient:'Add Client', updateClient:'Update Client', selectClient:'Select Client', chooseClient:'Choose client…',
-    generate_btn:'Generate', generateTopics:'Generate Topic Suggestions',
-    yourClients:'Your Clients', generated:'Generated Content',
-    clients_label:'Clients', content_label:'Content Items',
-    gender_label:'Gender', age_label:'Age Group', lifestage_label:'Life Stage',
-    income_label:'Income Level', interests_label:'Interests', decision_label:'Decision Style',
-    painpoints_label:'Pain Points', behaviour_label:'Platform Behaviour',
-    chip_female:'Female-led', chip_male:'Male-led', chip_balanced:'Gender Balanced',
-    chip_18:'18-24', chip_25:'25-34', chip_35:'35-44', chip_45:'45-54', chip_55:'55+',
-    chip_student:'Student', chip_newjob:'Early Career', chip_pro:'Professional',
-    chip_married:'Newly Married', chip_parent:'Parent', chip_retire:'Pre-retirement',
-    chip_mass:'Mass Market', chip_midclass:'Middle Class', chip_high:'High Income', chip_uhnw:'Ultra High Net Worth',
-    chip_beauty:'Beauty & Skincare', chip_health:'Health & Wellness', chip_finance:'Finance & Investment',
-    chip_travel:'Travel', chip_family:'Family & Kids', chip_fashion:'Fashion',
-    chip_food:'Food & Dining', chip_fitness:'Fitness', chip_tech:'Tech & Digital', chip_home:'Home & Living',
-    chip_price:'Price Sensitive', chip_quality:'Quality-driven', chip_brand_loyal:'Brand Loyal',
-    chip_wom:'Word of Mouth', chip_impulse:'Impulse Buyer',
-    chip_time:'Time-poor', chip_budget_pain:'Budget Conscious', chip_info:'Info Overload',
-    chip_trust:'Low Brand Trust', chip_choice:'Choice Paralysis', chip_motivation:'Lacks Motivation',
-    chip_active:'Active Searcher', chip_passive:'Passive Scroller', chip_social_b:'Community Engager', chip_lurker:'Lurker',
-    acc_basics:'Brand Basics', acc_audience:'Target Audience', acc_pillars:'Content Angles', acc_rules:'Brand Rules',
-    lbl_clientName:'Client Name *', lbl_industry:'Industry', lbl_brandTone:'Brand Tone *', lbl_brandStory:'Brand Story',
-    lbl_targetAudience:'Target Audience', lbl_competitors:'Competitors', lbl_forbiddenWords:'Forbidden Words', lbl_mustMention:'Must Mention Items',
-    ph_clientName:'Enter client name...', ph_industry:'Select industry...', ph_brandStory:'Brand background, mission, values...',
-    ph_competitors:'Main competitors...', ph_forbiddenWords:'Words to avoid...', ph_mustMention:'e.g., low fees, family-owned, 24/7 support...',
-    industry_beauty:'Beauty & Personal Care', industry_fashion:'Fashion & Apparel', industry_food:'Food & Beverage', industry_tech:'Technology',
-    industry_finance:'Finance & Banking', industry_health:'Health & Wellness', industry_realestate:'Real Estate', industry_travel:'Travel & Tourism',
-    industry_education:'Education', industry_entertainment:'Entertainment', industry_ecommerce:'E-commerce', industry_luxury:'Luxury Goods',
-    industry_fitness:'Fitness & Sports', industry_home:'Home & Living', industry_nonprofit:'Nonprofit', industry_other:'Other',
-    tone_professional:'Professional', tone_casual:'Casual', tone_luxury:'Luxury', tone_energetic:'Energetic',
-    pillarsDesc:'Pick 3–5 content angles. The system rotates through them automatically, keeping content varied and strategic.', ph_pillarCta:'Call-to-action for this angle (e.g., DM us to order)',
-    pillarCountMin:'{n} / 5 angles selected (min 3)',
-    addAngle:'<span data-i18n="addAngle">+ Add Another Angle</span>',
-    lbl_topic:'Topic / Idea *', ph_topic:'e.g., Spring Collection',
-    lbl_platforms:'Select Platforms *', lbl_contentLang:'Content Language',
-    lbl_selectClient:'Select Client *', lbl_contentDirection:'Content Direction (Optional)',
-    ph_contentDirection:'e.g., Health Insurance, Retirement Life...',
-    lbl_platform:'Select Platform *', lbl_contentLangReq:'Content Language *',
-    angleAuto:'Content Angle (Auto)', changeBtn:'Change', autoOption:'Auto (use rotation)',
-    pillar_Education:'Education', pillar_Product:'Product', pillar_BTS:'Behind-the-Scenes', pillar_Customer:'Customer Stories',
-    pillar_Lifestyle:'Lifestyle', pillar_Thought:'Thought Leadership', pillar_Community:'Community', pillar_Seasonal:'Seasonal',
-    pillar_Personal:'Personal Brand', pillar_QA:'Q&A', pillar_Custom:'Custom',
-    gettingStarted:'Getting Started', gs_step1:'Go to "Client Management" → Build your brand profile',
-    gs_step2:'Already have a profile? Go straight to "Generate" to start posting',
-    gs_step3:'Want more strategy? Set up "Content Angles" for automatic rotation'
+    // Navigation
+    dashboard: 'Dashboard', clients: 'Client Mgmt', discover: 'Topics', generate: 'Generate', history: 'History',
+    
+    // Common labels
+    apiKey: 'API Key', clientName: 'Client Name', brandTone: 'Brand Tone', addClient: 'Add Client',
+    updateClient: 'Update Client', selectClient: 'Select Client', topic: 'Topic', platforms: 'Select Platforms',
+    yourClients: 'Your Clients', generated: 'Generated Content', chooseClient: 'Choose client',
+    
+    // Accordion titles
+    acc_basics: 'Brand Basics',
+    acc_audience: 'Target Audience',
+    acc_pillars: 'Content Angles',
+    acc_rules: 'Brand Rules',
+    
+    // Pillar presets (NEW - FIXED)
+    pillar_Education: 'Education',
+    pillar_Product: 'Product',
+    pillar_BTS: 'Behind-the-Scenes',
+    pillar_Customer: 'Customer Stories',
+    pillar_Lifestyle: 'Lifestyle',
+    pillar_Thought: 'Thought Leadership',
+    pillar_Community: 'Community',
+    pillar_Seasonal: 'Seasonal',
+    pillar_Personal: 'Personal Brand',
+    pillar_QA: 'Q&A',
+    pillar_Custom: 'Custom',
+    
+    // Form labels
+    lbl_clientName: 'Client Name',
+    lbl_industry: 'Industry',
+    lbl_brandTone: 'Brand Tone',
+    lbl_brandStory: 'Brand Story',
+    lbl_targetAudience: 'Target Audience',
+    lbl_competitors: 'Competitors',
+    lbl_forbiddenWords: 'Forbidden Words',
+    lbl_mustMention: 'Must Mention Items',
+    lbl_selectClient: 'Select Client',
+    lbl_topic: 'Topic / Idea',
+    lbl_platforms: 'Select Platforms',
+    lbl_contentLang: 'Content Language',
+    lbl_contentDirection: 'Content Direction (Optional)',
+    lbl_platform: 'Select Platform',
+    
+    // Placeholders
+    ph_clientName: 'Enter client name...',
+    ph_industry: 'Select industry...',
+    ph_brandStory: 'Brand background, mission, values...',
+    ph_topic: 'e.g., Spring Collection',
+    ph_competitors: 'Main competitors...',
+    ph_forbiddenWords: 'Words to avoid...',
+    ph_mustMention: 'e.g., low fees, family-owned, 24/7 support...',
+    ph_contentDirection: 'e.g., Health Insurance, Retirement Life...',
+    ph_pillarCta: 'CTA for this angle (e.g., DM us to order)',
+    
+    // Buttons & UI
+    generate_btn: 'Generate',
+    pillarsDesc: 'Pick 3–5 content angles for this brand. The system will rotate through them automatically — keeping your content varied and strategic.',
+    addAngle: '+ Add Another Angle',
+    angleAuto: 'Content Angle (Auto)',
+    changeBtn: 'Change',
+    autoOption: 'Auto (use rotation)',
+    
+    // Audience tags
+    chip_female: 'Female-focused',
+    chip_male: 'Male-focused',
+    chip_balanced: 'Gender-balanced',
+    chip_18: '18-24',
+    chip_25: '25-34',
+    chip_35: '35-44',
+    chip_45: '45-54',
+    chip_55: '55+',
+    chip_student: 'Student',
+    chip_newjob: 'Early Career',
+    chip_pro: 'Professional',
+    chip_married: 'Newlywed',
+    chip_parent: 'Parent',
+    chip_retire: 'Pre-Retirement',
+    chip_mass: 'Mass Market',
+    chip_midclass: 'Middle Class',
+    chip_high: 'High Income',
+    chip_uhnw: 'UHNW',
+    chip_beauty: 'Beauty & Skincare',
+    chip_health: 'Health & Wellness',
+    chip_finance: 'Finance & Investment',
+    chip_travel: 'Travel',
+    chip_family: 'Family',
+    chip_fashion: 'Fashion',
+    chip_food: 'Food',
+    chip_fitness: 'Fitness & Sports',
+    chip_tech: 'Tech & Digital',
+    chip_home: 'Home & Living',
+    chip_price: 'Price-sensitive',
+    chip_quality: 'Quality-focused',
+    chip_brand_loyal: 'Brand-loyal',
+    chip_wom: 'Word-of-mouth-driven',
+    chip_impulse: 'Impulse-buying',
+    chip_time: 'Time-constrained',
+    chip_budget: 'Budget-limited',
+    chip_quality_c: 'Quality-concerned',
+    chip_choice: 'Decision-paralyzed',
+    chip_trust: 'Trust-deficient',
+    chip_active: 'Active Searcher',
+    chip_passive: 'Passive Scroller',
+    chip_social_b: 'Social Engager',
+    chip_lurker: 'Lurker',
+    
+    // Section labels
+    gender_label: 'Gender',
+    age_label: 'Age Group',
+    lifestage_label: 'Life Stage',
+    income_label: 'Income Level',
+    interests_label: 'Interests',
+    decision_label: 'Decision Style',
+    painpoints_label: 'Pain Points',
+    behaviour_label: 'Platform Behavior',
+    
+    // Industries
+    industry_beauty: 'Beauty & Personal Care',
+    industry_fashion: 'Fashion & Apparel',
+    industry_food: 'Food & Beverage',
+    industry_tech: 'Technology',
+    industry_finance: 'Finance & Banking',
+    industry_health: 'Health & Wellness',
+    industry_realestate: 'Real Estate',
+    industry_travel: 'Travel & Tourism',
+    industry_education: 'Education',
+    industry_entertainment: 'Entertainment',
+    industry_ecommerce: 'E-commerce',
+    industry_luxury: 'Luxury Goods',
+    industry_fitness: 'Fitness & Sports',
+    industry_home: 'Home & Living',
+    industry_nonprofit: 'Nonprofit',
+    industry_other: 'Other',
+    
+    // Tones
+    tone_professional: 'Professional',
+    tone_casual: 'Casual',
+    tone_luxury: 'Luxury',
+    tone_energetic: 'Energetic',
+    
+    // Dashboard
+    clients_label: 'Clients',
+    content_label: 'Content Items',
+    gettingStarted: 'Getting Started',
+    gs_step1: 'Go to "Client Management" → Build your brand profile',
+    gs_step2: 'Set up 3–5 content angles (Pillars)',
+    gs_step3: 'Go to "Generate" → Pick platforms and write a topic',
   }
 };
 
 // ═══════════════════════════════════════════
+// PILLAR PRESETS (核心)
+// ═══════════════════════════════════════════
+const PILLAR_PRESETS = [
+  { name: 'Education', placeholder: 'e.g., Teach audience how-to tips and industry insights' },
+  { name: 'Product', placeholder: 'e.g., Showcase new items and seasonal offerings' },
+  { name: 'Behind-the-Scenes', placeholder: 'e.g., Show real team culture and authentic moments' },
+  { name: 'Customer Stories', placeholder: 'e.g., Share real customer experiences and results' },
+  { name: 'Lifestyle', placeholder: 'e.g., Show brand in everyday moments and contexts' },
+  { name: 'Thought Leadership', placeholder: 'e.g., Share industry insights and expert opinions' },
+  { name: 'Community', placeholder: 'e.g., Engage audience with questions and discussions' },
+  { name: 'Seasonal', placeholder: 'e.g., Connect brand to holidays and trending moments' },
+  { name: 'Personal Brand', placeholder: 'e.g., Share founder story and personal values' },
+  { name: 'Q&A', placeholder: 'e.g., Answer common audience questions and concerns' },
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentLang = 'tc';
+let currentUser = null;
+let clients = [];
+let currentClient = null;
+let editingClientId = null;
+let selectedPlatforms = [];
+let generatedVariations = [];
+
+// ═══════════════════════════════════════════
+// SCREEN MANAGER
+// ═══════════════════════════════════════════
+function showScreen(name) {
+  document.getElementById('loadingScreen').style.display = name === 'loading' ? 'flex' : 'none';
+  document.getElementById('authScreen').style.display = name === 'auth' ? 'flex' : 'none';
+  document.getElementById('appScreen').style.display = name === 'app' ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════
-function showScreen(screen) {
-  document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('authScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'none';
-  if (screen === 'loading') document.getElementById('loadingScreen').style.display = 'flex';
-  else if (screen === 'auth') document.getElementById('authScreen').style.display = 'flex';
-  else if (screen === 'app') document.getElementById('appScreen').style.display = 'block';
-}
-
 function switchAuthTab(tab) {
-  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
   document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
-  clearAuthMessages();
-}
-
-function showAuthError(msg) {
-  const el = document.getElementById('authError');
-  el.textContent = msg;
-  el.classList.add('visible');
-  document.getElementById('authSuccess').classList.remove('visible');
-}
-
-function showAuthSuccess(msg) {
-  const el = document.getElementById('authSuccess');
-  el.textContent = msg;
-  el.classList.add('visible');
-  document.getElementById('authError').classList.remove('visible');
-}
-
-function clearAuthMessages() {
-  document.getElementById('authError').classList.remove('visible');
-  document.getElementById('authSuccess').classList.remove('visible');
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
 }
 
 async function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-  if (!email || !password) { showAuthError('Please enter email and password.'); return; }
-
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true; btn.textContent = 'Signing in...';
-
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  if (error) {
-    showAuthError(error.message);
-    btn.disabled = false; btn.textContent = 'Sign In';
+  const errorEl = document.getElementById('authError');
+  const successEl = document.getElementById('authSuccess');
+  
+  errorEl.classList.remove('visible');
+  successEl.classList.remove('visible');
+  
+  if (!email || !password) {
+    errorEl.textContent = 'Please enter email and password.';
+    errorEl.classList.add('visible');
+    return;
+  }
+  
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    // Auth state change listener will handle init
+  } catch (e) {
+    errorEl.textContent = e.message || 'Login failed.';
+    errorEl.classList.add('visible');
   }
 }
 
@@ -1345,39 +2100,182 @@ async function handleSignup() {
   const name = document.getElementById('signupName').value.trim();
   const email = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
-
-  if (!email || !password) { showAuthError('Please fill in all fields.'); return; }
-  if (password.length < 6) { showAuthError('Password must be at least 6 characters.'); return; }
-
-  const btn = document.getElementById('signupBtn');
-  btn.disabled = true; btn.textContent = 'Creating account...';
-
-  const { error } = await sb.auth.signUp({
-    email, password,
-    options: { data: { full_name: name } }
-  });
-
-  if (error) {
-    showAuthError(error.message);
-    btn.disabled = false; btn.textContent = 'Create Account';
-  } else {
-    showAuthSuccess('Account created! Please check your email to confirm, then sign in.');
-    btn.disabled = false; btn.textContent = 'Create Account';
+  const errorEl = document.getElementById('authError');
+  const successEl = document.getElementById('authSuccess');
+  
+  errorEl.classList.remove('visible');
+  successEl.classList.remove('visible');
+  
+  if (!name || !email || !password) {
+    errorEl.textContent = 'Please fill all fields.';
+    errorEl.classList.add('visible');
+    return;
+  }
+  
+  if (password.length < 6) {
+    errorEl.textContent = 'Password must be at least 6 characters.';
+    errorEl.classList.add('visible');
+    return;
+  }
+  
+  try {
+    const { data, error } = await sb.auth.signUp({ email, password });
+    if (error) throw error;
+    successEl.textContent = 'Sign up successful! Please sign in.';
+    successEl.classList.add('visible');
+    setTimeout(() => switchAuthTab('login'), 2000);
+  } catch (e) {
+    errorEl.textContent = e.message || 'Sign up failed.';
+    errorEl.classList.add('visible');
   }
 }
 
 async function handleGoogleLogin() {
-  const { error } = await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + '/flux-content-engine-v2.html' }
-  });
-  if (error) showAuthError(error.message);
+  try {
+    const { data, error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+    if (error) throw error;
+  } catch (e) {
+    alert('Google sign-in failed: ' + e.message);
+  }
 }
 
 async function handleLogout() {
   await sb.auth.signOut();
-  clients = []; currentClient = null; generatedVariations = [];
   showScreen('auth');
+}
+
+// ═══════════════════════════════════════════
+// LANGUAGE & UI
+// ═══════════════════════════════════════════
+function setLanguage(lang, e) {
+  currentLang = lang;
+  if (e) {
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    e.target.classList.add('active');
+  }
+  updateAllUI();
+  saveData();
+}
+
+function updateAllUI() {
+  const t = LANGS[currentLang];
+  
+  // Update nav items
+  const navItems = document.querySelectorAll('.nav-item');
+  const navLabels = [t.dashboard, t.clients, t.discover, t.generate, t.history];
+  navItems.forEach((item, i) => {
+    if (navLabels[i]) item.textContent = navLabels[i];
+  });
+  
+  // Update data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (!t[key]) return;
+    const prefix = el.getAttribute('data-i18n-prefix');
+    el.textContent = prefix ? (prefix + ' ' + t[key]) : t[key];
+  });
+  
+  // Update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
+  
+  // Update tag chips
+  document.querySelectorAll('.tag-chip[data-langkey]').forEach(chip => {
+    const key = chip.getAttribute('data-langkey');
+    if (t[key]) chip.textContent = t[key];
+  });
+  
+  // Update section labels
+  document.querySelectorAll('[data-sectionkey]').forEach(el => {
+    const key = el.getAttribute('data-sectionkey');
+    if (t[key]) el.textContent = t[key];
+  });
+  
+  // Update buttons
+  const saveBtn = document.getElementById('saveClientBtn');
+  if (saveBtn) saveBtn.textContent = editingClientId ? t.updateClient : t.addClient;
+  
+  // Update accordion titles
+  refreshAccordionTitles();
+  
+  // Update pillar preset labels (NEW - FIX FOR BUG 1)
+  refreshPillarPresetLabels();
+  
+  // Update dashboard text
+  refreshDashboardText();
+  
+  updatePageTitle();
+}
+
+function refreshAccordionTitles() {
+  const t = LANGS[currentLang];
+  const name = document.getElementById('clientName')?.value;
+  const basicsTitle = document.getElementById('acc-basics-title');
+  if (basicsTitle) {
+    basicsTitle.textContent = name ? `① ${t.acc_basics} — ${name}` : `① ${t.acc_basics}`;
+  }
+  updatePillarCount();
+}
+
+// NEW FUNCTION (BUG 1 FIX)
+function refreshPillarPresetLabels() {
+  const t = LANGS[currentLang];
+  const presetMap = {
+    'Education': t.pillar_Education || 'Education',
+    'Product': t.pillar_Product || 'Product',
+    'Behind-the-Scenes': t.pillar_BTS || 'Behind-the-Scenes',
+    'Customer Stories': t.pillar_Customer || 'Customer Stories',
+    'Lifestyle': t.pillar_Lifestyle || 'Lifestyle',
+    'Thought Leadership': t.pillar_Thought || 'Thought Leadership',
+    'Community': t.pillar_Community || 'Community',
+    'Seasonal': t.pillar_Seasonal || 'Seasonal',
+    'Personal Brand': t.pillar_Personal || 'Personal Brand',
+    'Q&A': t.pillar_QA || 'Q&A',
+  };
+  
+  // Re-render all pillar dropdowns
+  document.querySelectorAll('.pillar-name-select').forEach(sel => {
+    const currentValue = sel.value;
+    sel.innerHTML = [
+      ...PILLAR_PRESETS.map(p => `
+        <option value="${p.name}" ${currentValue === p.name ? 'selected' : ''}>
+          ${presetMap[p.name] || p.name}
+        </option>
+      `),
+      `<option value="Custom" ${currentValue === 'Custom' ? 'selected' : ''}>
+        ${t.pillar_Custom || 'Custom'}
+      </option>`
+    ].join('');
+  });
+}
+
+function refreshDashboardText() {
+  const t = LANGS[currentLang];
+  const gsTitle = document.getElementById('gsTitle');
+  const gsStep1 = document.getElementById('gsStep1');
+  const gsStep2 = document.getElementById('gsStep2');
+  const gsStep3 = document.getElementById('gsStep3');
+  if (gsTitle) gsTitle.textContent = t.gettingStarted;
+  if (gsStep1) gsStep1.textContent = t.gs_step1;
+  if (gsStep2) gsStep2.textContent = t.gs_step2;
+  if (gsStep3) gsStep3.textContent = t.gs_step3;
+}
+
+function updatePageTitle() {
+  const titles = {
+    dashboard: LANGS[currentLang].dashboard,
+    clients: LANGS[currentLang].clients,
+    discover: LANGS[currentLang].discover,
+    generate: LANGS[currentLang].generate,
+    history: LANGS[currentLang].history
+  };
+  const activeTab = document.querySelector('.section.active')?.id || 'dashboard';
+  document.getElementById('pageTitle').textContent = titles[activeTab] || 'Dashboard';
 }
 
 // ═══════════════════════════════════════════
@@ -1385,24 +2283,21 @@ async function handleLogout() {
 // ═══════════════════════════════════════════
 async function initApp(user) {
   currentUser = user;
-
-  // Set user info in sidebar
   const email = user.email || '';
   const initials = email.charAt(0).toUpperCase();
   document.getElementById('userAvatar').textContent = initials;
   document.getElementById('userEmail').textContent = email;
-
+  
   showScreen('app');
   await loadClients();
   updateStats();
   updateAllUI();
   startKeepAlive();
-  // Init pillar cards with defaults for new client form
   setTimeout(() => loadPillarData([]), 100);
 }
 
 // ═══════════════════════════════════════════
-// SUPABASE DATA OPERATIONS
+// DATA OPERATIONS
 // ═══════════════════════════════════════════
 async function loadClients() {
   if (!currentUser) return;
@@ -1497,7 +2392,6 @@ async function saveClient() {
   if (document.getElementById('clientMustMention')) document.getElementById('clientMustMention').value = '';
   loadPillarData([]);
   editingClientId = null;
-  btn.textContent = LANGS[currentLang].addClient;
 
   await loadClients();
   showSaving('Saved ✓');
@@ -1530,10 +2424,6 @@ async function loadHistory() {
   } catch(e) { console.error('Load history error:', e); return []; }
 }
 
-async function updateContentVariations(contentId, variations) {
-  await sb.from('content').update({ variations }).eq('id', contentId).eq('user_id', currentUser.id);
-}
-
 // ═══════════════════════════════════════════
 // UI HELPERS
 // ═══════════════════════════════════════════
@@ -1544,151 +2434,19 @@ function showSaving(msg) {
   setTimeout(() => el.classList.remove('visible'), 2000);
 }
 
-function switchTab(tab, fromHistory) {
+function switchTab(tab) {
   closeMobileMenu();
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(tab).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  if (event && event.target) event.target.classList.add('active');
-  else {
-    // Called programmatically (e.g. from history) - highlight correct nav item
-    const navMap = { dashboard: 0, clients: 1, discover: 2, generate: 3, history: 4 };
-    const navItems = document.querySelectorAll('.nav-item');
-    if (navItems[navMap[tab]]) navItems[navMap[tab]].classList.add('active');
-  }
-  updatePageTitle();
-  if (tab === 'history') renderHistory();
-
-  // Clear stale generated content when navigating to Generate tab directly
-  // (not when coming from a History click, which intentionally loads content)
-  if (tab === 'generate' && !fromHistory) {
-    const viewingFromHistory = document.getElementById('generatedContent')?.dataset.fromHistory === 'true';
-    if (viewingFromHistory) {
-      generatedVariations = [];
-      document.getElementById('generatedContent').innerHTML = '';
-      document.getElementById('generatedContent').dataset.fromHistory = 'false';
-      const topicField = document.getElementById('topic');
-      if (topicField) topicField.value = '';
-      updateTopicCount();
-    }
-  }
-}
-
-function updatePageTitle() {
-  const t = LANGS[currentLang];
-  const tabMap = { dashboard: t.dashboard, clients: t.clients, discover: t.discover, generate: t.generate, history: t.history };
-  const activeTab = document.querySelector('.section.active')?.id || 'dashboard';
-  document.getElementById('pageTitle').textContent = tabMap[activeTab] || 'Dashboard';
-}
-
-function setLanguage(lang, e) {
-  currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  if (e && e.target) e.target.classList.add('active');
-  updateAllUI();
-}
-
-function updateAllUI() {
-  const t = LANGS[currentLang];
-  const navKeys = ['dashboard','clients','discover','generate','history'];
-  document.querySelectorAll('.nav-item').forEach((item, i) => { if (t[navKeys[i]]) item.textContent = t[navKeys[i]]; });
-
-  const genBtn = document.getElementById('generateBtn');
-  if (genBtn) genBtn.textContent = t.generate_btn;
-  const topicBtn = document.getElementById('topicBtn');
-  if (topicBtn) topicBtn.textContent = t.generateTopics;
-  const saveBtn = document.getElementById('saveClientBtn');
-  if (saveBtn) saveBtn.textContent = editingClientId ? t.updateClient : t.addClient;
-  const header = document.getElementById('yourClientsHeader');
-  if (header) header.textContent = t.yourClients;
-  document.querySelectorAll('.stat-label')[0] && (document.getElementById('clientsLabel').textContent = t.clients_label);
-  document.querySelectorAll('.stat-label')[1] && (document.getElementById('contentLabel').textContent = t.content_label);
-
-  document.querySelectorAll('.tag-chip[data-langkey]').forEach(chip => {
-    const key = chip.getAttribute('data-langkey');
-    if (t[key]) chip.textContent = t[key];
-  });
-  document.querySelectorAll('[data-sectionkey]').forEach(el => {
-    const key = el.getAttribute('data-sectionkey');
-    if (t[key]) el.textContent = t[key];
-  });
-
-  // Generic data-i18n handler (text content, with optional numbered prefix)
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (!t[key]) return;
-    const prefix = el.getAttribute('data-i18n-prefix');
-    el.textContent = prefix ? (prefix + ' ' + t[key]) : t[key];
-  });
-
-  // Placeholder handler
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    if (t[key]) el.placeholder = t[key];
-  });
-
-  // Refresh accordion titles (preserve filled state with name/count suffix)
-  refreshAccordionTitles();
-
-  // Refresh pillar card preset dropdowns
-  refreshPillarPresetLabels();
-
-  // Refresh Dashboard Getting Started
-  refreshDashboardText();
-
+  const navIdx = ['dashboard', 'clients', 'discover', 'generate', 'history'].indexOf(tab);
+  if (navIdx >= 0) document.querySelectorAll('.nav-item')[navIdx].classList.add('active');
   updatePageTitle();
 }
 
-function refreshAccordionTitles() {
-  const t = LANGS[currentLang];
-  const name = document.getElementById('clientName')?.value;
-  const basicsTitle = document.getElementById('acc-basics-title');
-  if (basicsTitle) {
-    basicsTitle.textContent = name ? `① ${t.acc_basics} — ${name}` : `① ${t.acc_basics}`;
-  }
-  updatePillarCount();
-}
-
-function refreshPillarPresetLabels() {
-  const t = LANGS[currentLang];
-  const presetMap = {
-    'Education': t.pillar_Education, 'Product': t.pillar_Product,
-    'Behind-the-Scenes': t.pillar_BTS, 'Customer Stories': t.pillar_Customer,
-    'Lifestyle': t.pillar_Lifestyle, 'Thought Leadership': t.pillar_Thought,
-    'Community': t.pillar_Community, 'Seasonal': t.pillar_Seasonal,
-    'Personal Brand': t.pillar_Personal, 'Q&A': t.pillar_QA, 'Custom': t.pillar_Custom
-  };
-  document.querySelectorAll('.pillar-name-select option').forEach(opt => {
-    const translated = presetMap[opt.value];
-    if (translated) opt.textContent = translated;
-  });
-  document.querySelectorAll('.pillar-cta-input').forEach(input => {
-    if (t.ph_pillarCta) input.placeholder = t.ph_pillarCta;
-  });
-}
-
-function refreshDashboardText() {
-  const t = LANGS[currentLang];
-  const gsTitle = document.getElementById('gsTitle');
-  const gsStep1 = document.getElementById('gsStep1');
-  const gsStep2 = document.getElementById('gsStep2');
-  const gsStep3 = document.getElementById('gsStep3');
-  if (gsTitle) gsTitle.textContent = t.gettingStarted;
-  if (gsStep1) gsStep1.textContent = t.gs_step1;
-  if (gsStep2) gsStep2.textContent = t.gs_step2;
-  if (gsStep3) gsStep3.textContent = t.gs_step3;
-}
-
-function updateStats() {
-  document.getElementById('clientCount').textContent = clients.length;
-  if (currentUser) {
-    fetch(BACKEND + '/api/content/count?user_id=' + currentUser.id)
-      .then(r => r.json())
-      .then(res => { if(res.success) document.getElementById('contentCount').textContent = res.count; })
-      .catch(() => {});
-  }
-}
-
+// ═══════════════════════════════════════════
+// CLIENT MANAGEMENT
+// ═══════════════════════════════════════════
 function updateClientsList() {
   const list = document.getElementById('clientsList');
   if (!clients.length) {
@@ -1757,7 +2515,7 @@ async function deleteClient(id) {
 }
 
 // ═══════════════════════════════════════════
-// TAG CHIPS
+// AUDIENCE TAGS
 // ═══════════════════════════════════════════
 const AUDIENCE_GROUPS = ['gender','age','lifestage','income','interests','decision','painpoints','behaviour'];
 
@@ -1795,8 +2553,12 @@ function getAudienceString() {
 function updateAudienceSummary() {
   const el = document.getElementById('audienceSummary');
   const str = getAudienceString();
-  if (str) { el.textContent = '✓ ' + str; el.classList.add('visible'); }
-  else el.classList.remove('visible');
+  if (str) {
+    el.textContent = '✓ ' + str;
+    el.classList.add('visible');
+  } else {
+    el.classList.remove('visible');
+  }
 }
 
 function loadAudienceTags(audienceObj) {
@@ -1812,494 +2574,8 @@ function loadAudienceTags(audienceObj) {
 }
 
 // ═══════════════════════════════════════════
-// TOPIC COUNT
-// ═══════════════════════════════════════════
-function updateTopicCount() {
-  const ta = document.getElementById('topic');
-  const count = document.getElementById('topicCount');
-  if (ta && count) count.textContent = ta.value.length;
-}
-
-// ═══════════════════════════════════════════
-// PLATFORM TOGGLE
-// ═══════════════════════════════════════════
-function togglePlatform(id, e) {
-  const btn = e ? e.target : document.querySelector(`.platform-btn[onclick*="${id}"]`);
-  if (selectedPlatforms.includes(id)) {
-    selectedPlatforms = selectedPlatforms.filter(p => p !== id);
-    btn.classList.remove('active');
-  } else {
-    selectedPlatforms.push(id);
-    btn.classList.add('active');
-  }
-}
-
-// ═══════════════════════════════════════════
-// GENERATE CONTENT
-// ═══════════════════════════════════════════
-function generateContent() {
-  if (!currentClient || selectedPlatforms.length === 0 || !document.getElementById('topic').value.trim()) {
-    alert('Please select a client, choose at least one platform, and enter a topic.');
-    return;
-  }
-
-  const topic = document.getElementById('topic').value.trim();
-  const contentLang = document.getElementById('contentLanguage').value;
-  const btn = document.getElementById('generateBtn');
-  btn.disabled = true; btn.textContent = 'Generating...';
-
-  const overrideVal = document.getElementById('generatePillarOverride')?.value;
-  const pillarIdx = overrideVal !== undefined && overrideVal !== ''
-    ? parseInt(overrideVal)
-    : (currentClient.pillarRotationIndex || 0);
-
-  fetch(BACKEND + '/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      topic, clientName: currentClient.name, industry: currentClient.industry,
-      tone: currentClient.tone, brandStory: currentClient.brandStory,
-      targetAudience: currentClient.targetAudience, forbiddenWords: currentClient.forbiddenWords,
-      mustMentionItems: currentClient.mustMentionItems,
-      selectedPillars: currentClient.selectedPillars || [],
-      pillarRotationIndex: pillarIdx,
-      platforms: selectedPlatforms, language: contentLang
-    })
-  })
-  .then(r => r.json())
-  .then(async data => {
-    btn.disabled = false; btn.textContent = LANGS[currentLang].generate_btn;
-    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
-
-    generatedVariations = parseVariations(data.text);
-
-    const entry = {
-      clientId: currentClient.id, topic, variations: generatedVariations,
-      platforms: selectedPlatforms, contentLanguage: contentLang,
-      createdAt: new Date().toISOString()
-    };
-
-    await saveContent(entry);
-    renderVariations();
-
-    // Advance pillar rotation
-    if (currentClient && currentClient.selectedPillars && currentClient.selectedPillars.length > 0) {
-      fetch(BACKEND + '/api/clients/' + currentClient.id + '/advance-pillar', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: currentUser.id,
-          current_index: pillarIdx,
-          pillar_count: currentClient.selectedPillars.length
-        })
-      }).then(() => {
-        // Update local state
-        currentClient.pillarRotationIndex = (pillarIdx + 1) % currentClient.selectedPillars.length;
-        updatePillarIndicators();
-        // Refresh clients list to get updated rotation
-        loadClients();
-      }).catch(() => {});
-    }
-
-    document.getElementById('topic').value = '';
-    document.getElementById('topicCount').textContent = '0';
-    selectedPlatforms = [];
-    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-
-    fetch(BACKEND + '/api/content/count?user_id=' + currentUser.id)
-      .then(r => r.json())
-      .then(res => { if(res.success) document.getElementById('contentCount').textContent = res.count; });
-  })
-  .catch(err => {
-    btn.disabled = false; btn.textContent = LANGS[currentLang].generate_btn;
-    alert('Network error: ' + err.message);
-  });
-}
-
-function parseVariations(content) {
-  const variations = [];
-  const parts = content.split(/\[Variation \d+\]/i);
-  for (let i = 1; i < parts.length; i++) {
-    const text = parts[i].trim();
-    if (text) variations.push({ id: 'var_' + Date.now() + '_' + i, number: i, content: text, rating: 0, isBest: false });
-  }
-  return variations.length > 0 ? variations : [{ id: 'var_' + Date.now() + '_1', number: 1, content, rating: 0, isBest: false }];
-}
-
-function renderVariations() {
-  const div = document.getElementById('generatedContent');
-  if (!generatedVariations || !generatedVariations.length) { div.innerHTML = ''; return; }
-
-  let html = `<div class="generated-title">${LANGS[currentLang].generated} (${generatedVariations.length})</div>`;
-  generatedVariations.forEach(v => {
-    html += `<div class="variation-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div class="variation-title" style="margin-bottom:0;">Variation ${v.number}</div>
-        <button onclick="copyVariation('${v.id}',this)" style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Copy</button>
-      </div>
-      <div class="variation-content">${v.content}</div>
-      <div class="rating">`;
-    for (let i = 1; i <= 5; i++) {
-      html += `<span class="star${i <= v.rating ? ' active' : ''}" onclick="rateVariation('${v.id}',${i})">${i <= v.rating ? '★' : '☆'}</span>`;
-    }
-    html += `</div>${v.isBest ? '<div class="best-badge">✓ Best</div>' : ''}</div>`;
-  });
-  div.innerHTML = html;
-}
-
-function copyVariation(varId, btn) {
-  const v = generatedVariations.find(v => v.id === varId);
-  if (!v) return;
-  navigator.clipboard.writeText(v.content).then(() => {
-    btn.textContent = 'Copied ✓';
-    btn.style.color = '#cdffd8';
-    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = 'rgba(255,255,255,0.6)'; }, 2000);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = v.content; ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = 'Copied ✓';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-  });
-}
-
-function rateVariation(varId, rating) {
-  const v = generatedVariations.find(v => v.id === varId);
-  if (v) { v.rating = rating; v.isBest = rating >= 4; renderVariations(); }
-}
-
-// ═══════════════════════════════════════════
-// HISTORY
-// ═══════════════════════════════════════════
-async function renderHistory(filterPillar) {
-  const div = document.getElementById('historyList');
-  div.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:16px 0;">Loading history...</div>';
-
-  let history = await loadHistory();
-  if (!history.length) {
-    div.innerHTML = '<div style="color:var(--secondary);text-align:center;padding:48px 0;font-size:14px;">No content generated yet.</div>';
-    return;
-  }
-
-  // Store history entries for lookup by id (avoids inline JSON issues)
-  window._historyCache = {};
-  history.forEach(e => { window._historyCache[e.id] = e; });
-
-  // Filter by pillar if specified
-  if (filterPillar) {
-    history = history.filter(e => {
-      const vars = e.variations || [];
-      return vars.some(v => v.pillar === filterPillar);
-    });
-  }
-
-  // Group by pillar for display
-  const pillarGroups = {};
-  const noPillar = [];
-  history.forEach(entry => {
-    const vars = entry.variations || [];
-    const pillarName = vars[0]?.pillar || null;
-    if (pillarName) {
-      if (!pillarGroups[pillarName]) pillarGroups[pillarName] = [];
-      pillarGroups[pillarName].push(entry);
-    } else {
-      noPillar.push(entry);
-    }
-  });
-
-  // Build pillar filter tabs
-  const allPillars = Object.keys(pillarGroups);
-  let filterHtml = '';
-  if (allPillars.length > 0) {
-    filterHtml = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
-      <button onclick="renderHistory()" style="padding:6px 14px;border:1px solid ${!filterPillar ? 'var(--accent-mint)' : 'var(--border-mid)'};background:${!filterPillar ? 'rgba(205,255,216,0.1)' : 'transparent'};color:${!filterPillar ? 'var(--accent-mint)' : 'var(--secondary)'};border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">All</button>
-      ${allPillars.map(p => `<button onclick="renderHistory('${p}')" style="padding:6px 14px;border:1px solid ${filterPillar===p ? 'var(--accent-mint)' : 'var(--border-mid)'};background:${filterPillar===p ? 'rgba(205,255,216,0.1)' : 'transparent'};color:${filterPillar===p ? 'var(--accent-mint)' : 'var(--secondary)'};border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">${p}</button>`).join('')}
-    </div>`;
-  }
-
-  function renderEntries(entries) {
-    return entries.map(entry => {
-      const client = clients.find(c => c.id === entry.client_id);
-      const clientName = client ? client.name : 'Unknown Client';
-      const date = new Date(entry.created_at).toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-      const platforms = (entry.platforms || []).join(', ').toUpperCase();
-      const vars = entry.variations || [];
-      const bestVar = vars.find(v => v.isBest) || vars[0];
-      const preview = bestVar ? bestVar.content.substring(0, 120) + '...' : 'No content preview';
-      const pillarTag = vars[0]?.pillar ? `<span style="font-size:10px;padding:2px 8px;background:rgba(205,255,216,0.1);border:1px solid rgba(205,255,216,0.2);border-radius:999px;color:var(--accent-mint);margin-left:8px;">${vars[0].pillar}</span>` : '';
-
-      return `<div class="card" style="margin-bottom:12px;cursor:pointer;" onclick="loadHistoryEntry('${entry.id}')">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-          <div style="flex:1;">
-            <div style="font-weight:600;color:var(--accent-mint);margin-bottom:4px;">${entry.topic}${pillarTag}</div>
-            <div style="font-size:11px;color:var(--muted);">${clientName} · ${platforms} · ${date}</div>
-          </div>
-          ${bestVar && bestVar.isBest ? '<div style="font-size:10px;color:var(--accent-mint);font-weight:600;letter-spacing:0.08em;flex-shrink:0;">★ BEST</div>' : ''}
-        </div>
-        <div style="font-size:12px;color:var(--secondary);line-height:1.5;white-space:pre-wrap;">${preview}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px;">${vars.length} variations · Click to view</div>
-      </div>`;
-    }).join('');
-  }
-
-  let html = filterHtml;
-
-  if (filterPillar) {
-    html += renderEntries(history);
-  } else if (allPillars.length > 0) {
-    // Show by pillar groups first, then ungrouped
-    allPillars.forEach(pillar => {
-      html += `<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">${pillar}</div>`;
-      html += renderEntries(pillarGroups[pillar]);
-    });
-    if (noPillar.length > 0) {
-      html += `<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Other</div>`;
-      html += renderEntries(noPillar);
-    }
-  } else {
-    html += renderEntries(noPillar);
-  }
-
-  div.innerHTML = html;
-}
-
-function loadHistoryEntry(entryId) {
-  const entry = window._historyCache && window._historyCache[entryId];
-  if (!entry) { console.error('History entry not found:', entryId); return; }
-
-  generatedVariations = entry.variations || [];
-
-  // Switch to generate tab to show content
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('generate').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.nav-item')[3].classList.add('active');
-  updatePageTitle();
-
-  // Show topic info
-  const topicField = document.getElementById('topic');
-  if (topicField) topicField.value = entry.topic || '';
-  updateTopicCount();
-
-  renderVariations();
-  document.getElementById('generatedContent').dataset.fromHistory = 'true';
-
-  // Show back-to-history button
-  const contentDiv = document.getElementById('generatedContent');
-  if (contentDiv) {
-    const backBtn = document.createElement('div');
-    backBtn.style.cssText = 'margin-bottom:16px;';
-    backBtn.innerHTML = `<button onclick="switchTab('history')" style="padding:7px 16px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">← Back to History</button>
-    <span style="font-size:12px;color:var(--muted);margin-left:12px;">Viewing: ${entry.topic}</span>`;
-    contentDiv.insertBefore(backBtn, contentDiv.firstChild);
-  }
-}
-
-// ═══════════════════════════════════════════
-// TOPIC SUGGESTIONS
-// ═══════════════════════════════════════════
-function generateTopicSuggestions() {
-  const clientId = document.getElementById('discoverSelectClient').value;
-  const platform = document.getElementById('discoverPlatform').value;
-  const contentDirection = document.getElementById('discoverContentDirection').value;
-  const contentLang = document.getElementById('discoverContentLanguage').value;
-
-  if (!clientId || !platform) { alert('Please select client and platform.'); return; }
-  const client = clients.find(c => c.id === clientId);
-  if (!client) return;
-
-  const btn = document.getElementById('topicBtn');
-  btn.disabled = true; btn.textContent = 'Generating...';
-
-  const discoverOverrideVal = document.getElementById('discoverPillarOverride')?.value;
-  const discoverPillarIdx = discoverOverrideVal !== undefined && discoverOverrideVal !== ''
-    ? parseInt(discoverOverrideVal)
-    : (client.pillarRotationIndex || 0);
-
-  fetch(BACKEND + '/api/topics', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      clientName: client.name, industry: client.industry, tone: client.tone,
-      brandStory: client.brandStory, targetAudience: client.targetAudience,
-      platform, language: contentLang, contentDirection,
-      selectedPillars: client.selectedPillars || [],
-      pillarRotationIndex: discoverPillarIdx,
-      user_id: currentUser?.id, client_id: clientId
-    })
-  })
-  .then(r => r.json())
-  .then(data => {
-    btn.disabled = false; btn.textContent = LANGS[currentLang].generateTopics;
-    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
-    const suggestions = parseTopicSuggestions(data.text);
-    displayTopicSuggestions(suggestions);
-  })
-  .catch(err => {
-    btn.disabled = false; btn.textContent = LANGS[currentLang].generateTopics;
-    alert('Network error: ' + err.message);
-  });
-}
-
-function parseTopicSuggestions(text) {
-  const suggestions = [];
-  let topicBlocks = text.split(/\s*\[Topic \d+\]/i).filter(b => b.trim());
-  if (topicBlocks.length < 4) topicBlocks = text.split(/(?:^|\n)(?:\*{0,2})(?:\d+)[.)\]]\s*/m).filter(b => b.trim());
-  if (topicBlocks.length < 4) topicBlocks = text.split(/\n#{1,3}\s+|\n\*{2}Topic/i).filter(b => b.trim());
-
-  topicBlocks.forEach((block, index) => {
-    const lines = block.trim().split('\n').filter(l => l.trim());
-    if (!lines.length) return;
-    let angle = '', title = '', descLines = [];
-    lines.forEach((line, i) => {
-      const clean = line.replace(/^\*+|\*+$/g, '').trim();
-      if (/^angle[:\s]/i.test(clean)) angle = clean.replace(/^angle[:\s]*/i, '').trim();
-      else if (/^title[:\s]/i.test(clean)) title = clean.replace(/^title[:\s]*/i, '').trim();
-      else if (/^desc/i.test(clean)) descLines.push(clean.replace(/^desc[a-z]*[:\s]*/i, '').trim());
-      else if (i === 0 && !title) title = clean;
-      else if (title && i > 0) descLines.push(clean);
-    });
-    if (!title && lines.length) title = lines[0].replace(/^\*+|\*+$/g, '').trim();
-    title = title.replace(/^\d+[.)\]]\s*/, '').replace(/^\*+|\*+$/g, '').trim();
-    if (title && title.length > 2) suggestions.push({ id: 'topic_' + Date.now() + '_' + index, angle: angle || 'General', title, description: descLines.join(' ').trim() });
-  });
-
-  const seen = new Set();
-  return suggestions.filter(s => { if (seen.has(s.title)) return false; seen.add(s.title); return true; }).slice(0, 8);
-}
-
-function displayTopicSuggestions(suggestions) {
-  const div = document.getElementById('topicSuggestions');
-  if (!suggestions.length) { div.innerHTML = '<p style="color:var(--secondary);">No suggestions generated. Please try again.</p>'; return; }
-
-  let html = '';
-  suggestions.forEach(sug => {
-    html += `<div class="card" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div style="flex:1;">
-          <div style="color:var(--accent-mint);font-weight:600;margin-bottom:4px;">${sug.title}</div>
-          <div style="color:var(--secondary);font-size:12px;margin-bottom:8px;">📍 ${sug.angle}</div>
-          <div style="color:var(--secondary);font-size:13px;line-height:1.5;">${sug.description}</div>
-        </div>
-        <button onclick="useTopic('${sug.title.replace(/'/g,"\\'")}') " style="margin-left:12px;padding:8px 14px;background:var(--grad);color:#0d1521;border:none;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;font-family:inherit;">${LANGS[currentLang].generate_btn || 'Use'}</button>
-      </div>
-    </div>`;
-  });
-  div.innerHTML = html;
-}
-
-function useTopic(title) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('generate').classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.nav-item')[3].classList.add('active');
-  updatePageTitle();
-  document.getElementById('topic').value = title;
-  updateTopicCount();
-}
-
-// ═══════════════════════════════════════════
-// BACKUP / IMPORT
-// ═══════════════════════════════════════════
-async function exportData() {
-  const history = await loadHistory();
-  const data = { clients, history, exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'flux-backup-' + new Date().toISOString().split('T')[0] + '.json';
-  a.click();
-}
-
-async function importData() {
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = '.json';
-  input.onchange = async function(e) {
-    const reader = new FileReader();
-    reader.onload = async function(evt) {
-      try {
-        const data = JSON.parse(evt.target.result);
-        if (data.clients && data.clients.length) {
-          for (const c of data.clients) {
-            await fetch(BACKEND + '/api/clients', {
-              method: 'POST', headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                user_id: currentUser.id, name: c.name, industry: c.industry, tone: c.tone,
-                brand_story: c.brandStory, target_audience: c.targetAudience,
-                target_audience_tags: c.targetAudienceTags || {}, competitors: c.competitors,
-                forbidden_words: c.forbiddenWords, is_active: true
-              })
-            });
-          }
-          await loadClients();
-          alert('Import complete! ' + data.clients.length + ' clients imported.');
-        }
-      } catch(err) { alert('Invalid backup file.'); }
-    };
-    reader.readAsText(e.target.files[0]);
-  };
-  input.click();
-}
-
-// ═══════════════════════════════════════════
-// KEEP ALIVE
-// ═══════════════════════════════════════════
-function startKeepAlive() {
-  fetch(BACKEND + '/ping').catch(() => {});
-  setInterval(() => fetch(BACKEND + '/ping').catch(() => {}), 10 * 60 * 1000);
-}
-
-// ═══════════════════════════════════════════
-// MOBILE MENU
-// ═══════════════════════════════════════════
-function openMobileMenu() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('mobileOverlay').classList.add('visible');
-}
-function closeMobileMenu() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('mobileOverlay').classList.remove('visible');
-}
-
-// ═══════════════════════════════════════════
-// ACCORDION
-// ═══════════════════════════════════════════
-function toggleAccordion(id) {
-  const section = document.getElementById(id);
-  if (!section) return;
-  const header = section.querySelector('.accordion-header');
-  const body = section.querySelector('.accordion-body');
-  header.classList.toggle('open');
-  body.classList.toggle('open');
-}
-
-function updateAccordionTitles() {
-  const name = document.getElementById('clientName')?.value;
-  if (name) {
-    document.getElementById('acc-basics-title').textContent = '① Brand Basics — ' + name;
-    document.getElementById('acc-basics-title').classList.add('filled');
-  } else {
-    document.getElementById('acc-basics-title').textContent = '① Brand Basics';
-    document.getElementById('acc-basics-title').classList.remove('filled');
-  }
-}
-
-// ═══════════════════════════════════════════
 // PILLAR CARDS
 // ═══════════════════════════════════════════
-const PILLAR_PRESETS = [
-  { name: 'Education', placeholder: 'e.g., Teach audience how-to tips and industry insights' },
-  { name: 'Product', placeholder: 'e.g., Showcase new items and seasonal offerings' },
-  { name: 'Behind-the-Scenes', placeholder: 'e.g., Show real team culture and authentic moments' },
-  { name: 'Customer Stories', placeholder: 'e.g., Share real customer experiences and results' },
-  { name: 'Lifestyle', placeholder: 'e.g., Show brand in everyday moments and contexts' },
-  { name: 'Thought Leadership', placeholder: 'e.g., Share industry insights and expert opinions' },
-  { name: 'Community', placeholder: 'e.g., Engage audience with questions and discussions' },
-  { name: 'Seasonal', placeholder: 'e.g., Connect brand to holidays and trending moments' },
-  { name: 'Personal Brand', placeholder: 'e.g., Share founder story and personal values' },
-  { name: 'Q&A', placeholder: 'e.g., Answer common audience questions and concerns' },
-];
-
 function addPillarCard(name, description, checked, cta) {
   const grid = document.getElementById('pillarGrid');
   if (!grid) return;
@@ -2309,6 +2585,21 @@ function addPillarCard(name, description, checked, cta) {
   const isChecked = checked !== undefined ? checked : true;
   const presetName = name || (PILLAR_PRESETS[idx] ? PILLAR_PRESETS[idx].name : 'Custom');
   const presetPlaceholder = PILLAR_PRESETS[idx] ? PILLAR_PRESETS[idx].placeholder : 'Describe this content angle...';
+  const t = LANGS[currentLang];
+  
+  // Get pillar label translation
+  const presetMap = {
+    'Education': t.pillar_Education || 'Education',
+    'Product': t.pillar_Product || 'Product',
+    'Behind-the-Scenes': t.pillar_BTS || 'Behind-the-Scenes',
+    'Customer Stories': t.pillar_Customer || 'Customer Stories',
+    'Lifestyle': t.pillar_Lifestyle || 'Lifestyle',
+    'Thought Leadership': t.pillar_Thought || 'Thought Leadership',
+    'Community': t.pillar_Community || 'Community',
+    'Seasonal': t.pillar_Seasonal || 'Seasonal',
+    'Personal Brand': t.pillar_Personal || 'Personal Brand',
+    'Q&A': t.pillar_QA || 'Q&A',
+  };
 
   const card = document.createElement('div');
   card.className = 'pillar-card' + (isChecked ? ' selected' : '');
@@ -2316,10 +2607,10 @@ function addPillarCard(name, description, checked, cta) {
     <div class="pillar-card-header">
       <input type="checkbox" class="pillar-checkbox" ${isChecked ? 'checked' : ''} onchange="togglePillarCard(this)">
       <select class="pillar-name-select">
-        ${PILLAR_PRESETS.map(p => `<option value="${p.name}" ${p.name === presetName ? 'selected' : ''}>${p.name}</option>`).join('')}
-        <option value="Custom" ${!PILLAR_PRESETS.find(p=>p.name===presetName) ? 'selected' : ''}>Custom</option>
+        ${PILLAR_PRESETS.map(p => `<option value="${p.name}" ${p.name === presetName ? 'selected' : ''}>${presetMap[p.name] || p.name}</option>`).join('')}
+        <option value="Custom" ${!PILLAR_PRESETS.find(p=>p.name===presetName) ? 'selected' : ''}>${t.pillar_Custom || 'Custom'}</option>
       </select>
-      <button onclick="removePillarCard(this)" style="padding:4px 8px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;" title="Remove">×</button>
+      <button onclick="removePillarCard(this)" style="padding:4px 8px;background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;font-family:inherit;" title="Remove">×</button>
     </div>
     <textarea class="pillar-desc-input" placeholder="${presetPlaceholder}" maxlength="150">${description || ''}</textarea>
     <div style="text-align:right;font-size:10px;color:var(--muted);margin-top:3px;">max 150 chars</div>
@@ -2354,10 +2645,10 @@ function updatePillarCount() {
   const title = document.getElementById('acc-pillars-title');
   if (title) {
     if (selected >= 3) {
-      title.textContent = `③ Content Angles — ${selected} selected ✓`;
+      title.textContent = `③ ${LANGS[currentLang].acc_pillars} — ${selected} selected ✓`;
       title.classList.add('filled');
     } else {
-      title.textContent = '③ Content Angles';
+      title.textContent = `③ ${LANGS[currentLang].acc_pillars}`;
       title.classList.remove('filled');
     }
   }
@@ -2391,7 +2682,6 @@ function loadPillarData(pillars) {
   if (pillars && pillars.length > 0) {
     pillars.forEach(p => addPillarCard(p.name, p.description, true, p.cta));
   } else {
-    // Default: add 3 starter cards
     addPillarCard('Education', '', true, '');
     addPillarCard('Product', '', true, '');
     addPillarCard('Behind-the-Scenes', '', true, '');
@@ -2403,7 +2693,6 @@ function loadPillarData(pillars) {
 // PILLAR INDICATORS (Generate + Discover)
 // ═══════════════════════════════════════════
 function updatePillarIndicators() {
-  // Generate tab
   const genIndicator = document.getElementById('generatePillarIndicator');
   const genName = document.getElementById('generatePillarName');
   const genOverride = document.getElementById('generatePillarOverride');
@@ -2449,7 +2738,6 @@ function toggleDiscoverPillarOverride() {
   if (sel) sel.classList.toggle('visible');
 }
 
-// Update discover pillar when client changes
 document.addEventListener('change', function(e) {
   if (e.target && e.target.id === 'discoverSelectClient') {
     const clientId = e.target.value;
@@ -2473,6 +2761,565 @@ document.addEventListener('change', function(e) {
 });
 
 // ═══════════════════════════════════════════
+// TOPIC COUNT
+// ═══════════════════════════════════════════
+function updateTopicCount() {
+  const ta = document.getElementById('topic');
+  const count = document.getElementById('topicCount');
+  if (ta && count) count.textContent = ta.value.length;
+}
+
+// ═══════════════════════════════════════════
+// PLATFORM TOGGLE
+// ═══════════════════════════════════════════
+function togglePlatform(id, e) {
+  const btn = e ? e.target : document.querySelector(`.platform-btn[onclick*="${id}"]`);
+  if (selectedPlatforms.includes(id)) {
+    selectedPlatforms = selectedPlatforms.filter(p => p !== id);
+    btn.classList.remove('active');
+  } else {
+    selectedPlatforms.push(id);
+    btn.classList.add('active');
+  }
+}
+
+// ═══════════════════════════════════════════
+// GENERATE CONTENT
+// ═══════════════════════════════════════════
+function generateContent() {
+  if (!currentClient || selectedPlatforms.length === 0 || !document.getElementById('topic').value.trim()) {
+    alert('Please select a client, choose at least one platform, and enter a topic.');
+    return;
+  }
+
+  const topic = document.getElementById('topic').value.trim();
+  let contentLang = document.getElementById('contentLanguage').value;
+  
+  // BUG 5 FIX: Force SC for XHS + WeChat
+  const mainlandPlatforms = selectedPlatforms.filter(p => ['xiaohongshu', 'wechat'].includes(p));
+  if (mainlandPlatforms.length > 0) {
+    contentLang = 'sc'; // Force Simplified Chinese
+  }
+  
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  const overrideVal = document.getElementById('generatePillarOverride')?.value;
+  const pillarIdx = overrideVal !== undefined && overrideVal !== ''
+    ? parseInt(overrideVal)
+    : (currentClient.pillarRotationIndex || 0);
+
+  fetch(BACKEND + '/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      topic, clientName: currentClient.name, industry: currentClient.industry,
+      tone: currentClient.tone, brandStory: currentClient.brandStory,
+      targetAudience: currentClient.targetAudience, forbiddenWords: currentClient.forbiddenWords,
+      mustMentionItems: currentClient.mustMentionItems,
+      selectedPillars: currentClient.selectedPillars || [],
+      pillarRotationIndex: pillarIdx,
+      platforms: selectedPlatforms, language: contentLang
+    })
+  })
+  .then(r => r.json())
+  .then(async data => {
+    btn.disabled = false;
+    btn.textContent = LANGS[currentLang].generate_btn;
+    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
+
+    generatedVariations = parseVariations(data.text);
+
+    const entry = {
+      clientId: currentClient.id, topic, variations: generatedVariations,
+      platforms: selectedPlatforms, contentLanguage: contentLang,
+      createdAt: new Date().toISOString()
+    };
+
+    await saveContent(entry);
+    renderVariations();
+
+    if (currentClient && currentClient.selectedPillars && currentClient.selectedPillars.length > 0) {
+      fetch(BACKEND + '/api/clients/' + currentClient.id + '/advance-pillar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          current_index: pillarIdx,
+          pillar_count: currentClient.selectedPillars.length
+        })
+      }).then(() => {
+        currentClient.pillarRotationIndex = (pillarIdx + 1) % currentClient.selectedPillars.length;
+        updatePillarIndicators();
+        loadClients();
+      }).catch(() => {});
+    }
+
+    document.getElementById('topic').value = '';
+    document.getElementById('topicCount').textContent = '0';
+    selectedPlatforms = [];
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+
+    fetch(BACKEND + '/api/content/count?user_id=' + currentUser.id)
+      .then(r => r.json())
+      .then(res => { if(res.success) document.getElementById('contentCount').textContent = res.count; });
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.textContent = LANGS[currentLang].generate_btn;
+    alert('Network error: ' + err.message);
+  });
+}
+
+// BUG 2 + 3 FIX: 改進 Parser（防止 [Topic 2] 污染 + 確保返 8 個）
+function parseVariations(content) {
+  const variations = [];
+  
+  // 改用更穩健嘅 split（防止 [Topic X] 喺中間被 capture）
+  const topicRegex = /^\[Topic \d+\]/im;
+  const parts = content.split(topicRegex).filter(p => p.trim());
+
+  parts.forEach((block, index) => {
+    const text = block.trim();
+    if (text) {
+      // 清理殘留嘅 [Topic X]
+      const cleanedText = text.replace(/\[Topic \d+\]/gi, '').trim();
+      variations.push({
+        id: 'var_' + Date.now() + '_' + (index + 1),
+        number: index + 1,
+        content: cleanedText,
+        rating: 0,
+        isBest: false
+      });
+    }
+  });
+
+  return variations.length > 0 ? variations : [{
+    id: 'var_' + Date.now() + '_1',
+    number: 1,
+    content: content,
+    rating: 0,
+    isBest: false
+  }];
+}
+
+function renderVariations() {
+  const div = document.getElementById('generatedContent');
+  if (!generatedVariations || !generatedVariations.length) { div.innerHTML = ''; return; }
+
+  let html = `<div class="generated-title">${LANGS[currentLang].generated} (${generatedVariations.length})</div>`;
+  generatedVariations.forEach(v => {
+    html += `<div class="variation-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div class="variation-title" style="margin-bottom:0;">Variation ${v.number}</div>
+        <button onclick="copyVariation('${v.id}',this)" style="padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">Copy</button>
+      </div>
+      <div class="variation-content">${v.content}</div>
+      <div class="rating">`;
+    for (let i = 1; i <= 5; i++) {
+      html += `<span class="star${i <= v.rating ? ' active' : ''}" onclick="rateVariation('${v.id}',${i})">${i <= v.rating ? '★' : '☆'}</span>`;
+    }
+    html += `</div>${v.isBest ? '<div class="best-badge">✓ Best</div>' : ''}</div>`;
+  });
+  div.innerHTML = html;
+}
+
+function copyVariation(varId, btn) {
+  const v = generatedVariations.find(v => v.id === varId);
+  if (!v) return;
+  navigator.clipboard.writeText(v.content).then(() => {
+    btn.textContent = 'Copied ✓';
+    btn.style.color = '#cdffd8';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = 'rgba(255,255,255,0.6)'; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = v.content;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+function rateVariation(varId, rating) {
+  const v = generatedVariations.find(v => v.id === varId);
+  if (v) { v.rating = rating; v.isBest = rating >= 4; renderVariations(); }
+}
+
+// ═══════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════
+async function renderHistory(filterPillar) {
+  const div = document.getElementById('historyList');
+  div.innerHTML = '<div style="color:var(--secondary);font-size:13px;padding:16px 0;">Loading history...</div>';
+
+  let history = await loadHistory();
+  if (!history.length) {
+    div.innerHTML = '<div style="color:var(--secondary);text-align:center;padding:48px 0;font-size:14px;">No content generated yet.</div>';
+    return;
+  }
+
+  window._historyCache = {};
+  history.forEach(e => { window._historyCache[e.id] = e; });
+
+  if (filterPillar) {
+    history = history.filter(e => {
+      const vars = e.variations || [];
+      return vars.some(v => v.pillar === filterPillar);
+    });
+  }
+
+  const pillarGroups = {};
+  const noPillar = [];
+  history.forEach(entry => {
+    const vars = entry.variations || [];
+    const pillarName = vars[0]?.pillar || null;
+    if (pillarName) {
+      if (!pillarGroups[pillarName]) pillarGroups[pillarName] = [];
+      pillarGroups[pillarName].push(entry);
+    } else {
+      noPillar.push(entry);
+    }
+  });
+
+  const allPillars = Object.keys(pillarGroups);
+  let filterHtml = '';
+  if (allPillars.length > 0) {
+    filterHtml = `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;">
+      <button onclick="renderHistory()" style="padding:6px 14px;border:1px solid ${!filterPillar ? 'var(--accent-mint)' : 'var(--border-mid)'};background:${!filterPillar ? 'rgba(205,255,216,0.1)' : 'transparent'};color:${!filterPillar ? 'var(--accent-mint)' : 'var(--secondary)'};border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">All</button>
+      ${allPillars.map(p => `<button onclick="renderHistory('${p}')" style="padding:6px 14px;border:1px solid ${filterPillar===p ? 'var(--accent-mint)' : 'var(--border-mid)'};background:${filterPillar===p ? 'rgba(205,255,216,0.1)' : 'transparent'};color:${filterPillar===p ? 'var(--accent-mint)' : 'var(--secondary)'};border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">${p}</button>`).join('')}
+    </div>`;
+  }
+
+  function renderEntries(entries) {
+    return entries.map(entry => {
+      const client = clients.find(c => c.id === entry.client_id);
+      const clientName = client ? client.name : 'Unknown Client';
+      const date = new Date(entry.created_at).toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const platforms = (entry.platforms || []).join(', ').toUpperCase();
+      const vars = entry.variations || [];
+      const bestVar = vars.find(v => v.isBest) || vars[0];
+      const preview = bestVar ? bestVar.content.substring(0, 120) + '...' : 'No content preview';
+      const pillarTag = vars[0]?.pillar ? `<span style="font-size:10px;padding:2px 8px;background:rgba(205,255,216,0.1);border:1px solid rgba(205,255,216,0.2);border-radius:999px;color:var(--accent-mint);margin-left:8px;">${vars[0].pillar}</span>` : '';
+
+      return `<div class="card" style="margin-bottom:12px;cursor:pointer;" onclick="loadHistoryEntry('${entry.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div style="flex:1;">
+            <div style="font-weight:600;color:var(--accent-mint);margin-bottom:4px;">${entry.topic}${pillarTag}</div>
+            <div style="font-size:11px;color:var(--muted);">${clientName} · ${platforms} · ${date}</div>
+          </div>
+          ${bestVar && bestVar.isBest ? '<div style="font-size:10px;color:var(--accent-mint);font-weight:600;letter-spacing:0.08em;flex-shrink:0;">★ BEST</div>' : ''}
+        </div>
+        <div style="font-size:12px;color:var(--secondary);line-height:1.5;white-space:pre-wrap;">${preview}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;">${vars.length} variations · Click to view</div>
+      </div>`;
+    }).join('');
+  }
+
+  let html = filterHtml;
+
+  if (filterPillar) {
+    html += renderEntries(history);
+  } else if (allPillars.length > 0) {
+    allPillars.forEach(pillar => {
+      html += `<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">${pillar}</div>`;
+      html += renderEntries(pillarGroups[pillar]);
+    });
+    if (noPillar.length > 0) {
+      html += `<div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;">Other</div>`;
+      html += renderEntries(noPillar);
+    }
+  } else {
+    html += renderEntries(noPillar);
+  }
+
+  div.innerHTML = html;
+}
+
+function loadHistoryEntry(entryId) {
+  const entry = window._historyCache && window._historyCache[entryId];
+  if (!entry) { console.error('History entry not found:', entryId); return; }
+
+  generatedVariations = entry.variations || [];
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('generate').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[3].classList.add('active');
+  updatePageTitle();
+
+  const topicField = document.getElementById('topic');
+  if (topicField) topicField.value = entry.topic || '';
+  updateTopicCount();
+  renderVariations();
+  document.getElementById('generatedContent').dataset.fromHistory = 'true';
+
+  const contentDiv = document.getElementById('generatedContent');
+  if (contentDiv) {
+    const backBtn = document.createElement('div');
+    backBtn.style.cssText = 'margin-bottom:16px;';
+    backBtn.innerHTML = `<button onclick="switchTab('history')" style="padding:7px 16px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">← Back to History</button>
+    <span style="font-size:12px;color:var(--muted);margin-left:12px;">Viewing: ${entry.topic}</span>`;
+    contentDiv.insertBefore(backBtn, contentDiv.firstChild);
+  }
+}
+
+// ═══════════════════════════════════════════
+// TOPIC SUGGESTIONS
+// ═══════════════════════════════════════════
+function generateTopicSuggestions() {
+  const clientId = parseInt(document.getElementById('discoverSelectClient').value);
+  const platform = document.getElementById('discoverPlatform').value;
+  const contentDirection = document.getElementById('discoverContentDirection').value;
+  const contentLang = document.getElementById('discoverContentLanguage').value;
+  
+  if (!clientId || !platform) {
+    alert('Please select client and platform');
+    return;
+  }
+  
+  const client = clients.find(c => c.id === clientId);
+  if (!client) {
+    alert('Client not found');
+    return;
+  }
+  
+  const btn = document.querySelector('button[onclick="generateTopicSuggestions()"]');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  
+  fetch(BACKEND + '/api/topics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clientName: client.name,
+      industry: client.industry,
+      tone: client.tone,
+      brandStory: client.brandStory,
+      targetAudience: client.targetAudience,
+      platform: platform,
+      language: contentLang,
+      contentDirection: contentDirection,
+      selectedPillars: client.selectedPillars || [],
+      pillarRotationIndex: client.pillarRotationIndex || 0
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    btn.disabled = false;
+    btn.textContent = 'Generate Topic Suggestions';
+    
+    if (!data.success) {
+      alert('Error: ' + (data.error || 'Unknown error'));
+      return;
+    }
+    
+    const suggestions = parseTopicSuggestions(data.text);
+    displayTopicSuggestions(suggestions);
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.textContent = 'Generate Topic Suggestions';
+    alert('Error: ' + err.message);
+  });
+}
+
+// BUG 2 FIX: 改進 Parser（防止 [Topic 2] 污染）
+function parseTopicSuggestions(text) {
+  const suggestions = [];
+  const topicRegex = /^\[Topic \d+\]/im;
+  const parts = text.split(topicRegex).filter(p => p.trim());
+
+  parts.forEach((block, index) => {
+    const lines = block.trim().split('\n');
+    let angle = '', title = '', description = '';
+
+    lines.forEach((line, i) => {
+      const clean = line.replace(/^\*+|\*+$/g, '').trim();
+      if (/^angle[:\s]/i.test(clean)) {
+        angle = clean.replace(/^angle[:\s]*/i, '').trim();
+      } else if (/^title[:\s]/i.test(clean)) {
+        title = clean.replace(/^title[:\s]*/i, '').trim();
+      } else if (/^desc/i.test(clean)) {
+        description = clean.replace(/^desc[a-z]*[:\s]*/i, '').trim();
+      } else if (i === 0 && !title) {
+        title = clean;
+      }
+    });
+
+    // 清理殘留 [Topic X]
+    title = title.replace(/\[Topic \d+\]/gi, '').trim();
+    description = description.replace(/\[Topic \d+\]/gi, '').trim();
+
+    if (title && title.length > 2) {
+      suggestions.push({
+        id: 'topic_' + Date.now() + '_' + index,
+        angle: angle || 'General',
+        title,
+        description
+      });
+    }
+  });
+
+  const seen = new Set();
+  return suggestions.filter(s => {
+    if (seen.has(s.title)) return false;
+    seen.add(s.title);
+    return true;
+  }).slice(0, 8);
+}
+
+function displayTopicSuggestions(suggestions) {
+  const div = document.getElementById('topicSuggestions');
+  
+  if (suggestions.length === 0) {
+    div.innerHTML = '<p style="color:var(--secondary);">No suggestions generated. Please try again.</p>';
+    return;
+  }
+  
+  let html = '';
+  suggestions.forEach(sug => {
+    html += `<div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="flex:1;">
+          <div style="color:var(--accent-mint);font-weight:600;margin-bottom:4px;">${sug.title}</div>
+          <div style="color:var(--secondary);font-size:12px;margin-bottom:8px;">📍 ${sug.angle}</div>
+          <div style="color:var(--secondary);font-size:13px;line-height:1.5;">${sug.description}</div>
+        </div>
+        <button onclick="useTopic('${sug.title.replace(/'/g,"\\'")}') " style="margin-left:12px;padding:8px 14px;background:var(--grad);color:#0d1521;border:none;border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;font-family:inherit;">${LANGS[currentLang].generate_btn || 'Use'}</button>
+      </div>
+    </div>`;
+  });
+  div.innerHTML = html;
+}
+
+function useTopic(title) {
+  switchTab('generate');
+  document.getElementById('topic').value = title;
+  updateTopicCount();
+  document.getElementById('topic').focus();
+}
+
+// ═══════════════════════════════════════════
+// BACKUP / IMPORT
+// ═══════════════════════════════════════════
+async function exportData() {
+  const history = await loadHistory();
+  const data = { clients, history, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'flux-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+async function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async function(e) {
+    const reader = new FileReader();
+    reader.onload = async function(evt) {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (data.clients && data.clients.length) {
+          for (const c of data.clients) {
+            await fetch(BACKEND + '/api/clients', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                user_id: currentUser.id,
+                name: c.name,
+                industry: c.industry,
+                tone: c.tone,
+                brand_story: c.brandStory,
+                target_audience: c.targetAudience,
+                target_audience_tags: c.targetAudienceTags || {},
+                competitors: c.competitors,
+                forbidden_words: c.forbiddenWords,
+                is_active: true
+              })
+            });
+          }
+          await loadClients();
+          alert('Import complete! ' + data.clients.length + ' clients imported.');
+        }
+      } catch(err) { alert('Invalid backup file.'); }
+    };
+    reader.readAsText(e.target.files[0]);
+  };
+  input.click();
+}
+
+// ═══════════════════════════════════════════
+// KEEP ALIVE
+// ═══════════════════════════════════════════
+function startKeepAlive() {
+  fetch(BACKEND + '/ping').catch(() => {});
+  setInterval(() => fetch(BACKEND + '/ping').catch(() => {}), 10 * 60 * 1000);
+}
+
+// ═══════════════════════════════════════════
+// MOBILE MENU
+// ═══════════════════════════════════════════
+function openMobileMenu() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('mobileOverlay').classList.add('visible');
+}
+
+function closeMobileMenu() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════
+// ACCORDION
+// ═══════════════════════════════════════════
+function toggleAccordion(id) {
+  const section = document.getElementById(id);
+  if (!section) return;
+  const header = section.querySelector('.accordion-header');
+  const body = section.querySelector('.accordion-body');
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function updateAccordionTitles() {
+  const name = document.getElementById('clientName')?.value;
+  if (name) {
+    document.getElementById('acc-basics-title').textContent = `① ${LANGS[currentLang].acc_basics} — ${name}`;
+    document.getElementById('acc-basics-title').classList.add('filled');
+  } else {
+    document.getElementById('acc-basics-title').textContent = `① ${LANGS[currentLang].acc_basics}`;
+    document.getElementById('acc-basics-title').classList.remove('filled');
+  }
+}
+
+// ═══════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════
+function updateStats() {
+  document.getElementById('clientCount').textContent = clients.length;
+  if (currentUser) {
+    fetch(BACKEND + '/api/content/count?user_id=' + currentUser.id)
+      .then(r => r.json())
+      .then(res => { if(res.success) document.getElementById('contentCount').textContent = res.count; })
+      .catch(() => {});
+  }
+}
+
+// ═══════════════════════════════════════════
+// DATA PERSISTENCE
+// ═══════════════════════════════════════════
+function saveData() {
+  // Handled via Supabase
+}
+
+// ═══════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════
 showScreen('loading');
@@ -2485,7 +3332,6 @@ sb.auth.onAuthStateChange(async (event, session) => {
   }
 });
 
-// Handle OAuth redirect
 sb.auth.getSession().then(({ data: { session } }) => {
   if (!session) showScreen('auth');
 });
