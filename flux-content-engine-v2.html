@@ -2536,6 +2536,8 @@ function switchTab(tab) {
   if (navIdx >= 0) document.querySelectorAll('.nav-item')[navIdx].classList.add('active');
   // When switching to clients, always land on list panel
   if (tab === 'clients') switchClientTab('list');
+  // When switching to history, load records
+  if (tab === 'history') renderHistory();
   updatePageTitle();
 }
 
@@ -2905,13 +2907,7 @@ function generateContent() {
   }
 
   const topic = document.getElementById('topic').value.trim();
-  let contentLang = document.getElementById('contentLanguage').value;
-  
-  // BUG 5 FIX: Force SC for XHS + WeChat
-  const mainlandPlatforms = selectedPlatforms.filter(p => ['xiaohongshu', 'wechat'].includes(p));
-  if (mainlandPlatforms.length > 0) {
-    contentLang = 'sc'; // Force Simplified Chinese
-  }
+  const contentLang = document.getElementById('contentLanguage').value;
   
   const btn = document.getElementById('generateBtn');
   btn.disabled = true;
@@ -3348,6 +3344,10 @@ function useTopic(title) {
   switchTab('generate');
   document.getElementById('topic').value = title;
   updateTopicCount();
+  // Clear previous generated content so user starts fresh
+  generatedVariations = [];
+  const contentDiv = document.getElementById('generatedContent');
+  if (contentDiv) contentDiv.innerHTML = '';
   document.getElementById('topic').focus();
 }
 
