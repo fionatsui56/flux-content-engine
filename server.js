@@ -146,6 +146,17 @@ app.post('/api/content', async (req, res) => {
   res.json({ success: true, data: result.data });
 });
 
+// PATCH /api/content/:id — update variations (ratings)
+app.patch('/api/content/:id', async (req, res) => {
+  const { id } = req.params;
+  const { user_id, variations } = req.body;
+  if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
+
+  const result = await sbFetch(`/content?id=eq.${id}&user_id=eq.${user_id}`, 'PATCH', { variations });
+  if (!result.ok) return res.status(result.status).json({ success: false, error: result.data });
+  res.json({ success: true });
+});
+
 app.get('/api/content/count', async (req, res) => {
   const { user_id } = req.query;
   if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
@@ -572,7 +583,7 @@ Description: [1-2 sentences]
 
 All titles and descriptions in ${langName} ONLY. No English words except brand/platform names. Be specific and creative — NOT generic.`;
 
-    const result = await callAI(prompt, 2000);
+    const result = await callAI(prompt, 3000);
 
     // Log usage
     if (req.body.user_id && req.body.client_id) {
@@ -658,7 +669,7 @@ Each variation MUST follow that platform's exact rules and sound like a real hum
 OUTPUT FORMAT (use exactly):
 ${variationFormat}`;
 
-    const result = await callAI(prompt, 4000);
+    const result = await callAI(prompt, 6000);
     res.json({ success: true, text: result.text, provider: result.provider });
   } catch (err) {
     console.error('Generate error:', err.message);

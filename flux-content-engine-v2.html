@@ -1800,6 +1800,7 @@ const LANGS = {
     
     // Topics button
     generateTopics_btn: '生成話題建議',
+    newRound: '＋ 新一輪生成',
   },
   
   sc: {
@@ -1970,6 +1971,7 @@ const LANGS = {
     
     // Topics button
     generateTopics_btn: '生成话题建议',
+    newRound: '＋ 新一轮生成',
   },
   
   en: {
@@ -2140,6 +2142,7 @@ const LANGS = {
     
     // Topics button
     generateTopics_btn: 'Generate Topic Suggestions',
+    newRound: '+ New Round',
   }
 };
 
@@ -2490,10 +2493,12 @@ async function saveClient() {
   switchClientTab('list');
 }
 
+let currentContentId = null; // Track saved content ID for rating updates
+
 async function saveContent(entry) {
   if (!currentUser) return;
   try {
-    await fetch(BACKEND + '/api/content', {
+    const r = await fetch(BACKEND + '/api/content', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         user_id: currentUser.id,
@@ -2504,6 +2509,10 @@ async function saveContent(entry) {
         variations: entry.variations
       })
     });
+    const res = await r.json();
+    if (res.success && res.data && res.data[0]) {
+      currentContentId = res.data[0].id; // Store ID for rating updates
+    }
   } catch(e) { console.error('Save content error:', e); }
 }
 
@@ -3033,7 +3042,11 @@ function renderVariations() {
   const div = document.getElementById('generatedContent');
   if (!generatedVariations || !generatedVariations.length) { div.innerHTML = ''; return; }
 
-  let html = `<div class="generated-title">${LANGS[currentLang].generated} (${generatedVariations.length})</div>`;
+  const t = LANGS[currentLang];
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div class="generated-title" style="margin-bottom:0;">${t.generated} (${generatedVariations.length})</div>
+    <button onclick="newRound()" style="padding:8px 18px;background:transparent;border:1px solid var(--border-mid);color:var(--secondary);border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent-mint)';this.style.color='var(--accent-mint)'" onmouseout="this.style.borderColor='var(--border-mid)';this.style.color='var(--secondary)'">${t.newRound || '+ New Round'}</button>
+  </div>`;
   generatedVariations.forEach(v => {
     const meta = PLATFORM_META[v.platform] || null;
     const platformBadge = meta
@@ -3055,6 +3068,17 @@ function renderVariations() {
     html += `</div>${v.isBest ? '<div class="best-badge">✓ Best</div>' : ''}</div>`;
   });
   div.innerHTML = html;
+}
+
+function newRound() {
+  generatedVariations = [];
+  currentContentId = null;
+  document.getElementById('generatedContent').innerHTML = '';
+  document.getElementById('topic').value = '';
+  if (document.getElementById('topicCount')) document.getElementById('topicCount').textContent = '0';
+  selectedPlatforms = [];
+  document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('topic').focus();
 }
 
 function copyVariation(varId, btn) {
@@ -3080,7 +3104,17 @@ function copyVariation(varId, btn) {
 
 function rateVariation(varId, rating) {
   const v = generatedVariations.find(v => v.id === varId);
-  if (v) { v.rating = rating; v.isBest = rating >= 4; renderVariations(); }
+  if (!v) return;
+  v.rating = rating;
+  v.isBest = rating >= 4;
+  renderVariations();
+  // Persist rating to Supabase
+  if (currentContentId && currentUser) {
+    fetch(BACKEND + '/api/content/' + currentContentId, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id, variations: generatedVariations })
+    }).catch(e => console.error('Rating save error:', e));
+  }
 }
 
 // ═══════════════════════════════════════════
