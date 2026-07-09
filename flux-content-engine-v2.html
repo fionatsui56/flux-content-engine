@@ -2255,7 +2255,7 @@ async function handleGoogleLogin() {
   try {
     const { data, error } = await sb.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin }
+      options: { redirectTo: 'https://app.flux-strategy.com/flux-content-engine-v2.html' }
     });
     if (error) throw error;
   } catch (e) {
